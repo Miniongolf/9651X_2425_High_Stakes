@@ -7,7 +7,7 @@ Conveyor conveyor(intake, hooks);
 pros::adi::Pneumatics mogoMech('B', false);
 pros::adi::Pneumatics ptoPiston('A', false);
 
-pros::MotorGroup leftDrive({-1, -20, 3});
+pros::MotorGroup leftDrive({-1, -10, 3});
 pros::MotorGroup rightDrive({21, 2, -19});
 
 pros::IMU imu(18);
