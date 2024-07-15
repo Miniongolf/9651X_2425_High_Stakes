@@ -12,6 +12,7 @@ extern Hooks hooks;
 extern Conveyor conveyor;
 
 extern pros::adi::Pneumatics mogoMech;
+extern pros::adi::Pneumatics ptoPiston;
 
 extern pros::MotorGroup leftDrive, rightDrive;
 

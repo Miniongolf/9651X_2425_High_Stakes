@@ -1,18 +1,19 @@
 #include "globals.hpp"
 
-Intake intake(std::make_unique<pros::Motor>(-4));
-Hooks hooks(std::make_unique<pros::Motor>(-5));
+Intake intake(std::make_unique<pros::Motor>(-15));
+Hooks hooks(std::make_unique<pros::Motor>(-20));
 Conveyor conveyor(intake, hooks);
 
-pros::adi::Pneumatics mogoMech('A', false);
+pros::adi::Pneumatics mogoMech('B', false);
+pros::adi::Pneumatics ptoPiston('A', false);
 
-pros::MotorGroup leftDrive({-11, -13, 18});
-pros::MotorGroup rightDrive({12, 14, -19});
+pros::MotorGroup leftDrive({-1, -20, 3});
+pros::MotorGroup rightDrive({21, 2, -19});
 
-pros::IMU imu(9);
+pros::IMU imu(18);
 
-pros::Rotation horizRot(16);
-pros::Rotation vertRot(-15);
+pros::Rotation horizRot(5);
+pros::Rotation vertRot(-4);
 
 lemlib::TrackingWheel horizTracker(
     &horizRot,
@@ -62,9 +63,9 @@ lemlib::Drivetrain drivetrain(
 );
 
 lemlib::OdomSensors odom(
+    &vertTracker,
     nullptr,
-    nullptr,
-    nullptr,
+    &horizTracker,
     nullptr,
     &imu
 );
