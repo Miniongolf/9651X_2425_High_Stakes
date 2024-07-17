@@ -40,7 +40,7 @@ void opcontrol() {
        int turn = master.get_analog(ANALOG_RIGHT_X);
 
        chassis.arcade(throttle, turn, true); // Moves the robot based on the joystick values
-       std::cout << "hi " << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
+       std::cout << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
        pros::delay(10); // Run for 10 ms then update
    }
 }
