@@ -1,14 +1,24 @@
 #include "globals.hpp"
 
-Intake intake(std::make_unique<pros::Motor>(-15));
-Hooks hooks(std::make_unique<pros::Motor>(-20));
+Intake intake(std::make_unique<pros::Motor>(-15, pros::v5::MotorGears::green));
+Hooks hooks(std::make_unique<pros::Motor>(-20, pros::v5::MotorGears::green));
 Conveyor conveyor(intake, hooks);
+Arm arm(
+    std::make_unique<pros::MotorGroup>(std::initializer_list<std::int8_t>{3, -19}),
+    lemlib::PID{1, 0, 0},
+    200
+    );
 
 pros::adi::Pneumatics mogoMech('B', false);
 pros::adi::Pneumatics ptoPiston('A', false);
 
-pros::MotorGroup leftDrive({-1, -10, 3});
-pros::MotorGroup rightDrive({21, 2, -19});
+pros::MotorGroup leftDrive({-1, -10, 3}, pros::v5::MotorGears::blue);
+pros::MotorGroup rightDrive({21, 2, -19}, pros::v5::MotorGears::blue);
+
+pros::MotorGroup ptoLeftDrive({-1, -10}, pros::v5::MotorGears::blue);
+pros::MotorGroup ptoRightDrive({21, 2}, pros::v5::MotorGears::blue);
+
+
 
 pros::IMU imu(18);
 

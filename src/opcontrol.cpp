@@ -16,22 +16,18 @@
 void opcontrol() {
    pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-//   int intakeDir;
-
    while (true) {
-//       intakeDir = master.get_digital(DIGITAL_R1) ? -1 : master.get_digital(DIGITAL_R2) ? 1 : 0;
-//
-//       intake.move(intakeDir*127);
-//
-//       if (master.get_digital(DIGITAL_A)) hooks.move(40);
-//       else if (master.get_digital(DIGITAL_L2)) hooks.move(-intakeDir*50);
-//       else hooks.move(intakeDir*127);
-
+       // Update all subsys
        conveyor.update();
+
+       // Intake + hooks conveyor sys
        if (master.get_digital(DIGITAL_R2)) conveyor.forwards();
        else if (master.get_digital(DIGITAL_R1)) conveyor.reverse();
        else if (master.get_digital(DIGITAL_UP)) conveyor.queueIndex();
-       else conveyor.idle();
+       else conveyor.stop();
+
+//       std::printf("%f | %d | %d\n", conveyor.hooks.getPose(), conveyor.hooks.getCurrent(), static_cast<int>(conveyor.getState()));
+//       std::cout << conveyor.hooks.getPose() << ' ' << static_cast<int>(conveyor.getState()) << ' ' << "\n";
 
        if (master.get_digital_new_press(DIGITAL_L1)) mogoMech.toggle();
 
@@ -40,7 +36,7 @@ void opcontrol() {
        int turn = master.get_analog(ANALOG_RIGHT_X);
 
        chassis.arcade(throttle, turn, true); // Moves the robot based on the joystick values
-       std::cout << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
+//       std::cout << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
        pros::delay(10); // Run for 10 ms then update
    }
 }

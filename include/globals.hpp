@@ -10,6 +10,7 @@
 extern Intake intake;
 extern Hooks hooks;
 extern Conveyor conveyor;
+extern Arm arm;
 
 extern pros::adi::Pneumatics mogoMech;
 extern pros::adi::Pneumatics ptoPiston;
