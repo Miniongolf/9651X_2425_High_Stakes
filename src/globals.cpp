@@ -1,12 +1,15 @@
 #include "globals.hpp"
 
+bool isPtoActive = false;
+
 Intake intake(std::make_unique<pros::Motor>(-15, pros::v5::MotorGears::green));
 Hooks hooks(std::make_unique<pros::Motor>(-20, pros::v5::MotorGears::green));
 Conveyor conveyor(intake, hooks);
 Arm arm(
-    std::make_unique<pros::MotorGroup>(std::initializer_list<std::int8_t>{3, -19}),
-    lemlib::PID{1, 0, 0},
-    200
+    std::make_unique<pros::Motor>(3, pros::v5::MotorGears::blue),
+    std::make_unique<pros::Motor>(-19, pros::v5::MotorGears::blue),
+    lemlib::PID{4, 0, 2},
+    -20
     );
 
 pros::adi::Pneumatics mogoMech('B', false);
@@ -17,8 +20,6 @@ pros::MotorGroup rightDrive({21, 2, -19}, pros::v5::MotorGears::blue);
 
 pros::MotorGroup ptoLeftDrive({-1, -10}, pros::v5::MotorGears::blue);
 pros::MotorGroup ptoRightDrive({21, 2}, pros::v5::MotorGears::blue);
-
-
 
 pros::IMU imu(18);
 
@@ -72,6 +73,15 @@ lemlib::Drivetrain drivetrain(
     2
 );
 
+lemlib::Drivetrain ptoDrivetrain(
+    &ptoLeftDrive,
+    &ptoRightDrive,
+    12.5,
+    lemlib::Omniwheel::NEW_325,
+    450,
+    2
+);
+
 lemlib::OdomSensors odom(
     &vertTracker,
     nullptr,
@@ -82,6 +92,13 @@ lemlib::OdomSensors odom(
 
 lemlib::Chassis chassis(
     drivetrain,
+    lateralPID,
+    angularPID,
+    odom
+);
+
+lemlib::Chassis ptoChassis(
+    ptoDrivetrain,
     lateralPID,
     angularPID,
     odom

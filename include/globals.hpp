@@ -7,6 +7,8 @@
 #include "subsys/intake.hpp"
 #include "subsys/arm.hpp"
 
+extern bool isPtoActive;
+
 extern Intake intake;
 extern Hooks hooks;
 extern Conveyor conveyor;
@@ -16,6 +18,7 @@ extern pros::adi::Pneumatics mogoMech;
 extern pros::adi::Pneumatics ptoPiston;
 
 extern pros::MotorGroup leftDrive, rightDrive;
+extern pros::MotorGroup ptoLeftDrive, ptoRightDrive;
 
 extern pros::IMU imu;
 
@@ -27,5 +30,8 @@ extern lemlib::ControllerSettings lateralPID, angularPID;
 extern lemlib::OdomSensors odom;
 
 extern lemlib::Drivetrain drivetrain;
+extern lemlib::Drivetrain ptoDrivetrain;
+
 extern lemlib::Chassis chassis;
+extern lemlib::Chassis ptoChassis;
 
