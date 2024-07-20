@@ -36,8 +36,7 @@ void initialize() {
 
     robot::setPTO(false);
 
-    arm.suspendTask();
-    conveyor.suspendTask();
+    robot::suspendTasks();
 
     master.rumble("...");
 }

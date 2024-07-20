@@ -1,5 +1,15 @@
 #include "helperFuncts.hpp"
 
+void robot::suspendTasks() {
+    arm.resumeTask();
+    conveyor.resumeTask();
+}
+
+void robot::resumeTasks() {
+    arm.resumeTask();
+    conveyor.resumeTask();
+}
+
 void robot::setPTO(bool state) {
     isPtoActive = state;
     if (state) {

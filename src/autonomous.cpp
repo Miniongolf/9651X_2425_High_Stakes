@@ -12,10 +12,8 @@
 * from where it left off.
 */
 void autonomous() {
-    arm.resumeTask();
-    conveyor.resumeTask();
+    robot::resumeTasks();
 
     // Keep this at the end to suspend tasks. Resume later in opcontrol.
-    arm.suspendTask();
-    conveyor.suspendTask();
+    robot::suspendTasks();
 }

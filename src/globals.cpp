@@ -8,7 +8,7 @@ Conveyor conveyor(intake, hooks);
 Arm arm(
     std::make_unique<pros::Motor>(3, pros::v5::MotorGears::blue),
     std::make_unique<pros::Motor>(-19, pros::v5::MotorGears::blue),
-    lemlib::PID{4, 0, 2},
+    lemlib::PID{5, 0, 3},
     -20
     );
 

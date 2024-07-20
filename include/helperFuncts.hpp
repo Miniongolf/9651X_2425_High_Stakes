@@ -1,7 +1,10 @@
 #pragma once
 #include "globals.hpp"
+#include "lemlib/chassis/odom.hpp"
 
 namespace robot {
+void suspendTasks();
+void resumeTasks();
 void setPTO(bool state);
 
 /* Chassis Functions */

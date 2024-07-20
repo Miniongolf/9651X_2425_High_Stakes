@@ -18,8 +18,7 @@ void opcontrol() {
     pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
     // Initialize all subsystems
-    arm.resumeTask();
-    conveyor.resumeTask();
+    robot::resumeTasks();
 
     while (true) {
        // Update all subsys
