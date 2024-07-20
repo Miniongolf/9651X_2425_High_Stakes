@@ -34,4 +34,5 @@ extern lemlib::Drivetrain ptoDrivetrain;
 
 extern lemlib::Chassis chassis;
 extern lemlib::Chassis ptoChassis;
+extern lemlib::Chassis* activeChassis;
 

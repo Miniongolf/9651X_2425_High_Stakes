@@ -12,8 +12,8 @@ Arm arm(
     -20
     );
 
-pros::adi::Pneumatics mogoMech('B', false);
-pros::adi::Pneumatics ptoPiston('A', false);
+pros::adi::Pneumatics mogoMech('B', true, true);
+pros::adi::Pneumatics ptoPiston('A', true, true);
 
 pros::MotorGroup leftDrive({-1, -10, 3}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({21, 2, -19}, pros::v5::MotorGears::blue);
@@ -103,3 +103,5 @@ lemlib::Chassis ptoChassis(
     angularPID,
     odom
 );
+
+lemlib::Chassis* activeChassis = &chassis;

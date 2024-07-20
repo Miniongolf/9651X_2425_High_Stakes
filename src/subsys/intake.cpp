@@ -14,32 +14,7 @@ Hooks::Hooks(std::unique_ptr<pros::Motor> hooksMotor)
 
 Conveyor::Conveyor(Intake& intake, Hooks& hooks)
     : intake(intake),
-      hooks(hooks){
-    pros::Task conveyorTask{[&] {
-        while (true) {
-            if (this->currState == Conveyor::state::UNJAM) {}
-            else if (this->currState == Conveyor::state::INDEX) {
-                double error = lemlib::angleError(this->hooks.getPose(), this->indexQueue.front(), false, lemlib::AngularDirection::CW_CLOCKWISE);
-                std::printf("%f, %f\n", this->indexQueue.front(), error);
-                if (error >= this->farIndexThresh) {
-                    int hooksVel = this->hooks.farPID.update(error);
-                    hooks.move(hooksVel);
-                } else if (error <= this->closeIndexThresh) {
-                    int hooksVel = std::clamp(this->hooks.closePID.update(error), (float)-35.0, (float)35.0);
-                    hooks.move(hooksVel);
-                } else {
-                    this->hooks.move(-127);
-                    this->indexQueue.pop();
-                    pros::delay(500);
-                    this->idle();
-                }
-            }
-            pros::delay(10);
-        }
-    }};
-
-    conveyorTask;
-}
+      hooks(hooks){}
 
 void Conveyor::update() {
     this->isBusy = (this->currState == Conveyor::state::UNJAM) || (this->currState == Conveyor::state::INDEX);

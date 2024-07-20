@@ -23,15 +23,23 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+    pros::Controller master(pros::E_CONTROLLER_MASTER);
+
 	chassis.calibrate();
 	ptoChassis.calibrate(false);
 
+    /** @note this must come after chassis init to maintain motor encoder units in deg */
     arm.reset();
+    pros::delay(500);
 
     mogoMech.extend();
 
-    ptoPiston.retract();
-    isPtoActive = false;
+    robot::setPTO(false);
+
+    arm.suspendTask();
+    conveyor.suspendTask();
+
+    master.rumble("...");
 }
 
 /**

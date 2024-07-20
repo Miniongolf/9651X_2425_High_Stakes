@@ -41,6 +41,8 @@
 */
 //#include "okapi/api.hpp"
 #include "globals.hpp"
+#include "lemlib/api.hpp"
+#include "helperFuncts.hpp"
 
 /**
 * If you find doing pros::Motor() to be tedious and you'd prefer just to do

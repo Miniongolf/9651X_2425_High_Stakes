@@ -11,4 +11,11 @@
 * will be stopped. Re-enabling the robot will restart the task, not re-start it
 * from where it left off.
 */
-void autonomous() {}
+void autonomous() {
+    arm.resumeTask();
+    conveyor.resumeTask();
+
+    // Keep this at the end to suspend tasks. Resume later in opcontrol.
+    arm.suspendTask();
+    conveyor.suspendTask();
+}
