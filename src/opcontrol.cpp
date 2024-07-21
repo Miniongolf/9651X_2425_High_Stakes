@@ -45,12 +45,13 @@ void opcontrol() {
        if (partner.get_digital(DIGITAL_A)) arm.moveToAngle(0);
        if (partner.get_digital(DIGITAL_R1)) arm.changeAngle(1);
        if (partner.get_digital(DIGITAL_R2)) arm.changeAngle(-1);
+       arm.angleOffset += 0.5 * (partner.get_analog(ANALOG_LEFT_Y) - partner.get_analog(ANALOG_RIGHT_X));
 
        // Chassis
        int throttle = master.get_analog(ANALOG_LEFT_Y);
        int turn = master.get_analog(ANALOG_RIGHT_X);
 
-       activeChassis->arcade(throttle, turn, true);
+       activeChassis->arcade(throttle, turn, false, 0.7);
        // std::cout << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
 
        pros::delay(10);

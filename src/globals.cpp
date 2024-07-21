@@ -5,12 +5,17 @@ bool isPtoActive = false;
 Intake intake(std::make_unique<pros::Motor>(-15, pros::v5::MotorGears::green));
 Hooks hooks(std::make_unique<pros::Motor>(-20, pros::v5::MotorGears::green));
 Conveyor conveyor(intake, hooks);
+
 Arm arm(
     std::make_unique<pros::Motor>(3, pros::v5::MotorGears::blue),
+    std::make_unique<pros::adi::Encoder>('C', 'D', false),
+    1,
     std::make_unique<pros::Motor>(-19, pros::v5::MotorGears::blue),
-    lemlib::PID{5, 0, 3},
+    std::make_unique<pros::adi::Encoder>('E', 'F', false),
+    1,
+    lemlib::PID {5, 0, 3},
     -20
-    );
+);
 
 pros::adi::Pneumatics mogoMech('B', true, true);
 pros::adi::Pneumatics ptoPiston('A', true, true);
