@@ -27,7 +27,8 @@ void autonomous() {
     int s = isRedAlliance ? 1 : -1;
     robot::resumeTasks();
 
-    selector.run_auton();
+//    selector.run_auton();
+    auton::leftWP();
     // Keep this at the end to suspend tasks. Resume later in opcontrol.
     robot::suspendTasks();
 }

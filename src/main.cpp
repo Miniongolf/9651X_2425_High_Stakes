@@ -23,7 +23,7 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    pros::lcd::initialize();
+//    pros::lcd::initialize();
 
 //    pros::Task screenTask([&]() {
 //        while (true) {

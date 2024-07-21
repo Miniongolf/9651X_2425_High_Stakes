@@ -27,7 +27,7 @@ void chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToP
 
 
 void leftWP() {
-    activeChassis->setPose(-63, 16, -90);
+    activeChassis->setPose(-61, 16, -90);
     chassisGrabMogo(-24, 24, 45, 1000);
     activeChassis->turnToHeading(45, 1000);
     chassisGrabRing(-3.5, 43, 0, 2000);
