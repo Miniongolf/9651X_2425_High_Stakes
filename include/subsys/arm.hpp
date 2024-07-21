@@ -7,9 +7,9 @@
 class Arm {
     public:
         Arm(std::unique_ptr<pros::Motor> leftMotor,
-            std::unique_ptr<pros::adi::Encoder> leftEnc, double leftRatio,
+            std::unique_ptr<pros::Rotation> leftEnc, double leftRatio,
             std::unique_ptr<pros::Motor> rightMotor,
-            std::unique_ptr<pros::adi::Encoder> rightEnc, double rightRatio,
+            std::unique_ptr<pros::Rotation> rightEnc, double rightRatio,
             lemlib::PID pid, int rpm);
         ~Arm() {this->task.remove();};
 
@@ -37,7 +37,7 @@ class Arm {
         double getRightAngle(); // { return this->rightMotor->get_position() * (this->rpm/360.0); }
 
         std::unique_ptr<pros::Motor> leftMotor, rightMotor;
-        std::unique_ptr<pros::adi::Encoder> leftEnc, rightEnc;
+        std::unique_ptr<pros::Rotation> leftRot, rightRot;
         double leftRatio = 1, rightRatio = 1;
 
         lemlib::PID leftPID, rightPID;
@@ -51,7 +51,7 @@ class Arm {
                 double error = lemlib::angleError(this->getAngle(), this->targetAngle, false);
                 double leftError = lemlib::angleError(this->getLeftAngle(), this->targetAngle + angleOffset, false);
                 double rightError = lemlib::angleError(this->getRightAngle(), this->targetAngle - angleOffset, false);
-                std::printf("Arm: %f, %f\n", this->getLeftAngle(), this->getRightAngle());
+//                std::printf("Arm: %f, %f\n", this->getLeftAngle(), this->getRightAngle());
                 if (this->currState == Arm::state::INACTIVE) continue;
 
                 if (std::fabs(error) <= 5) { this->currState = Arm::state::HOLD; }

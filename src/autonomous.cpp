@@ -1,6 +1,9 @@
 #include "main.h"
 #include "autonFuncts.hpp"
 
+/**
+ * Robodash auton selector
+ */
 rd::Selector selector({
     {"Left WP", &auton::leftWP},
     {"Left Max", &auton::leftMax},
@@ -8,6 +11,7 @@ rd::Selector selector({
     {"Right Rush", &auton::rightRush},
     {"Skills", &auton::skills}
 });
+
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via
@@ -20,6 +24,7 @@ rd::Selector selector({
 * from where it left off.
 */
 void autonomous() {
+    int s = isRedAlliance ? 1 : -1;
     robot::resumeTasks();
 
     selector.run_auton();

@@ -36,6 +36,11 @@ void opcontrol() {
        else if (master.get_digital(DIGITAL_UP)) conveyor.queueIndex();
        else conveyor.stop();
 
+       if (master.get_digital(DIGITAL_A)) {
+           std::cout << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
+//           console.printf("Chassis pose: %f, %f | %f\n", chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
+       }
+
        // std::printf("%f | %d | %d\n", conveyor.hooks.getPose(), conveyor.hooks.getCurrent(), static_cast<int>(conveyor.getState()));
        // std::cout << conveyor.hooks.getPose() << ' ' << static_cast<int>(conveyor.getState()) << ' ' << "\n";
 
@@ -43,16 +48,15 @@ void opcontrol() {
        if (partner.get_digital(DIGITAL_B)) arm.reset();
        if (partner.get_digital(DIGITAL_X)) arm.moveToAngle(60);
        if (partner.get_digital(DIGITAL_A)) arm.moveToAngle(0);
-       if (partner.get_digital(DIGITAL_R1)) arm.changeAngle(1);
-       if (partner.get_digital(DIGITAL_R2)) arm.changeAngle(-1);
-       arm.angleOffset += 0.5 * (partner.get_analog(ANALOG_LEFT_Y) - partner.get_analog(ANALOG_RIGHT_X));
+       if (partner.get_digital(DIGITAL_R1)) arm.changeAngle(0.6);
+       if (partner.get_digital(DIGITAL_R2)) arm.changeAngle(-0.6);
+       arm.angleOffset += 0.5 * partner.get_analog(ANALOG_RIGHT_X);
 
        // Chassis
        int throttle = master.get_analog(ANALOG_LEFT_Y);
        int turn = master.get_analog(ANALOG_RIGHT_X);
 
        activeChassis->arcade(throttle, turn, false, 0.7);
-       // std::cout << chassis.getPose().x << ", " << chassis.getPose().y << " | " << chassis.getPose().theta << "\n";
 
        pros::delay(10);
    }

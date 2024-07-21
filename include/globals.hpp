@@ -5,11 +5,12 @@
 #include "pros/imu.hpp"
 #include "robodash/api.h"
 #include "lemlib/api.hpp"
-#include "autonFuncts.hpp"
 #include "subsys/intake.hpp"
 #include "subsys/arm.hpp"
+#include "constants.hpp"
 
 extern bool isPtoActive;
+extern bool isRedAlliance;
 
 extern Intake intake;
 extern Hooks hooks;
@@ -39,4 +40,5 @@ extern lemlib::Chassis ptoChassis;
 extern lemlib::Chassis* activeChassis;
 
 extern rd::Selector selector;
+extern rd::Console console;
 

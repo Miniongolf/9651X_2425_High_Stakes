@@ -25,18 +25,18 @@ void on_center_button() {
 void initialize() {
     pros::lcd::initialize();
 
-    pros::Task screenTask([&]() {
-        while (true) {
-            // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-            // log position telemetry
-            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-            // delay to save resources
-            pros::delay(50);
-        }
-    });
+//    pros::Task screenTask([&]() {
+//        while (true) {
+//            // print robot location to the brain screen
+//            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+//            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+//            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+//            // log position telemetry
+//            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+//            // delay to save resources
+//            pros::delay(50);
+//        }
+//    });
 
     pros::Controller master(pros::E_CONTROLLER_MASTER);
 
@@ -45,7 +45,6 @@ void initialize() {
 
     /** @note this must come after chassis init to maintain motor encoder units in deg */
     arm.reset();
-    pros::delay(500);
 
     mogoMech.extend();
 

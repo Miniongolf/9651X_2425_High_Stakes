@@ -1,14 +1,14 @@
 #include "subsys/arm.hpp"
 
 Arm::Arm(std::unique_ptr<pros::Motor> leftMotor,
-         std::unique_ptr<pros::adi::Encoder> leftEnc, double leftRatio,
+         std::unique_ptr<pros::Rotation> leftRot, double leftRatio,
          std::unique_ptr<pros::Motor> rightMotor,
-         std::unique_ptr<pros::adi::Encoder> rightEnc, double rightRatio,
+         std::unique_ptr<pros::Rotation> rightRot, double rightRatio,
          lemlib::PID pid, int rpm)
     : leftMotor(std::move(leftMotor)),
-      leftEnc(std::move(leftEnc)),
+      leftRot(std::move(leftRot)),
       rightMotor(std::move(rightMotor)),
-      rightEnc(std::move(rightEnc)),
+      rightRot(std::move(rightRot)),
       leftPID(pid),
       rightPID(pid),
       rpm(rpm) {
@@ -43,9 +43,9 @@ void Arm::connect() {
 }
 
 double Arm::getLeftAngle() {
-    return this->leftEnc->get_value() * this->leftRatio;
+    return this->leftRot->get_position() * 100 * this->leftRatio;
 }
 
 double Arm::getRightAngle() {
-    return this->rightEnc->get_value() * this->rightRatio;
+    return this->rightRot->get_position() * 100 * this->rightRatio;
 }
