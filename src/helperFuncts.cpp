@@ -1,8 +1,8 @@
 #include "helperFuncts.hpp"
 
 void robot::suspendTasks() {
-    arm.resumeTask();
-    conveyor.resumeTask();
+    arm.suspendTask();
+    conveyor.suspendTask();
 }
 
 void robot::resumeTasks() {

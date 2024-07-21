@@ -12,7 +12,7 @@ Arm arm(
     std::make_unique<pros::Rotation>(9),
     -0.25,
     std::make_unique<pros::Motor>(-19, pros::v5::MotorGears::blue),
-    std::make_unique<pros::Rotation>(12),
+    std::make_unique<pros::Rotation>(14),
     -0.25,
     lemlib::PID {5, 0, 3},
     -20
