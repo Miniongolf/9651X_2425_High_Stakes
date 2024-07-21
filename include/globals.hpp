@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cmath>
-#include "lemlib/api.hpp"
 #include "pros/motor_group.hpp"
 #include "pros/imu.hpp"
+#include "robodash/api.h"
+#include "lemlib/api.hpp"
+#include "autonFuncts.hpp"
 #include "subsys/intake.hpp"
 #include "subsys/arm.hpp"
 
@@ -35,4 +37,6 @@ extern lemlib::Drivetrain ptoDrivetrain;
 extern lemlib::Chassis chassis;
 extern lemlib::Chassis ptoChassis;
 extern lemlib::Chassis* activeChassis;
+
+extern rd::Selector selector;
 

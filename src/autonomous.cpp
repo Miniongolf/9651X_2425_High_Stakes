@@ -1,5 +1,13 @@
 #include "main.h"
+#include "autonFuncts.hpp"
 
+rd::Selector selector({
+    {"Left WP", &auton::leftWP},
+    {"Left Max", &auton::leftMax},
+    {"Right WP", &auton::rightWP},
+    {"Right Rush", &auton::rightRush},
+    {"Skills", &auton::skills}
+});
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via
@@ -14,6 +22,7 @@
 void autonomous() {
     robot::resumeTasks();
 
+    selector.run_auton();
     // Keep this at the end to suspend tasks. Resume later in opcontrol.
     robot::suspendTasks();
 }
