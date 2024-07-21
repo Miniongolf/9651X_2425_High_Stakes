@@ -43,11 +43,9 @@ void Arm::connect() {
 }
 
 double Arm::getLeftAngle() {
-    if (this->leftRot == nullptr) return 0;
-    return this->leftRot->get_position() * this->leftRatio;
+    return this->leftEnc->get_value() * this->leftRatio;
 }
 
 double Arm::getRightAngle() {
-    if (this->rightRot == nullptr) return 0;
-    return this->rightRot->get_position() * this->rightRatio;
+    return this->rightEnc->get_value() * this->rightRatio;
 }
