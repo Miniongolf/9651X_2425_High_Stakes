@@ -7,8 +7,10 @@ Arm::Arm(std::unique_ptr<pros::Motor> leftMotor,
          lemlib::PID pid, int rpm)
     : leftMotor(std::move(leftMotor)),
       leftRot(std::move(leftRot)),
+      leftRatio(leftRatio),
       rightMotor(std::move(rightMotor)),
       rightRot(std::move(rightRot)),
+      rightRatio(rightRatio),
       leftPID(pid),
       rightPID(pid),
       rpm(rpm) {
@@ -43,9 +45,9 @@ void Arm::connect() {
 }
 
 double Arm::getLeftAngle() {
-    return this->leftRot->get_position() * 100 * this->leftRatio;
+    return this->leftRot->get_position() * 0.01 * this->leftRatio;
 }
 
 double Arm::getRightAngle() {
-    return this->rightRot->get_position() * 100 * this->rightRatio;
+    return this->rightRot->get_position() * 0.01 * this->leftRatio;
 }

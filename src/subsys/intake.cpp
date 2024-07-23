@@ -36,14 +36,6 @@ void Conveyor::update() {
             this->hooks.move(-70);
             break;
         }
-        case Conveyor::state::UNJAM: {
-            if (this->prevState == Conveyor::state::FORWARDS) { this->hooks.move(-50); }
-            else { this->hooks.move(50); }
-
-            if (!this->hooks.isJammed()) { this->currState = Conveyor::state::IDLE; }
-
-            break;
-        }
         case Conveyor::state::INDEX: {
             break;
         }

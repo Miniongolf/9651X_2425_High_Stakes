@@ -32,13 +32,13 @@ class Arm {
         void resumeTask() {this->task.resume();};
         void suspendTask() {this->task.suspend();};
 
+        double getLeftAngle();
+        double getRightAngle();
     private:
-        double getLeftAngle(); // { return this->leftMotor->get_position() * (this->rpm/360.0); }
-        double getRightAngle(); // { return this->rightMotor->get_position() * (this->rpm/360.0); }
 
         std::unique_ptr<pros::Motor> leftMotor, rightMotor;
         std::unique_ptr<pros::Rotation> leftRot, rightRot;
-        double leftRatio = 1, rightRatio = 1;
+        double leftRatio, rightRatio;
 
         lemlib::PID leftPID, rightPID;
         int rpm;
@@ -51,10 +51,12 @@ class Arm {
                 double error = lemlib::angleError(this->getAngle(), this->targetAngle, false);
                 double leftError = lemlib::angleError(this->getLeftAngle(), this->targetAngle + angleOffset, false);
                 double rightError = lemlib::angleError(this->getRightAngle(), this->targetAngle - angleOffset, false);
-//                std::printf("Arm: %f, %f\n", this->getLeftAngle(), this->getRightAngle());
+
+//                std::printf("Arm: %f | %f, %f\n", error, leftError, rightError);
+
                 if (this->currState == Arm::state::INACTIVE) continue;
 
-                if (std::fabs(error) <= 5) { this->currState = Arm::state::HOLD; }
+                if (std::fabs(leftError) + std::fabs(rightError) <= 7) { this->currState = Arm::state::HOLD; }
                 else { this->currState = Arm::state::MOVING; }
 
                 if (this->currState == Arm::state::MOVING) {

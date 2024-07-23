@@ -1,17 +1,18 @@
 #include "autonFuncts.hpp"
 
 namespace auton {
-void chassisGrabRing(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params, bool async) {
+void chassisGrabRing(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params) {
+    conveyor.forwards();
     lemlib::Pose newPose(
         x + intakeOffset * std::cos(lemlib::degToRad(90-theta)),
         y + intakeOffset * std::sin(lemlib::degToRad(90-theta)),
         theta
         );
-    conveyor.forwards();
-    activeChassis->moveToPose(newPose.x, newPose.y, theta, timeout, params, async);
+    activeChassis->moveToPose(newPose.x, newPose.y, theta, timeout, params);
+    activeChassis->waitUntilDone();
 }
 
-void chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params, bool async) {
+void chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params) {
     lemlib::Pose newPose(
         x + mogoOffset * std::cos(lemlib::degToRad(90-theta)),
         y + mogoOffset * std::sin(lemlib::degToRad(90-theta)),
@@ -21,7 +22,8 @@ void chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToP
     mogoMech.extend();
     lemlib::MoveToPoseParams newParams = params;
     newParams.forwards = false;
-    activeChassis->moveToPose(newPose.x, newPose.y, theta, timeout, newParams, async);
+    activeChassis->moveToPose(newPose.x, newPose.y, theta, timeout, newParams);
+    activeChassis->waitUntilDone();
     mogoMech.retract();
 }
 

@@ -98,10 +98,17 @@ class Conveyor {
 
         pros::Task task{[&] {
             while (true) {
-                if (this->currState == Conveyor::state::UNJAM) {}
+                this->update();
+
+                if (this->currState == Conveyor::state::UNJAM) {
+                    if (this->prevState == Conveyor::state::FORWARDS) { this->hooks.move(-50); }
+                    else { this->hooks.move(50); }
+                    if (!this->hooks.isJammed()) { this->currState = Conveyor::state::IDLE; }
+                }
+
                 else if (this->currState == Conveyor::state::INDEX) {
                     double error = lemlib::angleError(this->hooks.getPose(), this->indexQueue.front(), false, lemlib::AngularDirection::CW_CLOCKWISE);
-                    std::printf("%f, %f\n", this->indexQueue.front(), error);
+//                    std::printf("%f, %f\n", this->indexQueue.front(), error);
                     if (error >= this->farIndexThresh) {
                         int hooksVel = this->hooks.farPID.update(error);
                         hooks.move(hooksVel);
@@ -115,7 +122,6 @@ class Conveyor {
                         this->idle();
                     }
                 }
-                pros::delay(10);
             }
         }};
 };

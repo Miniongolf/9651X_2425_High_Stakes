@@ -9,7 +9,7 @@ Conveyor conveyor(intake, hooks);
 
 Arm arm(
     std::make_unique<pros::Motor>(3, pros::v5::MotorGears::blue),
-    std::make_unique<pros::Rotation>(9),
+    std::make_unique<pros::Rotation>(6),
     -0.25,
     std::make_unique<pros::Motor>(-19, pros::v5::MotorGears::blue),
     std::make_unique<pros::Rotation>(14),
@@ -111,3 +111,5 @@ lemlib::Chassis ptoChassis(
 );
 
 lemlib::Chassis* activeChassis = &chassis;
+
+//rd::Console console;
