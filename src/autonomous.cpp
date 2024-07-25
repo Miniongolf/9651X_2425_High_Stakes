@@ -1,6 +1,12 @@
 #include "main.h"
 #include "autonFuncts.hpp"
 
+rd::Selector selector({
+    {"Left WP", &auton::leftWP},
+    {"Right WP", &auton::rightWP},
+    {"Skills", &auton::skills}
+});
+
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via

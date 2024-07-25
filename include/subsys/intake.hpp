@@ -98,6 +98,7 @@ class Conveyor {
 
         pros::Task task{[&] {
             while (true) {
+                pros::delay(10);
                 this->update();
 
                 if (this->currState == Conveyor::state::UNJAM) {

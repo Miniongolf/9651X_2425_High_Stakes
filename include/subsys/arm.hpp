@@ -48,11 +48,12 @@ class Arm {
 
         pros::Task task = pros::Task {[&] {
             while (true) {
+                pros::delay(10);
                 double error = lemlib::angleError(this->getAngle(), this->targetAngle, false);
                 double leftError = lemlib::angleError(this->getLeftAngle(), this->targetAngle + angleOffset, false);
                 double rightError = lemlib::angleError(this->getRightAngle(), this->targetAngle - angleOffset, false);
 
-//                std::printf("Arm: %f | %f, %f\n", error, leftError, rightError);
+                std::printf("Arm: %f | %f, %f\n", error, leftError, rightError);
 
                 if (this->currState == Arm::state::INACTIVE) continue;
 
@@ -68,7 +69,6 @@ class Arm {
                     this->leftMotor->move(0);
                     this->rightMotor->move(0);
                 }
-                pros::delay(10);
             }
         }};;
 };

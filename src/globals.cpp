@@ -112,6 +112,4 @@ lemlib::Chassis ptoChassis(
 );
 
 lemlib::Chassis* activeChassis = &chassis;
-
-
 //rd::Console console;

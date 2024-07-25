@@ -1,12 +1,6 @@
 #include "main.h"
 #include "autonFuncts.hpp"
 
-rd::Selector* selector = new rd::Selector({
-    {"Left WP", &auton::leftWP},
-    {"Right WP", &auton::rightWP},
-    {"Skills", &auton::skills}
-});
-
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
