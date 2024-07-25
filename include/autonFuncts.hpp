@@ -1,11 +1,8 @@
-#include "globals.hpp"
+#include "helperFuncts.hpp"
 
 #pragma once
 
 namespace auton {
-void chassisGrabRing(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params = {});
-void chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params = {});
-
 void leftWP();
 void leftMax();
 void rightWP();

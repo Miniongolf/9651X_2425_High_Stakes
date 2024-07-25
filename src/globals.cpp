@@ -1,4 +1,5 @@
 #include "globals.hpp"
+#include "autonFuncts.hpp"
 
 bool isPtoActive = false;
 bool isRedAlliance = true;
@@ -111,5 +112,6 @@ lemlib::Chassis ptoChassis(
 );
 
 lemlib::Chassis* activeChassis = &chassis;
+
 
 //rd::Console console;
