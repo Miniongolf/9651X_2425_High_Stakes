@@ -12,9 +12,10 @@ Hooks::Hooks(std::unique_ptr<pros::Motor> hooksMotor)
     this->motor->tare_position();
 }
 
-Conveyor::Conveyor(Intake& intake, Hooks& hooks)
+Conveyor::Conveyor(Intake& intake, Hooks& hooks, std::unique_ptr<pros::Optical> optical)
     : intake(intake),
-      hooks(hooks){}
+      hooks(hooks),
+      optical(std::move(optical)){}
 
 void Conveyor::update() {
     this->isBusy = (this->currState == Conveyor::state::UNJAM) || (this->currState == Conveyor::state::INDEX);
@@ -69,7 +70,7 @@ void Conveyor::unjam() {
 }
 
 void Conveyor::queueIndex() {
-    this->indexQueue.push(this->getIndexPose());
+    this->indexQueue += 1;
     this->index();
 }
 
@@ -84,7 +85,7 @@ double Conveyor::getIndexPose() {
 }
 
 void Conveyor::index() {
-    if (this->indexQueue.empty()) { return; }
+    if (this->indexQueue == 0) { return; }
     this->currState = Conveyor::state::INDEX;
 }
 

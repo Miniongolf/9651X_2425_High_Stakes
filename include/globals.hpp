@@ -3,6 +3,7 @@
 #include <cmath>
 #include "pros/motor_group.hpp"
 #include "pros/imu.hpp"
+#include "pros/optical.hpp"
 #include "robodash/api.h"
 #include "lemlib/api.hpp"
 #include "subsys/intake.hpp"
@@ -24,7 +25,6 @@ extern pros::MotorGroup leftDrive, rightDrive;
 extern pros::MotorGroup ptoLeftDrive, ptoRightDrive;
 
 extern pros::IMU imu;
-
 extern pros::Rotation horizRot, vertRot;
 extern lemlib::TrackingWheel horizTracker, vertTracker;
 

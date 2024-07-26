@@ -6,7 +6,7 @@ bool isRedAlliance = true;
 
 Intake intake(std::make_unique<pros::Motor>(-15, pros::v5::MotorGears::green));
 Hooks hooks(std::make_unique<pros::Motor>(-20, pros::v5::MotorGears::green));
-Conveyor conveyor(intake, hooks);
+Conveyor conveyor(intake, hooks, std::make_unique<pros::Optical>(10));
 
 Arm arm(
     std::make_unique<pros::Motor>(3, pros::v5::MotorGears::blue),
@@ -22,13 +22,14 @@ Arm arm(
 pros::adi::Pneumatics ptoPiston('A', isPtoActive, false);
 pros::adi::Pneumatics mogoMech('B', true, true);
 
-pros::MotorGroup leftDrive({-1, -10, 3}, pros::v5::MotorGears::blue);
+pros::MotorGroup leftDrive({-1, -9, 3}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({21, 2, -19}, pros::v5::MotorGears::blue);
 
-pros::MotorGroup ptoLeftDrive({-1, -10}, pros::v5::MotorGears::blue);
+pros::MotorGroup ptoLeftDrive({-1, -9}, pros::v5::MotorGears::blue);
 pros::MotorGroup ptoRightDrive({21, 2}, pros::v5::MotorGears::blue);
 
 pros::IMU imu(18);
+pros::Optical optical(10);
 
 pros::Rotation horizRot(5);
 pros::Rotation vertRot(-4);
