@@ -53,7 +53,7 @@ class Arm {
                 double leftError = lemlib::angleError(this->getLeftAngle(), this->targetAngle + angleOffset, false);
                 double rightError = lemlib::angleError(this->getRightAngle(), this->targetAngle - angleOffset, false);
 
-//                std::printf("Arm: %f | %f, %f\n", error, leftError, rightError);
+//                std::printf("Arm: %f | %f, %f\n", this->getAngle(), this->getLeftAngle(), this->getRightAngle());
 
                 if (this->currState == Arm::state::INACTIVE) continue;
 

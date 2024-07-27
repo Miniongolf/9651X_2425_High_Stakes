@@ -6,8 +6,17 @@ namespace robot {
 void suspendTasks();
 void resumeTasks();
 void setPTO(bool state);
-void chassisGrabRing(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params = {});
-void chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params = {});
+
+void chassisSetPose(float x, float y, float theta);
+lemlib::Pose chassisGetPose();
+void printPose(lemlib::Pose pose);
+void chassisPrintPose();
+
+void chassisStop();
+void chassisMove(int throttle, int turn, int time);
+
+void chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params = {});
+void chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params = {});
 
 /* Chassis Functions */
 

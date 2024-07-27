@@ -40,5 +40,4 @@ extern lemlib::Chassis ptoChassis;
 extern lemlib::Chassis* activeChassis;
 
 extern rd::Selector selector;
-//extern rd::Console console;
-
+extern rd::Console console;

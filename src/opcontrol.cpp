@@ -22,9 +22,6 @@ void opcontrol() {
 
     printf("-- OPCONTROL STARTING --\n");
     while (true) {
-        // Update all subsys
-
-
         // Mogo Mech
         if (master.get_digital_new_press(DIGITAL_L1)) mogoMech.toggle();
 
@@ -34,7 +31,8 @@ void opcontrol() {
         // Intake + hooks conveyor sys
         if (master.get_digital(DIGITAL_R2)) conveyor.forwards();
         else if (master.get_digital(DIGITAL_R1)) conveyor.reverse();
-        else if (master.get_digital(DIGITAL_UP)) conveyor.queueIndex();
+        else if (master.get_digital_new_press(DIGITAL_UP)) conveyor.queueIndex();
+        else if (master.get_digital_new_press(DIGITAL_DOWN)) conveyor.resetIndexQueue();
         else conveyor.stop();
 
         if (master.get_digital(DIGITAL_A)) {

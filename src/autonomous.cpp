@@ -7,6 +7,8 @@ rd::Selector selector({
     {"Skills", &auton::skills}
 });
 
+rd::Console console;
+
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via
@@ -23,8 +25,8 @@ void autonomous() {
     int s = isRedAlliance ? 1 : -1;
     robot::resumeTasks();
 
-//    selector.run_auton();
-    auton::leftWP();
+    selector.run_auton();
+
     // Keep this at the end to suspend tasks. Resume later in opcontrol.
     robot::suspendTasks();
 }

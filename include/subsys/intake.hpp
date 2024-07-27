@@ -5,6 +5,7 @@
 #include "pros/motor_group.hpp"
 #include "pros/optical.hpp"
 #include "lemlib/util.hpp"
+#include "lemlib/timer.hpp"
 #include "colourRange.hpp"
 
 class Intake {
@@ -37,17 +38,16 @@ class Hooks {
 
         /**
          * @return The current pose of the hooks in degrees (with a full revolution of a chain being 360º)
-         * @note The chain has 44 links, with a 1:1 to a 12t driving sprocket
+         * @note The chain has 40 links, with a 1:1 to a 12t driving sprocket
          */
-        double getPose() { return std::fmod(this->motor->get_position() * (12.0/44), 360); }
+        double getPose() { return 360-std::fmod(this->motor->get_position() * (12.0/40), 360); }
 
         int getCurrent() { return this->motor->get_current_draw(); };
 
-        lemlib::PID farPID {1, 0, 0};
-        lemlib::PID closePID {0.3, 0.01, 0.5};
+        lemlib::PID farPID {0.75, 0, 0};
+        lemlib::PID closePID {0.2, 0.01, 1};
     private:
-
-        int jamCurrent = 2000;
+        int jamCurrent = 4000;
         std::unique_ptr<pros::Motor> motor;
 };
 
@@ -68,7 +68,7 @@ class Conveyor {
 
         [[nodiscard]] Conveyor::state getState() const { return this->currState; }
 
-        [[nodiscard]] bool getIsBusy() const { return this->isBusy; }
+        [[nodiscard]] bool isBusy() const { return this->currState == state::UNJAM || this->currState == state::INDEX; }
 
         void update();
 
@@ -77,6 +77,7 @@ class Conveyor {
         void stop();
         void unjam();
         void queueIndex();
+        void resetIndexQueue() { this->indexQueue = 0; }
 
         void resumeTask() {this->task.resume();};
         void suspendTask() {this->task.suspend();};
@@ -87,75 +88,38 @@ class Conveyor {
     private:
         double getIndexPose();
         void index();
-
         void idle();
 
-        bool isBusy = false;
-
-        double closeIndexThresh = 20, farIndexThresh = 50;
+        [[nodiscard]] bool detectRing() const { return this->optical->get_brightness() > 0.03; }
+        void moveToIndex(double pose);
 
         Conveyor::state currState = Conveyor::state::IDLE;
         Conveyor::state prevState = Conveyor::state::IDLE;
 
+        double closeIndexThresh = 7, farIndexThresh = 50;
+
         int indexQueue = 0;
+        double targetIndexPose = 0;
 
         ColourRange red = ColourRange(0, 25);
-        ColourRange blue = ColourRange(130, 250);
+        ColourRange blue = ColourRange(150, 250);
+
 
         pros::Task task{[&] {
             while (true) {
                 pros::delay(10);
+                std::printf("Conveyor: %d\n", std::abs(this->hooks.getCurrent()));
                 this->update();
 
-                std::printf("Conveyor: %f\n", this->optical->get_hue());
-
                 if (this->currState == Conveyor::state::UNJAM) {
-                    if (this->prevState == Conveyor::state::FORWARDS) { this->hooks.move(-50); }
-                    else { this->hooks.move(50); }
+                    if (this->prevState == Conveyor::state::REVERSE) { this->hooks.move(50); }
+                    else { this->hooks.move(-50); }
                     pros::delay(100);
-                    if (!this->hooks.isJammed()) { this->currState = Conveyor::state::IDLE; }
+                    if (!this->hooks.isJammed()) { this->idle(); }
                 }
 
                 else if (this->currState == Conveyor::state::INDEX) {
-                    this->hooks.move(50);
-                    this->intake.move(127);
-                    bool detect1 = false, missFlag = false, detect2 = false;
-
-                    while (!detect1 || !detect2) {
-                        std::printf("Conveyor: %f\n", this->optical->get_hue());
-                        if (red.inRange(this->optical->get_hue()) || blue.inRange(this->optical->get_hue())) {
-                            if (!detect1) {
-                                detect1 = true;
-                                std::printf("PASS 1 DONE\n");
-                            } else if (missFlag){
-                                detect2  = true;
-                                std::printf("PASS 2 DONE\n");
-                            }
-                        } else {
-                            if (detect1) {
-                                missFlag = true;
-                                std::printf("MISS FLAG DONE\n");
-                            }
-                        }
-                    }
-
-                    this->hooks.move(-127);
-                    pros::delay(1000);
-                    this->currState = Conveyor::state::IDLE;
-//                    double error = lemlib::angleError(this->hooks.getPose(), , false, lemlib::AngularDirection::CW_CLOCKWISE);
-//                    std::printf("%f, %f\n", this->indexQueue.front(), error);
-//                    if (error >= this->farIndexThresh) {
-//                        int hooksVel = this->hooks.farPID.update(error);
-//                        hooks.move(hooksVel);
-//                    } else if (error <= this->closeIndexThresh) {
-//                        int hooksVel = std::clamp(this->hooks.closePID.update(error), (float)-35.0, (float)35.0);
-//                        hooks.move(hooksVel);
-//                    } else {
-//                        this->hooks.move(-127);
-//                        this->indexQueue.pop();
-//                        pros::delay(500);
-//                        this->idle();
-//                    }
+                    this->moveToIndex(0);
                 }
             }
         }};

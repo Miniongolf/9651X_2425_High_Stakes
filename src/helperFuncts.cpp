@@ -23,28 +23,73 @@ void robot::setPTO(bool state) {
     }
 }
 
-void robot::chassisGrabRing(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params) {
+void robot::chassisSetPose(float x, float y, float theta) {
+    chassis.setPose(x, y, theta);
+    ptoChassis.setPose(x, y, theta);
+}
+
+lemlib::Pose robot::chassisGetPose() {
+    return chassis.getPose();
+}
+
+void robot::printPose(lemlib::Pose pose) {
+    std::printf("Pose: %f, %f, %f\n", pose.x, pose.y, pose.theta);
+}
+
+void robot::chassisPrintPose() {
+    activeChassis->waitUntilDone();
+    pros::delay(500);
+    std::printf("Chassis ");
+    robot::printPose(robot::chassisGetPose());
+}
+
+void robot::chassisStop() {
+    activeChassis->arcade(0, 0);
+}
+
+void robot::chassisMove(int throttle, int turn, int time) {
+    activeChassis->arcade(throttle, turn, true);
+    pros::delay(time);
+    robot::chassisStop();
+}
+
+void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params) {
+    float moveSpeed = 50;
     conveyor.forwards();
+
     lemlib::Pose newPose(
-        x - intakeOffset * std::cos(lemlib::degToRad(90-theta)),
-        y - intakeOffset * std::sin(lemlib::degToRad(90-theta)),
-        theta
-    );
-    activeChassis->moveToPose(newPose.x, newPose.y, theta, timeout, params);
+        pose.x - intakeOffset * std::cos(lemlib::degToRad(90-pose.theta)),
+        pose.y - intakeOffset * std::sin(lemlib::degToRad(90-pose.theta)),
+        pose.theta
+        );
+
+    robot::printPose(newPose);
+
+    params.forwards = true;
+//    if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
+
+    activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
     activeChassis->waitUntilDone();
 }
 
-void robot::chassisGrabMogo(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params) {
+void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params) {
+    float moveSpeed = 75;
+
     lemlib::Pose newPose(
-        x - mogoOffset * std::cos(lemlib::degToRad(90-theta)),
-        y - mogoOffset * std::sin(lemlib::degToRad(90-theta)),
-        theta
-    );
+        pose.x - mogoOffset * std::cos(lemlib::degToRad(90-pose.theta)),
+        pose.y - mogoOffset * std::sin(lemlib::degToRad(90-pose.theta)),
+        pose.theta - 180
+        );
+
+    robot::printPose(newPose);
 
     mogoMech.extend();
-    lemlib::MoveToPoseParams newParams = params;
-    newParams.forwards = false;
-    activeChassis->moveToPose(newPose.x, newPose.y, theta, timeout, newParams);
+    params.forwards = false;
+//    if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
+
+    activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
     activeChassis->waitUntilDone();
+    robot::chassisMove(-moveSpeed, 0, 400);
+    robot::chassisStop();
     mogoMech.retract();
 }

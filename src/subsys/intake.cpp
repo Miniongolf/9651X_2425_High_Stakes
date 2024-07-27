@@ -15,63 +15,67 @@ Hooks::Hooks(std::unique_ptr<pros::Motor> hooksMotor)
 Conveyor::Conveyor(Intake& intake, Hooks& hooks, std::unique_ptr<pros::Optical> optical)
     : intake(intake),
       hooks(hooks),
-      optical(std::move(optical)){}
+      optical(std::move(optical)) {
+    this->optical->set_led_pwm(50);
+}
 
 void Conveyor::update() {
-    this->isBusy = (this->currState == Conveyor::state::UNJAM) || (this->currState == Conveyor::state::INDEX);
-
-    if (this->hooks.isJammed()) this->unjam();
+    if (this->hooks.isJammed()) {
+        this->unjam();
+        std::printf("--! HOOKS JAMMED %f!--\n", this->hooks.getPose());
+    } else if (this->detectRing() && this->indexQueue > 0 && !isBusy()) {
+        this->index();
+        std::printf("--? RING DETECTED | INDEXING ?--\n");
+    }
 
     if (this->currState != this->prevState) {
         this->prevState = this->currState;
     }
 
     switch (this->currState) {
-        case Conveyor::state::FORWARDS: {
+        case state::FORWARDS: {
             this->intake.move(127);
             this->hooks.move(127);
             break;
         }
-        case Conveyor::state::REVERSE: {
+        case state::REVERSE: {
             this->intake.move(-127);
             this->hooks.move(-70);
             break;
         }
-        case Conveyor::state::INDEX: {
+        case state::INDEX: {
             break;
         }
-        case Conveyor::state::STOP: {
+        case state::STOP: {
             this->intake.move(0);
             this->hooks.move(0);
             break;
         }
-        case Conveyor::state::IDLE: {break;}
+        case state::IDLE: {break;}
     }
 }
 
 void Conveyor::forwards() {
-    if (this->isBusy) return;
+    if (this->isBusy()) return;
     this->currState = Conveyor::state::FORWARDS;
 }
 
 void Conveyor::reverse() {
-    if (this->isBusy) return;
+    if (this->isBusy()) return;
     this->currState = Conveyor::state::REVERSE;
 }
 
 void Conveyor::stop() {
-    if (this->isBusy) return;
+    if (this->isBusy()) return;
     this->currState = Conveyor::state::STOP;
 }
 
 void Conveyor::unjam() {
-    if (this->isBusy) return;
     this->currState = Conveyor::state::UNJAM;
 }
 
 void Conveyor::queueIndex() {
     this->indexQueue += 1;
-    this->index();
 }
 
 void Conveyor::idle() {
@@ -79,14 +83,37 @@ void Conveyor::idle() {
 }
 
 double Conveyor::getIndexPose() {
-    double zeroDistance = lemlib::angleError(this->hooks.getPose(), 0, false, lemlib::AngularDirection::CW_CLOCKWISE);
-    double turnDistance = lemlib::angleError(this->hooks.getPose(), 180, false, lemlib::AngularDirection::CW_CLOCKWISE);
-    return zeroDistance < turnDistance ? 0 : 180;
+    double zeroDistance = -lemlib::angleError(this->hooks.getPose(), 0, false);
+    double turnDistance = -lemlib::angleError(this->hooks.getPose(), 180, false);
+    return (zeroDistance < turnDistance) ? 0 : 180;
 }
 
 void Conveyor::index() {
-    if (this->indexQueue == 0) { return; }
+    if (this->indexQueue == 0 || this->isBusy()) { return; }
+    this->targetIndexPose = this->getIndexPose();
     this->currState = Conveyor::state::INDEX;
 }
 
+void Conveyor::moveToIndex(double pose) {
+    double error = -lemlib::angleError(this->targetIndexPose, this->hooks.getPose(), false);
+    std::printf("Conveyor Error: %f -> %f\n", this->hooks.getPose(), error);
+    double hooksFF = (error > 0) ? 25 : -25;
+    if (std::fabs(error) <= this->closeIndexThresh) {
+        std::printf("DONE!!!\n");
+//        this->hooks.move(-127);
+        this->hooks.closePID.reset();
+        this->hooks.farPID.reset();
+        this->indexQueue -= 1;
+        pros::delay(1000);
+        this->idle();
 
+    } else if (std::fabs(error) <= this->farIndexThresh) {
+        int hooksVel = std::clamp(this->hooks.closePID.update(error), (float)-25.0, (float)25.0);
+        hooks.move(hooksVel + hooksFF);
+        std::printf("Close: %d\n", hooksVel);
+    } else {
+        int hooksVel = this->hooks.farPID.update(error);
+        hooks.move(hooksVel + hooksFF);
+        std::printf("Far: %d\n", hooksVel);
+    }
+}
