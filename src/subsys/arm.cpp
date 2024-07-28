@@ -26,12 +26,23 @@ void Arm::reset() {
 }
 
 void Arm::moveToAngle(double angle) {
-    if (angle < -60 || angle > 80 || this->currState == Arm::state::INACTIVE) return;
+    this->autonMovement = false;
+    double height = angleToHeight(angle);
+//    if (height > 30.25 + 4.5 || height < 8 || this->currState == Arm::state::INACTIVE) return;
+    if (angle > 70 || angle < -55 || this->currState == Arm::state::INACTIVE) return;
     this->targetAngle = angle;
+}
+
+void Arm::moveToHeight(double height) {
+    this->moveToAngle(heightToAngle(height));
 }
 
 void Arm::changeAngle(double deltaAngle) {
     this->moveToAngle(this->targetAngle + deltaAngle);
+}
+
+void Arm::changeHeight(double deltaHeight) {
+    this->moveToHeight(angleToHeight(this->targetAngle) + deltaHeight);
 }
 
 void Arm::disconnect() {
@@ -42,6 +53,10 @@ void Arm::connect() {
     this->leftMotor->move(0);
     this->rightMotor->move(0);
     this->currState = Arm::state::HOLD;
+}
+
+void Arm::hang() {
+    this->currState = Arm::state::HANG;
 }
 
 double Arm::getLeftAngle() {

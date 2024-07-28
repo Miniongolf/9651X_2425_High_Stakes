@@ -21,7 +21,21 @@ void initialize() {
 
     robot::setPTO(false);
 
+    lemlib::Timer allianceTimer(5000);
+
     robot::suspendTasks();
+
+    while (!(master.get_digital(DIGITAL_A) || (master.get_digital(DIGITAL_X)) || allianceTimer.isDone())) {
+        if (master.get_digital(DIGITAL_X)) {isRedAlliance = true;}
+        else if (master.get_digital(DIGITAL_A)) {isRedAlliance = false;}
+    }
+    if (isRedAlliance) {
+        master.rumble("_");
+        master.print(0, 0, "Red alliance");
+    } else {
+        master.rumble("...");
+        master.print(0, 0, "Blue alliance");
+    }
 }
 
 /**

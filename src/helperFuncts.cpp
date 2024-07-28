@@ -16,6 +16,7 @@ void robot::setPTO(bool state) {
         ptoPiston.extend();
         activeChassis = &ptoChassis;
         arm.connect();
+        arm.moveToAngle(arm.getAngle());
     } else {
         ptoPiston.retract();
         activeChassis = &chassis;
@@ -89,7 +90,32 @@ void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 
     activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
     activeChassis->waitUntilDone();
-    robot::chassisMove(-moveSpeed, 0, 400);
+    robot::chassisMove(-moveSpeed, 30, 200);
     robot::chassisStop();
     mogoMech.retract();
+}
+
+void robot::chassisWallStake(const lemlib::Pose pose, int timeout, bool isAllianceStake, lemlib::MoveToPoseParams params) {
+    double offset = isAllianceStake ? allianceStakeOffset : wallStakeOffset;
+    double targetAngle = isAllianceStake ? 8 : 60;
+
+    lemlib::Pose newPose(
+        pose.x - offset * std::cos(lemlib::degToRad(90-pose.theta)),
+        pose.y - offset * std::sin(lemlib::degToRad(90-pose.theta)),
+        pose.theta
+    );
+
+    robot::printPose(newPose);
+
+    robot::setPTO(true);
+    //    if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
+
+    activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
+    arm.moveToAngle(targetAngle + 3);
+    activeChassis->waitUntilDone();
+    pros::delay(200);
+    arm.moveToAngle(targetAngle - 9);
+    pros::delay(750);
+    robot::setPTO(false);
+    robot::chassisMove(-100, 0, 500);
 }

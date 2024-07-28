@@ -16,18 +16,29 @@ class Arm {
         enum class state {
             MOVING,
             HOLD,
+            HANG,
+            STOP,
             INACTIVE
         };
 
         double angleOffset = 0;
+        bool autonMovement = true;
 
         void reset();
 
+        static double angleToHeight(double angle) { return 18.5 + 12.5*std::sin(angle); }
+        static double heightToAngle(double height) { return std::asin((height - 18.5) / 12.5); }
+
         double getAngle() { return (this->getLeftAngle() + this->getRightAngle())/2; }
+        double getHeight() { return angleToHeight(this->getAngle()); }
         void moveToAngle(double angle);
+        void moveToHeight(double height);
         void changeAngle(double deltaAngle);
+        void changeHeight(double deltaHeight);
         void disconnect();
         void connect();
+
+        void hang();
 
         void resumeTask() {this->task.resume();};
         void suspendTask() {this->task.suspend();};
@@ -53,21 +64,27 @@ class Arm {
                 double leftError = lemlib::angleError(this->getLeftAngle(), this->targetAngle + angleOffset, false);
                 double rightError = lemlib::angleError(this->getRightAngle(), this->targetAngle - angleOffset, false);
 
-//                std::printf("Arm: %f | %f, %f\n", this->getAngle(), this->getLeftAngle(), this->getRightAngle());
+//                std::printf("Arm: %f | %f\n", this->getAngle(), this->getHeight());
 
                 if (this->currState == Arm::state::INACTIVE) continue;
 
-                if (std::fabs(leftError) + std::fabs(rightError) <= 7) { this->currState = Arm::state::HOLD; }
-                else { this->currState = Arm::state::MOVING; }
+                if (this->currState == Arm::state::HANG) {
+                    this->currState = state::HOLD;
+                } else {
+                    if (std::fabs(leftError) + std::fabs(rightError) <= 7) {
+                        this->currState = Arm::state::HOLD;
+                    } else {
+                        this->currState = Arm::state::MOVING;
+                    }
 
-                if (this->currState == Arm::state::MOVING) {
-                    double leftVel = this->leftPID.update(leftError),
-                           rightVel = this->rightPID.update(rightError);
-                    this->leftMotor->move(leftVel);
-                    this->rightMotor->move(rightVel);
-                } else if (this->currState == Arm::state::HOLD) {
-                    this->leftMotor->move(0);
-                    this->rightMotor->move(0);
+                    if (this->currState == Arm::state::MOVING) {
+                        double leftVel = this->leftPID.update(leftError), rightVel = this->rightPID.update(rightError);
+                        this->leftMotor->move(leftVel);
+                        this->rightMotor->move(rightVel);
+                    } else if (this->currState == Arm::state::HOLD) {
+                        this->leftMotor->move(0);
+                        this->rightMotor->move(0);
+                    }
                 }
             }
         }};;

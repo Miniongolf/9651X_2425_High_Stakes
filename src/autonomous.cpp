@@ -3,6 +3,7 @@
 
 rd::Selector selector({
     {"Left WP", &auton::leftWP},
+    {"Left Max", &auton::leftMax},
     {"Right WP", &auton::rightWP},
     {"Skills", &auton::skills}
 });
@@ -21,12 +22,19 @@ rd::Console console;
 * from where it left off.
 */
 void autonomous() {
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
-    int s = isRedAlliance ? 1 : -1;
     robot::resumeTasks();
 
-    selector.run_auton();
+//    selector.run_auton();
+//    auton::leftMax();
+    robot::chassisSetPose(0, 0, 0);
+    activeChassis->moveToPose(0, 24, 0, 2000);
+    robot::chassisPrintPose();
+    activeChassis->turnToHeading(90, 2000);
+    robot::chassisPrintPose();
 
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     // Keep this at the end to suspend tasks. Resume later in opcontrol.
     robot::suspendTasks();
 }

@@ -56,6 +56,7 @@ class Conveyor {
     public:
         enum class state {
             FORWARDS,
+            MAN_INDEX,
             REVERSE,
             STOP,
             UNJAM,
@@ -73,10 +74,11 @@ class Conveyor {
         void update();
 
         void forwards();
+        void manualInd();
         void reverse();
         void stop();
         void unjam();
-        void queueIndex();
+        void queueIndex(int count = 1);
         void resetIndexQueue() { this->indexQueue = 0; }
 
         void resumeTask() {this->task.resume();};
@@ -90,13 +92,13 @@ class Conveyor {
         void index();
         void idle();
 
-        [[nodiscard]] bool detectRing() const { return this->optical->get_brightness() > 0.03; }
-        void moveToIndex(double pose);
+        [[nodiscard]] bool detectRing() const { return this->optical->get_brightness() > 0.045; }
+        void moveToIndex();
 
         Conveyor::state currState = Conveyor::state::IDLE;
         Conveyor::state prevState = Conveyor::state::IDLE;
 
-        double closeIndexThresh = 7, farIndexThresh = 50;
+        double closeIndexThresh = 5, farIndexThresh = 40;
 
         int indexQueue = 0;
         double targetIndexPose = 0;
@@ -108,7 +110,6 @@ class Conveyor {
         pros::Task task{[&] {
             while (true) {
                 pros::delay(10);
-                std::printf("Conveyor: %d\n", std::abs(this->hooks.getCurrent()));
                 this->update();
 
                 if (this->currState == Conveyor::state::UNJAM) {
@@ -119,7 +120,8 @@ class Conveyor {
                 }
 
                 else if (this->currState == Conveyor::state::INDEX) {
-                    this->moveToIndex(0);
+                    this->moveToIndex();
+                    this->idle();
                 }
             }
         }};

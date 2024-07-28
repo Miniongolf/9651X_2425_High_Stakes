@@ -98,18 +98,25 @@ lemlib::OdomSensors odom(
     &imu
 );
 
+lemlib::ExpoDriveCurve throttleCurve(5, 20, 1);
+lemlib::ExpoDriveCurve steerCurve(5, 10, 1);
+
 lemlib::Chassis chassis(
     drivetrain,
     lateralPID,
     angularPID,
-    odom
+    odom,
+    &throttleCurve,
+    &steerCurve
 );
 
 lemlib::Chassis ptoChassis(
     ptoDrivetrain,
     lateralPID,
     angularPID,
-    odom
+    odom,
+    &throttleCurve,
+    &steerCurve
 );
 
 lemlib::Chassis* activeChassis = &chassis;
