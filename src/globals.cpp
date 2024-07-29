@@ -49,7 +49,7 @@ lemlib::TrackingWheel vertTracker(
 );
 
 lemlib::ControllerSettings lateralPID(
-    80, // proportional gain (kP)
+    85, // proportional gain (kP)
     0, // integral gain (kI), set to 0 to disable
     15, // derivative gain (kD)
     3, // integral anti-windup range, set to 0 to disable
@@ -57,19 +57,19 @@ lemlib::ControllerSettings lateralPID(
     100, // small error range timeout, in milliseconds
     3, // large error range, in inches
     500, // large error range timeout, in milliseconds
-    5 // maximum acceleration (slew)
+    20 // maximum acceleration (slew)
 );
 
 lemlib::ControllerSettings angularPID(
-    4, // proportional gain (kP)
-    0.1, // integral gain (kI), set to 0 to disable
-    15, // derivative gain (kD)
+    3, // proportional gain (kP)
+    0, // integral gain (kI), set to 0 to disable
+    20, // derivative gain (kD)
     3, // integral anti-windup range, set to 0 to disable
     1, // small error range, in degrees
     100, // small error range timeout, in milliseconds
     3, // large error range, in degrees
     500, // large error range timeout, in milliseconds
-    50 // maximum acceleration (slew)
+    20 // maximum acceleration (slew)
 );
 
 lemlib::Drivetrain drivetrain(
@@ -78,7 +78,7 @@ lemlib::Drivetrain drivetrain(
     12.5,
     lemlib::Omniwheel::NEW_275,
     450,
-    6
+    4
 );
 
 lemlib::Drivetrain ptoDrivetrain(
@@ -87,7 +87,7 @@ lemlib::Drivetrain ptoDrivetrain(
     12.5,
     lemlib::Omniwheel::NEW_275,
     450,
-    6
+    4
 );
 
 lemlib::OdomSensors odom(

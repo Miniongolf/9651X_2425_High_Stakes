@@ -17,10 +17,12 @@ void robot::setPTO(bool state) {
         activeChassis = &ptoChassis;
         arm.connect();
         arm.moveToAngle(arm.getAngle());
+        conveyor.canIndex = false;
     } else {
         ptoPiston.retract();
         activeChassis = &chassis;
         arm.disconnect();
+        conveyor.canIndex = true;
     }
 }
 
@@ -74,7 +76,7 @@ void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 }
 
 void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params) {
-    float moveSpeed = 75;
+    float moveSpeed = 40;
 
     lemlib::Pose newPose(
         pose.x - mogoOffset * std::cos(lemlib::degToRad(90-pose.theta)),
@@ -90,9 +92,9 @@ void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 
     activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
     activeChassis->waitUntilDone();
-    robot::chassisMove(-moveSpeed, 30, 200);
-    robot::chassisStop();
+    robot::chassisMove(-moveSpeed, 0, 500);
     mogoMech.retract();
+    robot::chassisStop();
 }
 
 void robot::chassisWallStake(const lemlib::Pose pose, int timeout, bool isAllianceStake, lemlib::MoveToPoseParams params) {

@@ -16,8 +16,8 @@ class Intake {
 
         void move(int speed) { this->motor->move(speed); };
 
-    private:
         std::unique_ptr<pros::Motor> motor;
+    private:
         const float threshTorque = 0;
 };
 
@@ -28,7 +28,7 @@ class Hooks {
         /**
          * @return Whether the hooks are jammed
          */
-        [[nodiscard]] bool isJammed() const { return std::abs(motor->get_current_draw()) > this->jamCurrent; }
+        [[nodiscard]] bool isJammed() const { return (std::abs(motor->get_current_draw()) > this->jamCurrent) && std::abs(this->motor->get_actual_velocity()) < 10; }
 
         /**
          * Moves the hooks at a given voltage
@@ -46,9 +46,9 @@ class Hooks {
 
         lemlib::PID farPID {0.75, 0, 0};
         lemlib::PID closePID {0.2, 0.01, 1};
-    private:
-        int jamCurrent = 4000;
         std::unique_ptr<pros::Motor> motor;
+    private:
+        int jamCurrent = 1500;
 };
 
 
@@ -84,6 +84,7 @@ class Conveyor {
         void resumeTask() {this->task.resume();};
         void suspendTask() {this->task.suspend();};
 
+        bool canIndex = true;
         Intake& intake;
         Hooks& hooks;
         std::unique_ptr<pros::Optical> optical;
@@ -92,7 +93,11 @@ class Conveyor {
         void index();
         void idle();
 
-        [[nodiscard]] bool detectRing() const { return this->optical->get_brightness() > 0.045; }
+        [[nodiscard]] bool detectRing() const {
+            return this->optical->get_brightness() > 0.04 &&
+                   (red.inRange(this->optical->get_hue()) ||
+                   blue.inRange(this->optical->get_hue()));
+        }
         void moveToIndex();
 
         Conveyor::state currState = Conveyor::state::IDLE;
@@ -102,6 +107,7 @@ class Conveyor {
 
         int indexQueue = 0;
         double targetIndexPose = 0;
+        bool isReversing = false;
 
         ColourRange red = ColourRange(0, 25);
         ColourRange blue = ColourRange(150, 250);
@@ -110,18 +116,24 @@ class Conveyor {
         pros::Task task{[&] {
             while (true) {
                 pros::delay(10);
+//                std::printf("Optical: %f %f | %d\n", optical->get_brightness(), optical->get_hue(), this->detectRing());
+                std::printf("HOOKS JAM TEST: %lu %f | %d\n", this->hooks.motor->get_current_draw(), this->hooks.motor->get_actual_velocity(), this->hooks.isJammed());
                 this->update();
 
                 if (this->currState == Conveyor::state::UNJAM) {
                     if (this->prevState == Conveyor::state::REVERSE) { this->hooks.move(50); }
                     else { this->hooks.move(-50); }
-                    pros::delay(100);
+                    pros::delay(500);
                     if (!this->hooks.isJammed()) { this->idle(); }
                 }
 
                 else if (this->currState == Conveyor::state::INDEX) {
-                    this->moveToIndex();
-                    this->idle();
+                    if (this->canIndex) {
+                        this->moveToIndex();
+                        this->idle();
+                    } else {
+                        this->idle();
+                    }
                 }
             }
         }};

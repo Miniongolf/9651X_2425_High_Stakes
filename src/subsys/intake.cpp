@@ -16,7 +16,7 @@ Conveyor::Conveyor(Intake& intake, Hooks& hooks, std::unique_ptr<pros::Optical> 
     : intake(intake),
       hooks(hooks),
       optical(std::move(optical)) {
-    this->optical->set_led_pwm(50);
+    this->optical->set_led_pwm(100);
 }
 
 void Conveyor::update() {
@@ -36,16 +36,19 @@ void Conveyor::update() {
         case state::FORWARDS: {
             this->intake.move(127);
             this->hooks.move(127);
+            this->isReversing = false;
             break;
         }
         case state::MAN_INDEX: {
             this->intake.move(127);
             this->hooks.move(50);
+            this->isReversing = false;
             break;
         }
         case state::REVERSE: {
             this->intake.move(-127);
             this->hooks.move(-70);
+            this->isReversing = true;
             break;
         }
         case state::INDEX: {
@@ -54,6 +57,7 @@ void Conveyor::update() {
         case state::STOP: {
             this->intake.move(0);
             this->hooks.move(0);
+            this->isReversing = false;
             break;
         }
         case state::IDLE: {break;}
@@ -111,8 +115,10 @@ void Conveyor::moveToIndex() {
     while (this->detectRing() && !indexTimer.isDone()) {
         pros::delay(10);
     }
+    pros::delay(200);
     hooks.move(-127);
-    pros::delay(1000);
+    pros::delay(1500);
+    indexQueue -= 1;
 
 //    double error = -lemlib::angleError(this->targetIndexPose, this->hooks.getPose(), false);
 ////    std::printf("Conveyor Error: %f -> %f\n", this->hooks.getPose(), error);

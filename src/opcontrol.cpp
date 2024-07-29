@@ -20,7 +20,13 @@ void opcontrol() {
     // Initialize all subsystems
     robot::resumeTasks();
 
+    if (isRedAlliance) {
+        master.print(0, 0, "Red alliance");
+    } else {
+        master.print(0, 0, "Blue alliance");
+    }
     printf("-- OPCONTROL STARTING --\n");
+
     while (true) {
         // Mogo Mech
         if (master.get_digital_new_press(DIGITAL_L1)) mogoMech.toggle();

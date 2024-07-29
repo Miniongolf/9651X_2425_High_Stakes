@@ -22,17 +22,15 @@ rd::Console console;
 * from where it left off.
 */
 void autonomous() {
+    std::printf("isRedAlliance: %d", isRedAlliance);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
     robot::resumeTasks();
 
+//    auton::tunePID();
 //    selector.run_auton();
-//    auton::leftMax();
-    robot::chassisSetPose(0, 0, 0);
-    activeChassis->moveToPose(0, 24, 0, 2000);
-    robot::chassisPrintPose();
-    activeChassis->turnToHeading(90, 2000);
-    robot::chassisPrintPose();
+    auton::leftMax();
+
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     // Keep this at the end to suspend tasks. Resume later in opcontrol.

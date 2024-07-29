@@ -30,7 +30,7 @@ void initialize() {
         else if (master.get_digital(DIGITAL_A)) {isRedAlliance = false;}
     }
     if (isRedAlliance) {
-        master.rumble("_");
+        master.rumble("..");
         master.print(0, 0, "Red alliance");
     } else {
         master.rumble("...");
