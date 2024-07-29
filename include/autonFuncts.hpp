@@ -3,10 +3,10 @@
 #pragma once
 
 namespace auton {
-void leftWP();
-void leftMax();
-void rightWP();
-void rightRush();
+void scoreWP();
+void scoreMax();
+void rushWP();
+void rushRush();
 void skills();
 
 void tunePID();

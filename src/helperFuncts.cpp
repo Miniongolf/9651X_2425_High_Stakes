@@ -72,7 +72,7 @@ void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 //    if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
 
     activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
-    activeChassis->waitUntilDone();
+    robot::chassisPrintPose();
 }
 
 void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params) {

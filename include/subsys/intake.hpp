@@ -117,7 +117,7 @@ class Conveyor {
             while (true) {
                 pros::delay(10);
 //                std::printf("Optical: %f %f | %d\n", optical->get_brightness(), optical->get_hue(), this->detectRing());
-                std::printf("HOOKS JAM TEST: %lu %f | %d\n", this->hooks.motor->get_current_draw(), this->hooks.motor->get_actual_velocity(), this->hooks.isJammed());
+//                std::printf("HOOKS JAM TEST: %lu %f | %d\n", this->hooks.motor->get_current_draw(), this->hooks.motor->get_actual_velocity(), this->hooks.isJammed());
                 this->update();
 
                 if (this->currState == Conveyor::state::UNJAM) {

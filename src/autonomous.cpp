@@ -2,9 +2,9 @@
 #include "autonFuncts.hpp"
 
 rd::Selector selector({
-    {"Left WP", &auton::leftWP},
-    {"Left Max", &auton::leftMax},
-    {"Right WP", &auton::rightWP},
+    {"Score WP", &auton::scoreWP},
+    {"Score Max", &auton::scoreMax},
+    {"Rush WP", &auton::rushWP},
     {"Skills", &auton::skills}
 });
 
@@ -22,14 +22,14 @@ rd::Console console;
 * from where it left off.
 */
 void autonomous() {
-    std::printf("isRedAlliance: %d", isRedAlliance);
+    std::printf("isRedAlliance: %d\n", isRedAlliance);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
     robot::resumeTasks();
 
 //    auton::tunePID();
 //    selector.run_auton();
-    auton::leftMax();
+    auton::scoreMax();
 
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

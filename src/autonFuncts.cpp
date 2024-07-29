@@ -1,7 +1,7 @@
 #include "autonFuncts.hpp"
 
 namespace auton {
-void leftWP() {
+void scoreWP() {
     float s = isRedAlliance ? 1 : -1;
     robot::chassisSetPose(-56.5*s, 16.5, -90*s);
     robot::chassisGrabMogo({-24*s, 24, 60*s}, 2500);
@@ -16,47 +16,51 @@ void leftWP() {
 //    activeChassis->moveToPose(-24, 5, 180, 2000, {.maxSpeed = 75});
 }
 
-void leftMax() {
-//    float s = isRedAlliance ? 1 : -1;
-    float s = -1;
+void scoreMax() {
+    float s = isRedAlliance ? 1 : -1;
     robot::chassisSetPose(-64*s, 12, 180*s);
     robot::chassisGrabMogo({-24*s, 24, 60*s}, 2000, {.lead=0.1, .maxSpeed=100});
+    // Close ring
     robot::chassisGrabRing({-28*s, 48, 0*s}, 2000, {.lead=0, .maxSpeed=100});
     activeChassis->moveToPose(-35*s, 35, 45*s, 2000, {.forwards=false});
     pros::delay(500);
+    // Mid ring 1
     robot::chassisGrabRing({-8*s, 45, 85*s}, 2000, {.lead=0});
-    pros::delay(1500);
-    activeChassis->moveToPose(-24*s, 48, 90*s, 1000, {.forwards=false});
-    conveyor.queueIndex(1);
     pros::delay(500);
-    robot::chassisGrabRing({-4*s, 51, 90*s}, 2000);
-    activeChassis->turnToPoint(0, 70, 1000);
+    activeChassis->moveToPose(-24*s, 48, 90*s, 1000, {.forwards=false});
+    pros::delay(500);
+    // Mid ring 2
+    robot::chassisGrabRing({-8*s, 51, 90*s}, 2000);
     pros::delay(1000);
-
-//    robot::chassisGrabRing({-4*s, 60, 100*s}, 2000, {.lead=1, .maxSpeed=70});
-
-//    activeChassis->moveToPose(48*s, 36, 135*s, 1250, {.forwards = false, .maxSpeed = 127});
-//    activeChassis->turnToPoint(-24*s, 24, 600, {.forwards = false});
-//    robot::chassisGrabMogo({-24*s, 24, 60*s}, 1500, {.lead = 0, .maxSpeed = 127});
-//    robot::chassisPrintPose();
-
-//    robot::chassisGrabRing({-4*s, 43, 90*s}, 2000);
-//    activeChassis->turnToPoint(0, 70, 2000);
-//    robot::chassisWallStake({0, 70, 45*s}, 4000);
-//    robot::chassisMove(-70, 0, 500);
-
-//    robot::chassisGrabRing({-4*s, 50, 90*s}, 2000);
-//    activeChassis->moveToPose(-18*s, 38, 45*s, 1500);
-//    robot::chassisGrabRing({-4*s, 55, 90*s}, 2000);
-//    robot::setPTO(true);
-//    robot::chassisWallStake({0, 69, 45*s}, 3000);
+    robot::setPTO(true);
+    conveyor.stop();
+    robot::chassisMove(50, 0, 200);
+    // Bar touch
+    activeChassis->moveToPose(-24*s, 24, 135*s, 5000, {.forwards=true, .lead=0, .maxSpeed=70});
+    robot::chassisPrintPose();
+    activeChassis->moveToPose(-15*s, 8.5, 135*s, 5000, {.forwards=true, .lead=0, .maxSpeed=70});
+    pros::delay(700);
+    arm.moveToAngle(20);
+    robot::chassisPrintPose();
 }
 
-void rightWP() {
-
+void rushWP() {
+    float s = isRedAlliance ? 1 : -1;
+    robot::chassisSetPose(-64*s, -12, 0);
+    robot::chassisGrabMogo({-24*s, -24, -60*s}, 2000, {.lead=0.1, .maxSpeed=100});
+    robot::chassisGrabRing({-28*s, -48, -0*s}, 2000, {.lead=0, .maxSpeed=100});
+    activeChassis->turnToHeading(0, 1000);
+    robot::setPTO(true);
+    activeChassis->moveToPose(-12*s, -12, 45*s, 2000, {.maxSpeed=50});
+    activeChassis->waitUntilDone();
+    arm.moveToAngle(20);
+    robot::chassisPrintPose();
+    pros::delay(5000);
+    arm.moveToAngle(arm.getAngle());
+    pros::delay(2000);
 }
 
-void rightRush() {}
+void rushRush() {}
 
 void skills() {
     robot::chassisSetPose(0, 0, 0);
