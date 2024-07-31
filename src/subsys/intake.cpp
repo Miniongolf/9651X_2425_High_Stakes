@@ -35,7 +35,12 @@ void Conveyor::update() {
     switch (this->currState) {
         case state::FORWARDS: {
             this->intake.move(127);
-            this->hooks.move(127);
+
+            if (this->indexQueue > 0) {
+                this->hooks.move(100);
+            } else {
+                this->hooks.move(127);
+            }
             this->isReversing = false;
             break;
         }
@@ -113,12 +118,13 @@ void Conveyor::moveToIndex() {
     lemlib::Timer indexTimer(5000);
     indexTimer.resume();
 
-    hooks.move(50);
+    this->intake.move(-127);
+    this->hooks.move(50);
     this->isReversing = false;
     while (this->detectRing() && !indexTimer.isDone()) {
         pros::delay(10);
     }
-    pros::delay(200);
+    pros::delay(70);
     hooks.move(-127);
     this->isReversing = true;
     pros::delay(1500);

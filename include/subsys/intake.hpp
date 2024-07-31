@@ -121,8 +121,9 @@ class Conveyor {
                 this->update();
 
                 if (this->currState == Conveyor::state::UNJAM) {
-                    if (this->prevState == Conveyor::state::REVERSE) { this->hooks.move(50); }
+                    if (this->isReversing) { this->hooks.move(50); }
                     else { this->hooks.move(-50); }
+                    this->isReversing = !this->isReversing;
                     pros::delay(500);
                     if (!this->hooks.isJammed()) { this->idle(); }
                 }
@@ -130,10 +131,8 @@ class Conveyor {
                 else if (this->currState == Conveyor::state::INDEX) {
                     if (this->canIndex) {
                         this->moveToIndex();
-                        this->idle();
-                    } else {
-                        this->idle();
                     }
+                    this->idle();
                 }
             }
         }};

@@ -8,9 +8,8 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-
     pros::Controller master(pros::E_CONTROLLER_MASTER);
-
+    master.print(0, 0, "X -> Red | A -> Blue");
 	chassis.calibrate();
 //	ptoChassis.calibrate(false);
 
@@ -30,10 +29,10 @@ void initialize() {
         else if (master.get_digital(DIGITAL_A)) {isRedAlliance = false;}
     }
     if (isRedAlliance) {
-        master.rumble("..");
+        master.rumble(". .");
         master.print(0, 0, "Red alliance");
     } else {
-        master.rumble("...");
+        master.rumble("..");
         master.print(0, 0, "Blue alliance");
     }
 }

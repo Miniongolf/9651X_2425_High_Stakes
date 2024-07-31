@@ -57,12 +57,12 @@ void opcontrol() {
 
         // Chassis
         int throttle = master.get_analog(ANALOG_LEFT_Y);
-        int turn = master.get_analog(ANALOG_RIGHT_X);
+        int turn = master.get_analog(ANALOG_RIGHT_X) * 0.7;
 
-        if (master.get_digital(DIGITAL_RIGHT)) {
-            activeChassis->arcade(throttle/2, turn/2, false, 0.7);
+        if (master.get_digital(DIGITAL_RIGHT) != arm.getAngle() > 0) {
+            activeChassis->arcade(throttle/2, turn/2, false, 1);
         } else {
-            activeChassis->arcade(throttle, turn, false, 0.7);
+            activeChassis->arcade(throttle, turn, false, 1);
 
         }
 
