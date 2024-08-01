@@ -17,19 +17,12 @@ Arm::Arm(std::unique_ptr<pros::Motor> leftMotor,
     this->reset();
 }
 
-void Arm::reset() {
-    this->leftMotor->set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-    this->rightMotor->set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-
-    this->leftMotor->tare_position();
-    this->rightMotor->tare_position();
-}
+void Arm::reset() {}
 
 void Arm::moveToAngle(double angle) {
-    this->autonMovement = false;
     double height = angleToHeight(angle);
 //    if (height > 30.25 + 4.5 || height < 8 || this->currState == Arm::state::INACTIVE) return;
-    if (angle > 70 || angle < -55 || this->currState == Arm::state::INACTIVE) return;
+    if (angle > 55 || angle < -55 || this->currState == Arm::state::INACTIVE) return;
     this->targetAngle = angle;
 }
 
@@ -55,8 +48,8 @@ void Arm::connect() {
     this->currState = Arm::state::HOLD;
 }
 
-void Arm::hang() {
-    this->currState = Arm::state::HANG;
+void Arm::descore() {
+    this->currState = Arm::state::DESCORE;
 }
 
 double Arm::getLeftAngle() {

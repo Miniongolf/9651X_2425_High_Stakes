@@ -6,7 +6,7 @@
 #include "pros/optical.hpp"
 #include "lemlib/util.hpp"
 #include "lemlib/timer.hpp"
-#include "colourRange.hpp"
+#include "constants.hpp"
 
 class Intake {
     public:
@@ -48,7 +48,7 @@ class Hooks {
         lemlib::PID closePID {0.2, 0.01, 1};
         std::unique_ptr<pros::Motor> motor;
     private:
-        int jamCurrent = 1500;
+        int jamCurrent = 2000;
 };
 
 
@@ -88,16 +88,17 @@ class Conveyor {
         Intake& intake;
         Hooks& hooks;
         std::unique_ptr<pros::Optical> optical;
-    private:
-        double getIndexPose();
-        void index();
-        void idle();
 
         [[nodiscard]] bool detectRing() const {
             return this->optical->get_brightness() > 0.04 &&
                    (red.inRange(this->optical->get_hue()) ||
                    blue.inRange(this->optical->get_hue()));
         }
+        void idle();
+    private:
+        double getIndexPose();
+        void index();
+
         void moveToIndex();
 
         Conveyor::state currState = Conveyor::state::IDLE;
@@ -109,19 +110,17 @@ class Conveyor {
         double targetIndexPose = 0;
         bool isReversing = false;
 
-        ColourRange red = ColourRange(0, 25);
-        ColourRange blue = ColourRange(150, 250);
 
 
         pros::Task task{[&] {
             while (true) {
                 pros::delay(10);
-//                std::printf("Optical: %f %f | %d\n", optical->get_brightness(), optical->get_hue(), this->detectRing());
-//                std::printf("HOOKS JAM TEST: %lu %f | %d\n", this->hooks.motor->get_current_draw(), this->hooks.motor->get_actual_velocity(), this->hooks.isJammed());
+
                 this->update();
 
                 if (this->currState == Conveyor::state::UNJAM) {
-                    if (this->isReversing) { this->hooks.move(50); }
+                    this->intake.move(-127);
+                    if (this->isReversing) { this->hooks.move(50);}
                     else { this->hooks.move(-50); }
                     this->isReversing = !this->isReversing;
                     pros::delay(500);

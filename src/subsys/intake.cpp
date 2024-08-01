@@ -23,7 +23,7 @@ void Conveyor::update() {
     if (this->hooks.isJammed()) {
         this->unjam();
         std::printf("--! HOOKS JAMMED %f!--\n", this->hooks.getPose());
-    } else if (this->detectRing() && this->indexQueue > 0 && !isBusy()) {
+    } else if (this->detectRing() && this->indexQueue > 0 && !isBusy() && this->canIndex) {
         this->index();
         std::printf("--? RING DETECTED | INDEXING ?--\n");
     }
@@ -37,7 +37,7 @@ void Conveyor::update() {
             this->intake.move(127);
 
             if (this->indexQueue > 0) {
-                this->hooks.move(100);
+                this->hooks.move(90);
             } else {
                 this->hooks.move(127);
             }
@@ -60,8 +60,16 @@ void Conveyor::update() {
             break;
         }
         case state::STOP: {
+            double error0 = -lemlib::angleError(0, this->hooks.getPose(), false);
+            double error180 = -lemlib::angleError(180, this->hooks.getPose(), false);
+
             this->intake.move(0);
-            this->hooks.move(0);
+
+            if (std::fabs(error0) < 30 || std::fabs(error180) < 30) {
+                this->hooks.move(50);
+            } else {
+                this->hooks.move(0);
+            }
             this->isReversing = false;
             break;
         }
@@ -119,7 +127,7 @@ void Conveyor::moveToIndex() {
     indexTimer.resume();
 
     this->intake.move(-127);
-    this->hooks.move(50);
+    this->hooks.move(60);
     this->isReversing = false;
     while (this->detectRing() && !indexTimer.isDone()) {
         pros::delay(10);
@@ -129,26 +137,4 @@ void Conveyor::moveToIndex() {
     this->isReversing = true;
     pros::delay(1500);
     indexQueue -= 1;
-
-//    double error = -lemlib::angleError(this->targetIndexPose, this->hooks.getPose(), false);
-////    std::printf("Conveyor Error: %f -> %f\n", this->hooks.getPose(), error);
-//    double hooksFF = (error > 0) ? 25 : -25;
-//    if (std::fabs(error) <= this->closeIndexThresh) {
-//        std::printf("DONE!!!\n");
-//        this->hooks.move(-127);
-//        this->hooks.closePID.reset();
-//        this->hooks.farPID.reset();
-//        this->indexQueue -= 1;
-//        pros::delay(1000);
-//        this->idle();
-//
-//    } else if (std::fabs(error) <= this->farIndexThresh) {
-//        int hooksVel = std::clamp(this->hooks.closePID.update(error), (float)-25.0, (float)25.0);
-//        hooks.move(hooksVel + hooksFF);
-////        std::printf("Close: %d\n", hooksVel);
-//    } else {
-//        int hooksVel = this->hooks.farPID.update(error);
-//        hooks.move(hooksVel + hooksFF);
-////        std::printf("Far: %d\n", hooksVel);
-//    }
 }

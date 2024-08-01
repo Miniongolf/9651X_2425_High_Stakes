@@ -76,7 +76,7 @@ void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 }
 
 void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params) {
-    float moveSpeed = 40;
+    float moveSpeed = 60;
 
     lemlib::Pose newPose(
         pose.x - mogoOffset * std::cos(lemlib::degToRad(90-pose.theta)),
@@ -99,7 +99,7 @@ void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 
 void robot::chassisWallStake(const lemlib::Pose pose, int timeout, bool isAllianceStake, lemlib::MoveToPoseParams params) {
     double offset = isAllianceStake ? allianceStakeOffset : wallStakeOffset;
-    double targetAngle = isAllianceStake ? 8 : 60;
+    double targetAngle = isAllianceStake ? 10 : 60;
 
     lemlib::Pose newPose(
         pose.x - offset * std::cos(lemlib::degToRad(90-pose.theta)),
@@ -110,14 +110,16 @@ void robot::chassisWallStake(const lemlib::Pose pose, int timeout, bool isAllian
     robot::printPose(newPose);
 
     robot::setPTO(true);
-    //    if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
+    arm.moveToAngle(targetAngle);
+    pros::delay(1000);
+//    robot::chassisMove(50, -50, 200);
+//        if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
 
     activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
-    arm.moveToAngle(targetAngle + 3);
     activeChassis->waitUntilDone();
     pros::delay(200);
     arm.moveToAngle(targetAngle - 9);
-    pros::delay(750);
+    pros::delay(1000);
     robot::setPTO(false);
-    robot::chassisMove(-100, 0, 500);
+    robot::chassisMove(-100, 0, 300);
 }

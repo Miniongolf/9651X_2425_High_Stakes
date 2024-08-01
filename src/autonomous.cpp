@@ -5,6 +5,7 @@ rd::Selector selector({
     {"Score WP", &auton::scoreWP},
     {"Score Max", &auton::scoreMax},
     {"Rush WP", &auton::rushWP},
+    {"Rush Rush", &auton::rushRush},
     {"Skills", &auton::skills}
 });
 
@@ -28,8 +29,8 @@ void autonomous() {
     robot::resumeTasks();
 
 //    auton::tunePID();
-//    selector.run_auton();
-    auton::scoreMax();
+    selector.run_auton();
+//    auton::scoreMax();
 
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

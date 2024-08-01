@@ -19,6 +19,7 @@ void opcontrol() {
 
     // Initialize all subsystems
     robot::resumeTasks();
+    robot::setPTO(false);
 
     if (isRedAlliance) {
         master.print(0, 0, "Red alliance");
@@ -42,24 +43,29 @@ void opcontrol() {
         else if (master.get_digital_new_press(DIGITAL_DOWN)) conveyor.resetIndexQueue();
         else conveyor.stop();
 
-        if (master.get_digital(DIGITAL_A)) {
+        if (master.get_digital(DIGITAL_A) && master.get_digital(DIGITAL_LEFT)) {
             autonomous();
+            robot::resumeTasks();
         }
 
         // Arm
-        if (partner.get_digital(DIGITAL_B)) arm.reset();
-        else if (partner.get_digital(DIGITAL_X)) arm.moveToAngle(60);
-        else if (partner.get_digital(DIGITAL_A)) arm.moveToAngle(10);
+
+
+        if (master.get_digital_new_press(DIGITAL_B) || partner.get_digital_new_press(DIGITAL_Y)) {
+            arm.changeAngle(-9);
+        } else if (partner.get_digital(DIGITAL_X)) arm.moveToAngle(50);
+        else if (partner.get_digital(DIGITAL_A)) arm.moveToAngle(9);
         else if (partner.get_digital(DIGITAL_R1)) arm.changeAngle(0.6);
         else if (partner.get_digital(DIGITAL_R2)) arm.changeAngle(-0.6);
-//        else if (partner.get_digital(DIGITAL_DOWN)) arm.hang();
+//        else if (partner.get_digital(DIGITAL_L1)) arm.descore();
+
         arm.angleOffset += 0.01 * partner.get_analog(ANALOG_RIGHT_X);
 
         // Chassis
         int throttle = master.get_analog(ANALOG_LEFT_Y);
-        int turn = master.get_analog(ANALOG_RIGHT_X) * 0.7;
+        int turn = master.get_analog(ANALOG_RIGHT_X) * 0.5;
 
-        if (master.get_digital(DIGITAL_RIGHT) != arm.getAngle() > 0) {
+        if (master.get_digital(DIGITAL_RIGHT) != arm.getAngle() > 40) {
             activeChassis->arcade(throttle/2, turn/2, false, 1);
         } else {
             activeChassis->arcade(throttle, turn, false, 1);
