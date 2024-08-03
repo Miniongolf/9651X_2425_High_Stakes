@@ -9,7 +9,7 @@ rd::Selector selector({
     {"Skills", &auton::skills}
 });
 
-rd::Console console;
+//rd::Console console;
 
 /**
 * Runs the user autonomous code. This function will be started in its own task
@@ -29,8 +29,9 @@ void autonomous() {
     robot::resumeTasks();
 
 //    auton::tunePID();
-    selector.run_auton();
-//    auton::scoreMax();
+//    selector.run_auton();
+    auton::skills();
+//    auton::rushRush();
 
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

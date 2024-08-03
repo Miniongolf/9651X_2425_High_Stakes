@@ -5,6 +5,7 @@
 namespace auton {
 void scoreWP();
 void scoreMax();
+void scoreRush();
 void rushWP();
 void rushRush();
 void skills();

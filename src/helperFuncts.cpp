@@ -56,8 +56,7 @@ void robot::chassisMove(int throttle, int turn, int time) {
     robot::chassisStop();
 }
 
-void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params) {
-    float moveSpeed = 50;
+void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPointParams params, bool index, int indexTime) {
     conveyor.forwards();
 
     lemlib::Pose newPose(
@@ -69,9 +68,14 @@ void robot::chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
     robot::printPose(newPose);
 
     params.forwards = true;
-//    if (params.minSpeed <= moveSpeed) { params.minSpeed = moveSpeed; }
 
-    activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
+//    activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
+    activeChassis->moveToPoint(newPose.x, newPose.y, timeout, params);
+    if (index) {
+        pros::delay(indexTime);
+        conveyor.queueIndex();
+    }
+    activeChassis->waitUntilDone();
     robot::chassisPrintPose();
 }
 
@@ -92,7 +96,7 @@ void robot::chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPosePa
 
     activeChassis->moveToPose(newPose.x, newPose.y, newPose.theta, timeout, params);
     activeChassis->waitUntilDone();
-    robot::chassisMove(-moveSpeed, 0, 500);
+    robot::chassisMove(-moveSpeed, 0, 300);
     mogoMech.retract();
     robot::chassisStop();
 }

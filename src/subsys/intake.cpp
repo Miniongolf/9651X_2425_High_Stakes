@@ -28,19 +28,10 @@ void Conveyor::update() {
         std::printf("--? RING DETECTED | INDEXING ?--\n");
     }
 
-    if (this->currState != this->prevState) {
-        this->prevState = this->currState;
-    }
-
     switch (this->currState) {
         case state::FORWARDS: {
             this->intake.move(127);
-
-            if (this->indexQueue > 0) {
-                this->hooks.move(90);
-            } else {
-                this->hooks.move(127);
-            }
+            this->hooks.move(127);
             this->isReversing = false;
             break;
         }
@@ -52,7 +43,7 @@ void Conveyor::update() {
         }
         case state::REVERSE: {
             this->intake.move(-127);
-            this->hooks.move(-70);
+            this->hooks.move(-127);
             this->isReversing = true;
             break;
         }

@@ -28,7 +28,7 @@ class Hooks {
         /**
          * @return Whether the hooks are jammed
          */
-        [[nodiscard]] bool isJammed() const { return (std::abs(motor->get_current_draw()) > this->jamCurrent) && std::abs(this->motor->get_actual_velocity()) < 10; }
+        [[nodiscard]] bool isJammed() const { return (std::abs(motor->get_current_draw()) > this->jamCurrent) && std::abs(this->motor->get_actual_velocity()) < 4; }
 
         /**
          * Moves the hooks at a given voltage
@@ -48,7 +48,7 @@ class Hooks {
         lemlib::PID closePID {0.2, 0.01, 1};
         std::unique_ptr<pros::Motor> motor;
     private:
-        int jamCurrent = 2000;
+        int jamCurrent = 2500;
 };
 
 
@@ -103,6 +103,7 @@ class Conveyor {
 
         Conveyor::state currState = Conveyor::state::IDLE;
         Conveyor::state prevState = Conveyor::state::IDLE;
+        Conveyor::state lastState = Conveyor::state::IDLE;
 
         double closeIndexThresh = 5, farIndexThresh = 40;
 
@@ -124,7 +125,7 @@ class Conveyor {
                     else { this->hooks.move(-50); }
                     this->isReversing = !this->isReversing;
                     pros::delay(500);
-                    if (!this->hooks.isJammed()) { this->idle(); }
+                    if (!this->hooks.isJammed()) { this->currState = prevState; }
                 }
 
                 else if (this->currState == Conveyor::state::INDEX) {

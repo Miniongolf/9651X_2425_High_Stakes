@@ -22,10 +22,10 @@ Arm arm(
 pros::adi::Pneumatics ptoPiston('A', isPtoActive, false);
 pros::adi::Pneumatics mogoMech('B', true, true);
 
-pros::MotorGroup leftDrive({-1, -9, 3}, pros::v5::MotorGears::blue);
+pros::MotorGroup leftDrive({-1, -7, 3}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({21, 2, -19}, pros::v5::MotorGears::blue);
 
-pros::MotorGroup ptoLeftDrive({-1, -9}, pros::v5::MotorGears::blue);
+pros::MotorGroup ptoLeftDrive({-1, -7}, pros::v5::MotorGears::blue);
 pros::MotorGroup ptoRightDrive({21, 2}, pros::v5::MotorGears::blue);
 
 pros::IMU imu(18);
@@ -49,19 +49,19 @@ lemlib::TrackingWheel vertTracker(
 );
 
 lemlib::ControllerSettings lateralPID(
-    85, // proportional gain (kP)
+    250, // proportional gain (kP)
     0, // integral gain (kI), set to 0 to disable
-    15, // derivative gain (kD)
+    5, // derivative gain (kD)
     3, // integral anti-windup range, set to 0 to disable
     1, // small error range, in inches
     100, // small error range timeout, in milliseconds
     3, // large error range, in inches
     500, // large error range timeout, in milliseconds
-    20 // maximum acceleration (slew)
+    0 // maximum acceleration (slew)
 );
 
 lemlib::ControllerSettings angularPID(
-    3, // proportional gain (kP)
+    2.5, // proportional gain (kP)
     0, // integral gain (kI), set to 0 to disable
     20, // derivative gain (kD)
     3, // integral anti-windup range, set to 0 to disable

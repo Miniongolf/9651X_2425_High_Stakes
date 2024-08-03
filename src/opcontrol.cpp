@@ -17,9 +17,11 @@ void opcontrol() {
     pros::Controller master(pros::E_CONTROLLER_MASTER);
     pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
+    int counter = 0;
+
     // Initialize all subsystems
     robot::resumeTasks();
-    robot::setPTO(false);
+//    robot::setPTO(false);
 
     if (isRedAlliance) {
         master.print(0, 0, "Red alliance");
@@ -29,6 +31,10 @@ void opcontrol() {
     printf("-- OPCONTROL STARTING --\n");
 
     while (true) {
+        if (isPtoActive && counter % 100 == 0) {
+            master.rumble(".");
+        }
+
         // Mogo Mech
         if (master.get_digital_new_press(DIGITAL_L1)) mogoMech.toggle();
 
@@ -44,13 +50,14 @@ void opcontrol() {
         else conveyor.stop();
 
         if (master.get_digital(DIGITAL_A) && master.get_digital(DIGITAL_LEFT)) {
-            autonomous();
-            robot::resumeTasks();
+            arm.moveToAngle(9);
+            pros::delay(500);
+            robot::chassisMove(50, 0, 350);
+            arm.moveToAngle(-20);
+            pros::delay(100);
         }
 
         // Arm
-
-
         if (master.get_digital_new_press(DIGITAL_B) || partner.get_digital_new_press(DIGITAL_Y)) {
             arm.changeAngle(-9);
         } else if (partner.get_digital(DIGITAL_X)) arm.moveToAngle(50);
@@ -72,6 +79,7 @@ void opcontrol() {
 
         }
 
+        counter++;
         pros::delay(10);
    }
 }
