@@ -49,14 +49,6 @@ void opcontrol() {
         else if (master.get_digital_new_press(DIGITAL_DOWN)) conveyor.resetIndexQueue();
         else conveyor.stop();
 
-        if (master.get_digital(DIGITAL_A) && master.get_digital(DIGITAL_LEFT)) {
-            arm.moveToAngle(9);
-            pros::delay(500);
-            robot::chassisMove(50, 0, 350);
-            arm.moveToAngle(-20);
-            pros::delay(100);
-        }
-
         // Arm
         if (master.get_digital_new_press(DIGITAL_B) || partner.get_digital_new_press(DIGITAL_Y)) {
             arm.changeAngle(-9);

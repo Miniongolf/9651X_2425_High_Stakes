@@ -2,11 +2,11 @@
 #include "autonFuncts.hpp"
 
 rd::Selector selector({
-    {"Score WP", &auton::scoreWP},
-    {"Score Max", &auton::scoreMax},
+    {"Score Disrupt", &auton::scoreDisrupt},
+    {"Score Proper", &auton::scoreMax},
     {"Rush WP", &auton::rushWP},
     {"Rush Rush", &auton::rushRush},
-    {"Skills", &auton::skills}
+//    {"Skills", &auton::skills}
 });
 
 //rd::Console console;
@@ -29,9 +29,10 @@ void autonomous() {
     robot::resumeTasks();
 
 //    auton::tunePID();
-//    selector.run_auton();
-    auton::skills();
+    selector.run_auton();
+//    auton::scoreMax();
 //    auton::rushRush();
+//    auton::rushWP();
 
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

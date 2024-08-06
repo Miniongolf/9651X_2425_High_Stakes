@@ -15,7 +15,7 @@ void chassisPrintPose();
 void chassisStop();
 void chassisMove(int throttle, int turn, int time);
 
-void chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPointParams params = {}, bool index = false, int indexTime = 500);
+void chassisGrabRing(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params = {}, bool index = false, int indexTime = 500);
 void chassisGrabMogo(lemlib::Pose pose, int timeout, lemlib::MoveToPoseParams params = {.lead=0.2});
 void chassisWallStake(lemlib::Pose pose, int timeout, bool isAllianceStake = false, lemlib::MoveToPoseParams params = {.lead=0});
 
