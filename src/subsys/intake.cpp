@@ -1,16 +1,16 @@
 #include "subsys/intake.hpp"
 
-Intake::Intake(std::unique_ptr<pros::Motor> intakeMotor)
-    : motor(std::move(intakeMotor)) {
-    this->motor->set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-    this->motor->tare_position();
+#include <utility>
+
+Intake::Intake(pros::Motor motor, pros::Optical optical)
+    : motor(std::move(motor)),
+      optical(std::move(optical)) {
+    this->motor.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+    this->motor.tare_position();
+    this->optical.set_led_pwm(100);
 }
 
-Hooks::Hooks(std::unique_ptr<pros::Motor> hooksMotor)
-    : motor(std::move(hooksMotor)) {
-    this->motor->set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
-    this->motor->tare_position();
-}
+
 
 Conveyor::Conveyor(Intake& intake, Hooks& hooks, std::unique_ptr<pros::Optical> optical)
     : intake(intake),
