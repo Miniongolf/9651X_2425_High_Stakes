@@ -1,61 +1,44 @@
 #include "subsys/arm.hpp"
 
-Arm::Arm(std::unique_ptr<pros::Motor> leftMotor,
-         std::unique_ptr<pros::Rotation> leftRot, double leftRatio,
-         std::unique_ptr<pros::Motor> rightMotor,
-         std::unique_ptr<pros::Rotation> rightRot, double rightRatio,
-         lemlib::PID pid, int rpm)
-    : leftMotor(std::move(leftMotor)),
-      leftRot(std::move(leftRot)),
-      leftRatio(leftRatio),
-      rightMotor(std::move(rightMotor)),
-      rightRot(std::move(rightRot)),
-      rightRatio(rightRatio),
-      leftPID(pid),
-      rightPID(pid),
-      rpm(rpm) {
-    this->reset();
+// Abstract Arm
+AbstractArm::AbstractArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
+                         double length, double heightOffset, double ratio)
+    : m_motor(std::move(motor)),
+      m_rotSensor(std::move(rotSensor)),
+      m_pid(pid),
+      m_length(length),
+      m_heightOffset(heightOffset),
+      m_ratio(ratio) {}
+
+// Base Arm
+BaseArm::BaseArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
+                 double length, double heightOffset, double ratio)
+    : AbstractArm(std::move(motor), std::move(rotSensor), pid, length, heightOffset, ratio) {}
+
+// Top Arm
+TopArm::TopArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
+               double length, double heightOffset, double ratio, std::unique_ptr<BaseArm> baseArm)
+    : AbstractArm(std::move(motor), std::move(rotSensor), pid, length, heightOffset, ratio),
+      m_baseArm(std::move(baseArm)) {}
+
+TopArm::TopArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
+               double length, double heightOffset, std::unique_ptr<BaseArm> baseArm)
+    : AbstractArm(std::move(motor), std::move(rotSensor), pid, length, heightOffset),
+      m_baseArm(std::move(baseArm)) {}
+
+// Double Arm
+DoubleArm::DoubleArm(std::unique_ptr<BaseArm> baseArm, std::unique_ptr<TopArm> topArm)
+    : m_baseArm(std::move(baseArm)),
+      m_topArm(std::move(topArm)) {}
+
+void DoubleArm::resumeTasks() {
+    m_task.resume();
+    m_baseArm->resumeTask();
+    m_topArm->resumeTask();
 }
 
-void Arm::reset() {}
-
-void Arm::moveToAngle(double angle) {
-    double height = angleToHeight(angle);
-//    if (height > 30.25 + 4.5 || height < 8 || this->currState == Arm::state::INACTIVE) return;
-    if (angle > 55 || angle < -55 || this->currState == Arm::state::INACTIVE) return;
-    this->targetAngle = angle;
-}
-
-void Arm::moveToHeight(double height) {
-    this->moveToAngle(heightToAngle(height));
-}
-
-void Arm::changeAngle(double deltaAngle) {
-    this->moveToAngle(this->targetAngle + deltaAngle);
-}
-
-void Arm::changeHeight(double deltaHeight) {
-    this->moveToHeight(angleToHeight(this->targetAngle) + deltaHeight);
-}
-
-void Arm::disconnect() {
-    this->currState = Arm::state::INACTIVE;
-}
-
-void Arm::connect() {
-    this->leftMotor->move(0);
-    this->rightMotor->move(0);
-    this->currState = Arm::state::HOLD;
-}
-
-void Arm::descore() {
-    this->currState = Arm::state::DESCORE;
-}
-
-double Arm::getLeftAngle() {
-    return this->leftRot->get_position() * 0.01 * this->leftRatio;
-}
-
-double Arm::getRightAngle() {
-    return this->rightRot->get_position() * 0.01 * this->leftRatio;
+void DoubleArm::suspendTasks() {
+    m_task.suspend();
+    m_baseArm->suspendTask();
+    m_topArm->suspendTask();
 }

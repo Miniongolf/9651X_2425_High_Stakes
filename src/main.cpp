@@ -9,35 +9,10 @@
  */
 void initialize() {
     pros::Controller master(pros::E_CONTROLLER_MASTER);
-    master.print(0, 0, "Feed preload into intake");
-
-//    conveyor.forwards();
-//    conveyor.queueIndex(1);
-
 	chassis.calibrate();
-//	ptoChassis.calibrate(false);
-
-    /** @note this must come after chassis init to maintain motor encoder units in deg */
-    arm.reset();
-    arm.moveToAngle(arm.getAngle());
-
     mogoMech.extend();
 
-//    robot::setPTO(true);
-
-//    lemlib::Timer allianceTimer(5000);
-
-//    while (!(master.get_digital(DIGITAL_A) || (master.get_digital(DIGITAL_X)) || (master.get_digital(DIGITAL_Y) || allianceTimer.isDone()))) {
-//        if (master.get_digital(DIGITAL_X)) { isRedAlliance = true; }
-//        else if (master.get_digital(DIGITAL_A)) { isRedAlliance = false; }
-//        else if (master.get_digital(DIGITAL_Y)) { isRedAlliance = red.inRange(conveyor.optical->get_hue()); }
-//    }
-
-//    while (!conveyor.detectRing() && !allianceTimer.isDone()) {
-//        pros::delay(10);
-//    }
-    isRedAlliance = red.inRange(conveyor.optical->get_hue());
-
+    baseArm.zeroRot();
     master.clear();
     if (isRedAlliance) {
         master.rumble(". .");
@@ -47,11 +22,9 @@ void initialize() {
         master.print(0, 0, "Blue alliance");
     }
 
-    conveyor.resetIndexQueue();
     std::printf("Initialized\n");
     std::printf("Left motor temps: %f, %f, %f\n", leftDrive.get_temperature(0), leftDrive.get_temperature(1), leftDrive.get_temperature(2));
     std::printf("Right motor temps: %f, %f, %f\n", rightDrive.get_temperature(0), rightDrive.get_temperature(1), rightDrive.get_temperature(2));
-    robot::suspendTasks();
 }
 
 /**

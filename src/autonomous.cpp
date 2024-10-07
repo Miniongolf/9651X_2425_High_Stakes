@@ -1,16 +1,6 @@
 #include "main.h"
 #include "autonFuncts.hpp"
 
-rd::Selector selector({
-    {"Score Disrupt", &auton::scoreDisrupt},
-    {"Score Proper", &auton::scoreMax},
-    {"Rush WP", &auton::rushWP},
-    {"Rush Rush", &auton::rushRush},
-//    {"Skills", &auton::skills}
-});
-
-//rd::Console console;
-
 /**
 * Runs the user autonomous code. This function will be started in its own task
 * with the default priority and stack size whenever the robot is enabled via
@@ -26,16 +16,15 @@ void autonomous() {
     std::printf("isRedAlliance: %d\n", isRedAlliance);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
-    robot::resumeTasks();
+//     robot::resumeTasks();
 
-//    auton::tunePID();
-    selector.run_auton();
-//    auton::scoreMax();
-//    auton::rushRush();
-//    auton::rushWP();
+// //    auton::tunePID();
+// //    auton::scoreMax();
+// //    auton::rushRush();
+// //    auton::rushWP();
 
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-    // Keep this at the end to suspend tasks. Resume later in opcontrol.
-    robot::suspendTasks();
+//     // Keep this at the end to suspend tasks. Resume later in opcontrol.
+//     robot::suspendTasks();
 }
