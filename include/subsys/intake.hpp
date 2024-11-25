@@ -3,30 +3,13 @@
 #include <cmath>
 #include <memory>
 #include <queue>
+#include "colourRange.hpp"
 #include "pros/adi.hpp"
 #include "pros/motor_group.hpp"
 #include "pros/optical.hpp"
 #include "lemlib/util.hpp"
 #include "lemlib/timer.hpp"
 #include "constants.hpp"
-
-class Redirect {
-    public:
-        enum class state { UP, DOWN };
-
-        /**
-         * @brief Construct a new Redirect object
-         *
-         * @param piston unique ptr to a piston
-         * @param optical unique ptr to an optical sensor
-         */
-        Redirect(std::unique_ptr<pros::adi::Pneumatics> piston, std::unique_ptr<pros::Optical> optical)
-            : m_piston(std::move(piston)),
-              m_optical(std::move(optical)) {};
-    private:
-        std::unique_ptr<pros::adi::Pneumatics> m_piston;
-        std::unique_ptr<pros::Optical> m_optical;
-};
 
 class Intake {
     public:
@@ -37,13 +20,23 @@ class Intake {
          *
          * @param motor unique ptr to a motor object
          */
-        explicit Intake(std::unique_ptr<pros::Motor> motor)
+        Intake(std::unique_ptr<pros::Motor> motor)
             : m_motor(std::move(motor)) {};
 
         /**
          * @brief Destroy the Intake object
          */
         ~Intake() { m_task.remove(); }
+
+        /**
+         * @brief Suspend the intake task
+         */
+        void suspendTask() { m_task.suspend(); }
+
+        /**
+         * @brief Suspend the intake task
+         */
+        void resumeTask() { m_task.resume(); }
 
         /**
          * @brief Move the intake forwards
@@ -67,15 +60,32 @@ class Intake {
          */
         void move(const int voltage) { m_motor->move(voltage); }
 
-        state m_currState = state::STOP;
-    protected:
-        std::unique_ptr<pros::Motor> m_motor;
+        /**
+         * @brief Returns whether the optical sensor hue is in a colour range
+         * @
+         */
+        bool isColourInRange(ColourRange colourRange) {
+            return false;
+        }
 
+        /**
+         * @brief Detect if a ring is present
+         *
+         * @return true if a ring is present
+         * @return false if a ring is not present
+         */
+        bool detectRing() { return false; }
+
+        state m_currState = state::STOP;
+
+        bool filterOn = false;
+        std::unique_ptr<pros::Motor> m_motor;
+    protected:
 
         pros::Task m_task = pros::Task {[&]() {
             while (true) {
                 pros::delay(10);
-                std::printf("INTAKE STATE: %d\n", static_cast<int>(m_currState));
+                
                 switch (m_currState) {
                     case state::FORWARDS: this->move(127); break;
                     case state::REVERSE: this->move(-127); break;

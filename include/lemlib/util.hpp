@@ -75,7 +75,7 @@ constexpr float degToRad(float deg) { return deg * M_PI / 180; }
  * sanitizeAngle(7 * M_PI); // returns pi
  * @endcode
  */
-constexpr float sanitizeAngle(float angle, bool radians = true);
+float sanitizeAngle(float angle, bool radians = true);
 
 /**
  * @brief Calculate the error between 2 angles. Useful when calculating the error between 2 headings

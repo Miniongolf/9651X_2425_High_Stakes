@@ -5,84 +5,57 @@
 
 bool isRedAlliance = true;
 
-Intake intake(std::make_unique<pros::Motor>(20, pros::v5::MotorGears::blue));
-
-BaseArm baseArm(
-    std::make_unique<pros::Motor>(-17, pros::v5::MotorGears::green),
-    std::make_unique<pros::Rotation>(7),
-    {1, 0, 0},
-    8.5,
-    0,
-    7
+Intake intake(
+    std::make_unique<pros::Motor>(20, pros::v5::MotorGears::blue)
 );
 
-// TopArm topArm(
-//     std::make_unique<pros::Motor>(-17, pros::v5::MotorGears::green),
-//     std::make_unique<pros::Rotation>(7),
-//     {0, 0, 0},
-//     8.5,
-//     0,
-//     1,
-//     std::make_unique(baseArm);
-// );
+Arm arm(
+    std::make_unique<pros::Motor>(-9, pros::v5::MotorGears::red),
+    std::make_unique<pros::Rotation>(-10),
+    std::make_unique<pros::adi::Pneumatics>('A', false, false),
+    {10, 0, 5, 0, {-127, 127}, 5, 3, true}
+    // {0, 0, 0}
+);
 
-pros::adi::Pneumatics mogoMech('B', true, true);
+pros::adi::Pneumatics mogoMech('B', false, false);
+pros::adi::Pneumatics doinker('C', false, false);
 
 
-pros::MotorGroup leftDrive({-10, -1, 3}, pros::v5::MotorGears::blue);
-pros::MotorGroup rightDrive({21, 5, -19}, pros::v5::MotorGears::blue);
+pros::MotorGroup leftDrive({-12, -13, 14}, pros::v5::MotorGears::blue);
+pros::MotorGroup rightDrive({2, 3, -4}, pros::v5::MotorGears::blue);
 
-pros::IMU imu(18);
-pros::Optical optical(10);
+pros::IMU imu(5);
 
-pros::Rotation horizRot(6);
-pros::Rotation vertRot(-4);
+pros::Rotation horizRot(1);
+pros::Rotation vertRot(-11);
 
 lemlib::TrackingWheel horizTracker(
     &horizRot,
     lemlib::Omniwheel::NEW_2,
-    2.25,
+    1.5,
     1
 );
 
 lemlib::TrackingWheel vertTracker(
     &vertRot,
     lemlib::Omniwheel::NEW_2,
-    -1,
+    -0.25,
     1
 );
 
-lemlib::ControllerSettings lateralPID(
-    10, // proportional gain (kP)
-    0, // integral gain (kI), set to 0 to disable
-    0, // derivative gain (kD)
-    3, // integral anti-windup range, set to 0 to disable
-    1, // small error range, in inches
-    100, // small error range timeout, in milliseconds
-    3, // large error range, in inches
-    500, // large error range timeout, in milliseconds
-    5 // maximum acceleration (slew)
-);
+lemlib::PID emptyLateralPID(7, 0, 15, 3, true);
+lemlib::PID emptyAngularPID(2, 0, 12, 5, true);
 
-lemlib::ControllerSettings angularPID(
-    2.5, // proportional gain (kP)
-    0, // integral gain (kI), set to 0 to disable
-    0, // derivative gain (kD)
-    3, // integral anti-windup range, set to 0 to disable
-    1, // small error range, in degrees
-    100, // small error range timeout, in milliseconds
-    3, // large error range, in degrees
-    500, // large error range timeout, in milliseconds
-    5 // maximum acceleration (slew)
-);
+lemlib::PID mogoLateralPID(9, 0, 20, 3, true);
+lemlib::PID mogoAngularPID(2.5, 0, 15, 5, true);
 
 lemlib::Drivetrain drivetrain(
     &leftDrive,
     &rightDrive,
-    12.5,
+    11.5,
     lemlib::Omniwheel::NEW_325,
     450,
-    4
+    2
 );
 
 lemlib::OdomSensors odom(
@@ -93,9 +66,13 @@ lemlib::OdomSensors odom(
     &imu
 );
 
+/**
+ * @note take out 2 zeroes from timeouts (100 and 500)
+ * increase timeouts when tuning PID
+ */
 lemlib::Chassis chassis(
     drivetrain,
-    lateralPID,
-    angularPID,
+    {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(), 1, 10000, 3, 50000, 5},
+    {emptyAngularPID.kP, emptyAngularPID.kI, emptyAngularPID.kD, emptyAngularPID.getWindupRange(), 1, 10000, 3, 50000, 0},
     odom
 );

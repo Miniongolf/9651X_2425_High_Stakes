@@ -1,5 +1,6 @@
 #include "main.h"
 #include "autonFuncts.hpp"
+#include "helperFuncts.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -9,22 +10,23 @@
  */
 void initialize() {
     pros::Controller master(pros::E_CONTROLLER_MASTER);
-	chassis.calibrate();
-    mogoMech.extend();
 
-    baseArm.zeroRot();
+    // Calibrate chassis    
+	chassis.calibrate();
+    chassis.setPose(0, 0, 0);
+
+    // Set pneumatics positions
+    arm.retract();
+    mogoMech.retract();
+    doinker.retract();
+
     master.clear();
-    if (isRedAlliance) {
-        master.rumble(". .");
-        master.print(0, 0, "Red alliance");
-    } else {
-        master.rumble("..");
-        master.print(0, 0, "Blue alliance");
-    }
 
     std::printf("Initialized\n");
     std::printf("Left motor temps: %f, %f, %f\n", leftDrive.get_temperature(0), leftDrive.get_temperature(1), leftDrive.get_temperature(2));
     std::printf("Right motor temps: %f, %f, %f\n", rightDrive.get_temperature(0), rightDrive.get_temperature(1), rightDrive.get_temperature(2));
+    std::printf("Intake temp: %f\n", intake.m_motor->get_temperature());
+    std::printf("Arm temp: %f\n", arm.m_motor->get_temperature());
 }
 
 /**
@@ -32,7 +34,9 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+    robot::suspendTasks();
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field

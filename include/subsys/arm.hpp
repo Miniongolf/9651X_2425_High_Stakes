@@ -1,287 +1,270 @@
 #pragma once
 
+#include <cmath>
 #include <memory>
-#include <queue>
+#include <atomic>
+#include <utility>
 #include "lemlib/util.hpp"
+#include "pros/adi.hpp"
 #include "pros/motor_group.hpp"
 #include "lemlib/api.hpp"
+#include "pros/rotation.hpp"
 
-class AbstractArm {
-    protected:
-        AbstractArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
-                    double length, double heightOffset = 0, double ratio = 1);
-        double m_targetAngle = 0, m_angleOffset = 0;
-        double m_length, m_heightOffset, m_jointOffset;
-        std::unique_ptr<pros::Motor> m_motor;
-        std::unique_ptr<pros::Rotation> m_rotSensor;
-        lemlib::PID m_pid;
+namespace armPositions {
+constexpr double standby = 171;
+constexpr double load = 183;
+constexpr double extendedLimit = 45;
+constexpr double wallStake = 50;
+constexpr double allianceStake = 340;
+constexpr double mogoTip = 20;
+} // namespace armPositions
 
-        double m_ratio;
+class PIDf : public lemlib::PID {
     public:
-        virtual void zeroRot() { m_rotSensor->set_position(0); }
+        /**
+         * @brief Construct a new PIDf object
+         *
+         * @param kP
+         * @param kI
+         * @param kD
+         * @param kF
+         * @param range
+         * @param slew
+         * @param windupRange
+         * @param signFlipReset
+         */
+        PIDf(double kP, double kI, double kD, double kF = 0, std::pair<double, double> range = {-127, 127},
+             int slew = 0, float windupRange = 0, bool signFlipReset = false)
+            : lemlib::PID(kP, kI, kD, windupRange, signFlipReset),
+              m_kF(kF),
+              m_range(range),
+              m_slew(slew) {}
 
         /**
-         * @brief Get the angle of the arm, relative to the ground
+         * @brief Set the constants of the PIDf controller
          *
-         * @return double angle in degrees
+         * @param kP
+         * @param kI
+         * @param kD
+         * @param kF
          */
-        virtual double getAngle() { return double(m_rotSensor->get_angle()*m_ratio) / 100 + m_angleOffset; }
+        void setConstants(double kP, double kI, double kD, double kF) {
+            this->kP = kP;
+            this->kI = kI;
+            this->kD = kD;
+            m_kF = kF;
+        }
 
         /**
-         * @brief Get the height of the arm
+         * @brief Get an output from the PIDf controller
          *
-         * @return double height
+         * @param error target - current value
+         * @param feedforward
+         * @return double
          */
-        virtual double getHeight() { return angleToHeight(getAngle()); }
+        double update(double error, double feedforward) {
+            double output = lemlib::PID::update(error) + m_kF * feedforward;
+            lemlib::slew(output, m_prevOutput, m_slew);
+            output = std::clamp(output, m_range.first, m_range.second);
+            m_prevOutput = output;
+            return output;
+        }
+    protected:
+        double m_kF;
+        double m_slew;
+        std::pair<double, double> m_range;
+        double m_prevOutput = 0;
+};
+
+class Arm {
+    public:
+        /**
+         * @brief Construct a new Arm object
+         *
+         * @param motor unique ptr to a motor object
+         * @param rotSens unique ptr to a rotation sensor object
+         * @param piston unique ptr to a pneumatics object
+         * @param pid LemLib PID controller object
+         */
+        Arm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSens,
+            std::unique_ptr<pros::adi::Pneumatics> piston, PIDf pid)
+            : m_motor(std::move(motor)),
+              m_rotSens(std::move(rotSens)),
+              m_piston(std::move(piston)),
+              m_pid(pid) {
+            m_motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        };
 
         /**
-         * @brief Convert the angle of the arm to the height above the field at the end of the arm
-         *
-         * @param angle in degrees
-         * @return double height
+         * @brief Destroy the Arm object
          */
-        virtual double angleToHeight(double angle) {
-            return m_heightOffset + m_length * std::sin(lemlib::degToRad(angle));
+        ~Arm() { m_task.remove(); }
+
+        /**
+         * @brief Suspend the arm task
+         */
+        void suspendTask() { m_task.suspend(); }
+
+        /**
+         * @brief Resume the arm task
+         */
+        void resumeTask() { m_task.resume(); }
+
+        /**
+         * @brief Set the extension of the arm
+         *
+         * @param extended whether to extend the arm
+         */
+        void setExtension(const bool extended) {
+            if (extended) m_piston->extend();
+            else m_piston->retract();
+        }
+
+        /**
+         * @brief Toggle the extension of the arm
+         */
+        void toggle() {
+            if (m_piston->is_extended()) this->retract();
+            else this->extend();
+        }
+
+        /**
+         * @brief Retract the slide
+         */
+        void retract() { m_piston->retract(); }
+
+        /**
+         * @brief Extend the slide
+         */
+        void extend() {
+            if (!this->canExtend()) return;
+            m_piston->extend();
+            if (targetAngle < armPositions::extendedLimit) { targetAngle = armPositions::extendedLimit; }
+            if (bufferAngle < armPositions::extendedLimit) { targetAngle = armPositions::extendedLimit; }
+        }
+
+        /**
+         * @brief Returns whether or not the arm can extend without going out of expansion limits
+         */
+        bool canExtend() { return !(this->getAngle() < armPositions::extendedLimit || this->getAngle() > 230); }
+
+        /**
+         * @brief Returns whether or not a movement is already buffered
+         */
+        bool hasBuffer() { return this->bufferAngle != this->targetAngle; }
+
+        /**
+         * @brief Returns the angle of the arm
+         */
+        double getAngle() { return lemlib::sanitizeAngle(m_rotSens->get_position() / 100.0, false); }
+
+        /**
+         * @brief Checks if the arm is at a specific angle
+         * @param angle the angle to check against
+         */
+        bool isAtPosition(const double angle) {
+            return std::fabs(lemlib::angleError(angle, this->getAngle(), false)) < 1;
+        }
+
+        /**
+         * @brief Checks if the arm is at the target angle
+         * @param checkBuffer whether to check only the primary target or both the target and buffer
+         */
+        bool isAtTarget(const bool checkBuffer = true) {
+            bool atTarget = this->isAtPosition(targetAngle);
+            if (checkBuffer) {
+                bool atBuffer = this->isAtPosition(bufferAngle);
+                return atTarget && atBuffer;
+            }
+            return atTarget;
+        }
+
+        /**
+         * @brief Waits until the arm is at the target angle
+         * @note Blocking operation
+         */
+        void waitUntilSettled() {
+            while (!this->isAtTarget()) pros::delay(10);
         }
 
         /**
          * @brief Move the arm to a specific angle
          *
-         * @param angle in degrees
-         */
-        virtual void moveToAngle(double angle) { m_targetAngle = angle; }
-
-        bool isAtTarget() { return std::fabs(this->getAngle() - m_targetAngle) < 2; }
-};
-
-class BaseArm : public AbstractArm {
-    public:
-        /**
-         * @brief Construct a new Base Arm object
+         * @param angle target angle to move the arm to in degrees (standard angle system)
+         * @param force whether to immediately force the new movement
+         * @param async whether to run the movement asynchronously
          *
-         * @param motor unique ptr to a motor object
-         * @param rotSensor unique ptr to a rotation sensor object
-         * @param pid lemlib pid object
-         * @param length length of the arm (in inches)
-         * @param heightOffset height of the pivot (in inches)
-         * @param ratio ratio of the rotation sensor
+         * @note This command will override the previous buffered angle.
+         * @note If `force` is false, the movement will be buffered until the arm completes its current movement.
          */
-        BaseArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
-                double length, double heightOffset, double ratio);
-
-        /**
-         * @brief Destroy the Base Arm object
-         */
-        ~BaseArm() { m_task.remove(); }
-
-        /**
-         * @brief Resume the arm's task
-         */
-        void resumeTask() { m_task.resume(); }
-
-        /**
-         * @brief Suspend the arm's task
-         */
-        void suspendTask() { m_task.suspend(); }
-    private:
-        pros::Task m_task = pros::Task {[&] {
-            double error;
-            while (true) {
-                pros::delay(10);
-
-                error = lemlib::angleError(this->getAngle(), m_targetAngle, false);
-
-                if (this->isAtTarget()) {
-                    m_motor->move(0);
-                } else {
-                    m_motor->move(m_pid.update(error));
-                }
+        void moveToAngle(double angle, const bool force = true, const bool async = true) {
+            angle = lemlib::sanitizeAngle(angle, false);
+            if (angle > armPositions::load + 5 && angle < 270) { return; }
+            if (m_piston->is_extended() && (angle < armPositions::extendedLimit || angle > 250)) {
+                angle = armPositions::extendedLimit;
             }
-        }};
-};
 
-class TopArm : public AbstractArm {
-    public:
-        /**
-         * @brief Construct a new Top Arm object
-         *
-         * @param motor unique ptr to a motor object
-         * @param rotSensor unique ptr to a rotation sensor object
-         * @param pid lemlib pid object
-         * @param length length of the arm (in inches)
-         * @param heightOffset height of the pivot (in inches)
-         * @param baseArm unique ptr to a base arm object
-         */
-        TopArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
-               double length, double heightOffset, std::unique_ptr<BaseArm> baseArm);
-
-        /**
-         * @brief Construct a new Top Arm object
-         *
-         * @param motor unique ptr to a motor object
-         * @param rotSensor unique ptr to a rotation sensor object
-         * @param pid lemlib pid object
-         * @param length length of the arm (in inches)
-         * @param heightOffset height of the pivot (in inches)
-         * @param baseArm unique ptr to a base arm object
-         * @param ratio ratio of the rotation sensor
-         */
-        TopArm(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Rotation> rotSensor, lemlib::PID pid,
-               double length, double heightOffset, double ratio, std::unique_ptr<BaseArm> baseArm);
-
-        /**
-         * @brief Destroy the Top Arm object
-         */
-        ~TopArm() { m_task.remove(); }
-
-        /**
-         * @brief Get the angle of the arm, relative to the ground. Takes the angle of the base arm into account.
-         *
-         * @return double angle in degrees
-         */
-        double getAngle() { return m_rotSensor->get_angle()*m_ratio + m_baseArm->getAngle(); }
-
-        /**
-         * @brief Resume the arm's task
-         */
-        void resumeTask() { m_task.resume(); }
-
-        /**
-         * @brief Suspend the arm's task
-         */
-        void suspendTask() { m_task.suspend(); }
-    protected:
-        std::unique_ptr<BaseArm> m_baseArm;
-    private:
-        pros::Task m_task = pros::Task {[&] {
-            double error;
-
-            while (true) {
-                pros::delay(10);
-
-                m_angleOffset = m_baseArm->getAngle();
-
-                error = lemlib::angleError(this->getAngle(), m_targetAngle, false);
-
-                if (this->isAtTarget()) {
-                    m_motor->move(0);
-                } else {
-                    m_motor->move(m_pid.update(error));
-                }
-            }
-        }};
-};
-
-struct DoubleArmPose {
-        double bottomAngle, topAngle;
-};
-
-struct DoubleArmItem {};
-
-struct DoubleArmMovement : DoubleArmItem {
-    DoubleArmMovement(DoubleArmPose pose, int maxSpeed, int minSpeed, int slew)
-        : endPose(pose), maxSpeed(maxSpeed), minSpeed(minSpeed), slew(slew) {};
-
-    DoubleArmPose endPose;
-    int maxSpeed, minSpeed, slew;
-};
-
-class DoubleArm {
-    public:
-        /**
-         * @brief Construct a new Double Arm object
-         *
-         * @param baseArm unique ptr to a base arm object
-         * @param topArm unique ptr to a top arm object
-         */
-        DoubleArm(std::unique_ptr<BaseArm> baseArm, std::unique_ptr<TopArm> topArm);
-
-        /**
-         * @brief Destroy the Double Arm object
-         */
-        ~DoubleArm() { m_task.remove(); }
-
-        /**
-         * @brief Resume the base and top arms' tasks
-         */
-        void resumeTasks();
-
-        /**
-         * @brief Suspend the base and top arms' tasks
-         */
-        void suspendTasks();
-
-        /**
-         * @brief Get the current pose of the arms
-         *
-         * @return DoubleArmPose object
-         */
-        DoubleArmPose getPose() { return {m_baseArm->getAngle(), m_topArm->getAngle()}; }
-
-        /**
-         * @brief Move the arms to a specific pose
-         * @note This will add the motion to the queue
-         *
-         * @param pose DoubleArmPose object
-         */
-        void queuePose(DoubleArmPose pose) { m_poseQueue.push(pose); };
-
-        /**
-         * @brief Cancel the current motion
-         * @note This will proceed to the next motion in the queue
-         */
-        void cancelCurrentMotion() { m_targetPose = this->getPose(); }
-
-        /**
-         * @brief Clear the motion queue
-         * @note This will not stop the current motion
-         */
-        void clearMotionQueue() { m_poseQueue = {}; }
-
-        /**
-         * @brief Cancel all motions
-         * @note This will clear the motion queue and stop the current motion
-         */
-        void cancelAllMotions() {
-            this->cancelCurrentMotion();
-            this->clearMotionQueue();
+            this->bufferAngle = angle;
+            if (force) this->targetAngle = angle;
+            if (!async) { this->waitUntilSettled(); }
         }
 
-        /**
-         * @brief Move the arms to a specific pose, clearing the motion queue
-         *
-         * @param pose DoubleArmPose object
-         */
-        void forceMoveToPose(DoubleArmPose pose) {
-            this->cancelAllMotions();
-            this->queuePose(pose);
-        }
+        void changeAngle(double angle) { this->moveToAngle(this->getAngle() + angle, true); }
+        
+        std::atomic<double> targetAngle = armPositions::load, bufferAngle = armPositions::load;
 
-        /**
-         * @brief Check if the arms are in position
-         *
-         * @return true if the arms are in position
-         * @return false if the arms are not in position
-         */
-        bool isAtTarget() { return m_baseArm->isAtTarget() && m_topArm->isAtTarget(); }
+        std::unique_ptr<pros::Motor> m_motor;
+        std::unique_ptr<pros::adi::Pneumatics> m_piston;
     protected:
-        std::queue<DoubleArmPose> m_poseQueue;
-        DoubleArmPose m_targetPose;
+        std::unique_ptr<pros::Rotation> m_rotSens;
+        PIDf m_pid;
 
-        std::unique_ptr<BaseArm> m_baseArm;
-        std::unique_ptr<TopArm> m_topArm;
-    private:
-        pros::Task m_task = pros::Task {[&] {
+
+        pros::Task m_task {[&] {
+            int counter = 0;
+            int voltage = 0, lastVoltage = 0;
+
+            targetAngle = armPositions::load;
+            bufferAngle = armPositions::load;
             while (true) {
                 pros::delay(10);
-                if (!this->isAtTarget()) {
-                    continue;
+
+                if (m_piston->is_extended() && !this->canExtend()) { m_piston->retract(); }
+
+                double cwAngleError = lemlib::angleError(this->getAngle(), this->targetAngle, false,
+                                                         AngularDirection::CW_CLOCKWISE),
+                       ccwAngleError = lemlib::angleError(this->getAngle(), this->targetAngle, false,
+                                                          AngularDirection::CCW_COUNTERCLOCKWISE);
+
+                double smaller, larger;
+                if (std::fabs(cwAngleError) < std::fabs(ccwAngleError)) {
+                    smaller = cwAngleError;
+                    larger = ccwAngleError;
                 } else {
-                    m_poseQueue.pop();
-                    if (!m_poseQueue.empty()) {
-                        m_targetPose = m_poseQueue.front();
-                    }
+                    smaller = ccwAngleError;
+                    larger = cwAngleError;
                 }
+
+                double midPoint = lemlib::sanitizeAngle(this->getAngle() - smaller / 2, false);
+                double usedError = ((midPoint > armPositions::load + 5) && (midPoint < 300)) ? larger : smaller;
+
+                if (this->targetAngle == armPositions::load && this->getAngle() > 120 && this->getAngle() > 200) {
+                    voltage = 0;
+                } else if (this->isAtPosition(armPositions::load)) {
+                    voltage = m_pid.update(-usedError, 0);
+                } else {
+                    voltage = m_pid.update(-usedError, std::cos(lemlib::degToRad(this->getAngle())));
+                }
+
+                m_motor->move(voltage);
+
+                if (counter % 20 == 0) {
+                    double target = this->targetAngle;
+                    // std::printf("Arm position: %f\n", this->getAngle());
+                    // std::printf("Arm positions: %d %d\n", (midPoint > armPositions::load + 5) && (midPoint < 300), usedError==smaller);
+                    counter = 0;
+                }
+                counter++;
             }
         }};
 };

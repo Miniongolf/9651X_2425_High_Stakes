@@ -25,6 +25,39 @@ class PID {
         PID(float kP, float kI, float kD, float windupRange = 0, bool signFlipReset = false);
 
         /**
+         * @brief Set the gains of the PID (kP, kI, kD)
+         * 
+         * @param kP 
+         * @param kI 
+         * @param kD 
+         */
+        void setGains(float kP, float kI, float kD) {
+            this->kP = kP;
+            this->kI = kI;
+            this->kD = kD;
+        };
+
+        /**
+         * @brief Set the gains of the PID to those of another PID object
+         * 
+         * @param pid 
+         */
+        void setGains(lemlib::PID pid) {
+            this->kP = pid.kP;
+            this->kI = pid.kI;
+            this->kD = pid.kD;
+        };
+
+        /**
+         * @brief Get the value of the windup range
+         * 
+         * @return float 
+         */
+        float getWindupRange() {
+            return this->windupRange;
+        };
+
+        /**
          * @brief Update the PID
          *
          * @param error target minus position - AKA error
@@ -60,12 +93,13 @@ class PID {
          * @endcode
          */
         void reset();
-    protected:
+        
         // gains
-        const float kP;
-        const float kI;
-        const float kD;
-
+        float kP;
+        float kI;
+        float kD;
+        
+    protected:
         // optimizations
         const float windupRange;
         const bool signFlipReset;
