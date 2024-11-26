@@ -11,11 +11,11 @@
 #include "pros/rotation.hpp"
 
 namespace armPositions {
-constexpr double standby = 171;
+constexpr double standby = 165;
 constexpr double load = 183;
 constexpr double extendedLimit = 45;
 constexpr double wallStake = 50;
-constexpr double allianceStake = 340;
+constexpr double allianceStake = 11;
 constexpr double mogoTip = 20;
 } // namespace armPositions
 

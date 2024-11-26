@@ -37,6 +37,7 @@ void autonomous() {
 // // //    auton::scoreMax();
 // //    auton::rushRush();
 // //    auton::rushWP();
+    // auton::BruteForceAutoSkills();
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
