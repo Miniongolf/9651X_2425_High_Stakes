@@ -248,7 +248,7 @@ class Arm {
                 double midPoint = lemlib::sanitizeAngle(this->getAngle() - smaller / 2, false);
                 double usedError = ((midPoint > armPositions::load + 5) && (midPoint < 300)) ? larger : smaller;
 
-                if (this->targetAngle == armPositions::load && this->getAngle() > 120 && this->getAngle() > 200) {
+                if (this->targetAngle == armPositions::load && this->getAngle() > 120 && this->getAngle() < 190) {
                     voltage = 0;
                 } else if (this->isAtPosition(armPositions::load)) {
                     voltage = m_pid.update(-usedError, 0);
