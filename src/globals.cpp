@@ -6,14 +6,17 @@
 bool isRedAlliance = true;
 
 Intake intake(
-    std::make_unique<pros::Motor>(20, pros::v5::MotorGears::blue)
+    std::make_unique<pros::Motor>(20, pros::v5::MotorGears::blue),
+    std::make_unique<pros::Motor>(19, pros::v5::MotorGears::green)
+    
 );
 
 Arm arm(
-    std::make_unique<pros::Motor>(-9, pros::v5::MotorGears::red),
+    std::make_unique<pros::Motor>(-9, pros::v5::MotorGears::green),
     std::make_unique<pros::Rotation>(-10),
     std::make_unique<pros::adi::Pneumatics>('A', false, false),
-    {10, 0, 5, 0, {-127, 127}, 5, 3, true}
+    {5, 0.1, 12, 20, {-127, 127}, 5, 3, true}
+    // {0, 0, 0, 20, {-127, 127}, 5, 3, true}
     // {0, 0, 0}
 );
 

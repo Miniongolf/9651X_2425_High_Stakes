@@ -20,8 +20,9 @@ class Intake {
          *
          * @param motor unique ptr to a motor object
          */
-        Intake(std::unique_ptr<pros::Motor> motor)
-            : m_motor(std::move(motor)) {};
+        Intake(std::unique_ptr<pros::Motor> motor, std::unique_ptr<pros::Motor> motor2)
+            : m_motor(std::move(motor)),
+              m_motor2(std::move(motor2)) {};
 
         /**
          * @brief Destroy the Intake object
@@ -80,6 +81,7 @@ class Intake {
 
         bool filterOn = false;
         std::unique_ptr<pros::Motor> m_motor;
+        std::unique_ptr<pros::Motor> m_motor2;
     protected:
 
         pros::Task m_task = pros::Task {[&]() {
@@ -87,9 +89,9 @@ class Intake {
                 pros::delay(10);
                 
                 switch (m_currState) {
-                    case state::FORWARDS: this->move(127); break;
-                    case state::REVERSE: this->move(-127); break;
-                    case state::STOP: this->move(0); break;
+                    case state::FORWARDS: this->move(127); m_motor2->move(-127); break;
+                    case state::REVERSE: this->move(-127); m_motor2->move(127); break;
+                    case state::STOP: this->move(0); m_motor2->move(0); break;
                 }
             }
         }};
