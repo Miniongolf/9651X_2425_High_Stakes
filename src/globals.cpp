@@ -15,7 +15,7 @@ Arm arm(
     std::make_unique<pros::Motor>(-9, pros::v5::MotorGears::green),
     std::make_unique<pros::Rotation>(-10),
     std::make_unique<pros::adi::Pneumatics>('A', false, false),
-    {7, 0.1, 17, 23, {-127, 127}, 5, 3, true}
+    {5, 0, 0, 20, {-127, 127}, 5, 3, true}
     // {0, 0, 0, 20, {-127, 127}, 5, 3, true}
     // {0, 0, 0}
 );

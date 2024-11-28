@@ -23,17 +23,15 @@ void autonomous() {
     robot::resumeTasks();
     arm.moveToAngle(armPositions::standby, true);
 
+    auton::alternateAutoSkills();
     // auton::tunePID(false);
-    auton::soloAWP();
+    // auton::soloAWP();
     // auton::tunePID(true);
     // auton::testBoomerang();
-    // auton::safeSAWP();
     // auton::blueMogoRush();
     // auton::redMogoRush();
     // auton::safeSAWP();
     // auton::autoSkills();
-//     robot::grabMogo({-24, 24, 90}, 2000, 2000, 24, {.forwards=false, .minSpeed=50});
-//     robot::grabRing({-6, 50, 0}, 2000, 1000, 15, {.minSpeed=50});
 // // //    auton::scoreMax();
 // //    auton::rushRush();
 // //    auton::rushWP();

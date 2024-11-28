@@ -1,5 +1,6 @@
 #include "globals.hpp"
 #include "helperFuncts.hpp"
+#include "lemlib/timer.hpp"
 #include "main.h"
 #include "pros/abstract_motor.hpp"
 #include "pros/misc.h"
@@ -24,17 +25,18 @@ void opcontrol() {
     pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
     printf("-- OPCONTROL STARTING --\n");
-    robot::resumeTasks();
+    lemlib::Timer wallIntakeTimer = {500};
+
 
     while (true) {
         // Mogo Mech
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) mogoMech.toggle();
 
         // Doinker
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) doinker.toggle();
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) doinker.toggle();
 
         // Intake + hooks conveyor sys
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) || master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT) || partner.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.forwards();
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) || !wallIntakeTimer.isDone() || partner.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.forwards();
         else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.reverse();
         else intake.stop();
 
@@ -73,20 +75,17 @@ void opcontrol() {
         else if (partner.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) arm.changeAngle(10);
 
         // Wall + alliance
-        if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) || master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+        if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) || master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
             arm.moveToAngle(armPositions::wallStake);
+            wallIntakeTimer.set(500);
+            wallIntakeTimer.resume();
         } else if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             arm.moveToAngle(armPositions::allianceStake);
         }
 
         // Driver 1 arm down
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-            arm.moveToAngle(300);
-        }
-
-        // Mogo tip
-        if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-            arm.moveToAngle(armPositions::mogoTip);
+            arm.moveToAngle(330);
         }
 
         // if (counter % 20 == 0) robot::printPose();
