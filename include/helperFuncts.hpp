@@ -14,6 +14,8 @@ struct PathPoint {
          * @param point
          * @param turnTimeout 
          * @param moveTimeout 
+         * @param ttpParams
+         * @param mtpParams
          */
         PathPoint(lemlib::Pose point, int turnTimeout, int moveTimeout, lemlib::TurnToPointParams ttpParams = {}, lemlib::MoveToPointParams mtpParams = {})
             : point(point), turnTimeout(turnTimeout), moveTimeout(turnTimeout), ttpParams(ttpParams), mtpParams(mtpParams) {}
@@ -40,7 +42,7 @@ namespace robot {
     /**
      * @brief Clamps a mogo and switches to the mogo PID constants
      */
-    void clampMogo();
+    void clampMogo(bool wait=false);
 
     /**
      * @brief Releases a mogo and switches to the empty PID constants

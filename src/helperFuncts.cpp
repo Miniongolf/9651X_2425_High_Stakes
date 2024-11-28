@@ -19,10 +19,12 @@ lemlib::Pose relativeToGlobal(lemlib::Pose relativePose) {
     };
 }
 
-void clampMogo() {
+void clampMogo(bool wait) {
+    if (wait) pros::delay(30);
     mogoMech.extend();
     chassis.lateralPID.setGains(mogoLateralPID);
     chassis.angularPID.setGains(mogoAngularPID);
+    if (wait) pros::delay(30);
 }
 
 void releaseMogo() {
@@ -114,7 +116,6 @@ void pathInterp(std::vector<PathPoint> path, int waitTime) {
         chassis.moveToPoint(pathPoint.point.x, pathPoint.point.x, pathPoint.moveTimeout, pathPoint.mtpParams, false);
         pros::delay(waitTime);
         robot::printPose();
-
     }
 }
 } // namespace robot

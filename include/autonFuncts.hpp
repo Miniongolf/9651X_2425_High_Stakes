@@ -11,4 +11,6 @@ void safeAWP();
 void autoSkills();
 void redMogoRush();
 void blueMogoRush();
+
+void alternateAutoSkills();
 }
