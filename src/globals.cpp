@@ -50,7 +50,7 @@ lemlib::PID emptyLateralPID(7, 0, 15, 3, true);
 lemlib::PID emptyAngularPID(2, 0, 12, 5, true);
 
 lemlib::PID mogoLateralPID(9, 0, 20, 3, true);
-lemlib::PID mogoAngularPID(2.5, 0, 15, 5, true);
+lemlib::PID mogoAngularPID(1.5, 0, 15, 5, true);
 
 lemlib::Drivetrain drivetrain(
     &leftDrive,
