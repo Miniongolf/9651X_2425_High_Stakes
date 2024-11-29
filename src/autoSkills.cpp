@@ -23,7 +23,7 @@ void auton::alternateAutoSkills() {
     robot::clampMogo(true);
     intake.forwards();
     robot::pathInterp({
-        {{-48, 70}, 500, 750}, // rings 1+2
+        {{-48, 70}, 500, 1500}, // rings 1+2
         {{-60, 48}, 500, 750}, // ring 3
         {{-24, 48}, 500, 750}, // ring 4
         {  {0, 60}, 500, 750}, // ring 5
@@ -46,7 +46,7 @@ void auton::alternateAutoSkills() {
     robot::clampMogo(true);
     intake.forwards();
     robot::pathInterp({
-        {{-48, -70}, 500, 750}, // rings 1+2
+        {{-48, -70}, 500, 1500}, // rings 1+2
         {{-60, -48}, 500, 750}, // ring 3
         {{-24, -48}, 500, 750}, // ring 4
         {  {0, -60}, 500, 750}, // ring 5
