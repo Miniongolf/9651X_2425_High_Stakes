@@ -18,7 +18,7 @@ struct PathPoint {
          * @param mtpParams
          */
         PathPoint(lemlib::Pose point, int turnTimeout, int moveTimeout, lemlib::TurnToPointParams ttpParams = {}, lemlib::MoveToPointParams mtpParams = {})
-            : point(point), turnTimeout(turnTimeout), moveTimeout(turnTimeout), ttpParams(ttpParams), mtpParams(mtpParams) {}
+            : point(point), turnTimeout(turnTimeout), moveTimeout(moveTimeout), ttpParams(ttpParams), mtpParams(mtpParams) {}
     
     lemlib::Pose point;
     int turnTimeout, moveTimeout;

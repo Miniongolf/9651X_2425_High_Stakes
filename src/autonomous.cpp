@@ -29,7 +29,7 @@ void autonomous() {
     // auton::tunePID(true);
     // auton::testBoomerang();
     // auton::blueMogoRush();
-    auton::redMogoRush();
+    // auton::redMogoRush();
     // auton::safeSAWP();
     // auton::autoSkills();
 // // //    auton::scoreMax();
