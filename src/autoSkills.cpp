@@ -37,7 +37,7 @@ void auton::alternateAutoSkills() {
 
     // Position reset
     chassis.moveToPoint(-48, 48, 1000);
-    chassis.turnToHeading(0, 750);
+    chassis.turnToHeading(0, 750, {}, false);
     robot::moveTimed(100, 0, 1000);
     chassis.setPose(chassis.getPose().x, 62, 0);
 
