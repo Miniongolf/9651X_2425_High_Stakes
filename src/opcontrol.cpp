@@ -32,7 +32,9 @@ void opcontrol() {
         // 20s buzz
         if (std::fabs(matchTimer.getTimeLeft() - 20000) < 10) {
             master.rumble("-.");
-        } else if (std::fabs(matchTimer.getTimeLeft() - 15000) < 10) {
+        } else if (std::fabs(matchTimer.getTimeLeft() - 17000) < 10) {
+            master.rumble(".");
+        } else if (std::fabs(matchTimer.getTimeLeft() - 16000) < 10) {
             master.rumble("...");
         }
 
