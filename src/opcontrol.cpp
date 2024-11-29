@@ -25,10 +25,17 @@ void opcontrol() {
     pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
     printf("-- OPCONTROL STARTING --\n");
-    lemlib::Timer wallIntakeTimer = {500};
-
+    lemlib::Timer wallIntakeTimer = 0;
+    lemlib::Timer matchTimer = 105000;
 
     while (true) {
+        // 20s buzz
+        if (std::fabs(matchTimer.getTimeLeft() - 20000) < 10) {
+            master.rumble("-.");
+        } else if (std::fabs(matchTimer.getTimeLeft() - 15000) < 10) {
+            master.rumble("...");
+        }
+
         // Mogo Mech
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) mogoMech.toggle();
 
@@ -77,8 +84,8 @@ void opcontrol() {
         // Wall + alliance
         if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) || master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
             arm.moveToAngle(armPositions::wallStake);
-            wallIntakeTimer.set(500);
-            wallIntakeTimer.resume();
+            wallIntakeTimer.set(300);
+            // wallIntakeTimer.resume();
         } else if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
             arm.moveToAngle(armPositions::allianceStake);
         }
@@ -97,7 +104,7 @@ void opcontrol() {
         int rightPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
         int turnPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-        chassis.arcade(leftPower, turnPower*0.9, false, 0.8);
+        chassis.arcade(leftPower, turnPower*0.85, false, 0.8);
         // chassis.tank(leftPower, rightPower);
         counter++;
         pros::delay(10);
