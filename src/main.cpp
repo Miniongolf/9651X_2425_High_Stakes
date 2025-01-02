@@ -1,6 +1,4 @@
 #include "main.h"
-#include "autonFuncts.hpp"
-#include "helperFuncts.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -16,7 +14,6 @@ void initialize() {
     chassis.setPose(0, 0, 0);
 
     // Set pneumatics positions
-    arm.retract();
     mogoMech.retract();
     doinker.retract();
 
@@ -25,8 +22,6 @@ void initialize() {
     std::printf("Initialized\n");
     std::printf("Left motor temps: %f, %f, %f\n", leftDrive.get_temperature(0), leftDrive.get_temperature(1), leftDrive.get_temperature(2));
     std::printf("Right motor temps: %f, %f, %f\n", rightDrive.get_temperature(0), rightDrive.get_temperature(1), rightDrive.get_temperature(2));
-    std::printf("Intake temps: %f %f\n", intake.m_motor->get_temperature(), intake.m_motor2->get_temperature());
-    std::printf("Arm temp: %f\n", arm.m_motor->get_temperature());
 }
 
 /**

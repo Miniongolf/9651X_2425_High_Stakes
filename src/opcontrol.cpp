@@ -1,10 +1,4 @@
-#include "globals.hpp"
-#include "helperFuncts.hpp"
-#include "lemlib/timer.hpp"
 #include "main.h"
-#include "pros/abstract_motor.hpp"
-#include "pros/misc.h"
-#include "subsys/arm.hpp"
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -37,76 +31,14 @@ void opcontrol() {
         } else if (std::fabs(matchTimer.getTimeLeft() - 16000) < 10) {
             master.rumble("...");
         }
-
-        // Mogo Mech
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) mogoMech.toggle();
-
-        // Doinker
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) doinker.toggle();
-
-        // Intake + hooks conveyor sys
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) || !wallIntakeTimer.isDone() || partner.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.forwards();
-        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.reverse();
-        else intake.stop();
-
-        // Arm
-
-        /* Driver 2:
-        L2 load
-        L1 standby
-        R1 lady brown extend
-        dpad up, dpad down manual
-        R2 alliance stake
-        Y mogo tip
-        A piston extend
-        */
         
-        // Arm slides
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-            if (arm.m_piston->is_extended()) {
-                arm.retract();
-                if (arm.targetAngle == armPositions::load) arm.moveToAngle(armPositions::standby);
-            } else {
-                arm.extend();
-                if (arm.targetAngle == armPositions::standby) arm.moveToAngle(armPositions::load);
-            }
-        }
-
-        // Controller 1 load + standby
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) {
-            if (arm.m_piston->is_extended() || arm.targetAngle == armPositions::standby) {
-                arm.moveToAngle(armPositions::load);
-            } else { arm.moveToAngle(armPositions::standby); }
-        }
-
-        // Manual arm
-        if (partner.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) arm.changeAngle(-10);
-        else if (partner.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) arm.changeAngle(10);
-
-        // Wall + alliance
-        if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) || master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-            arm.moveToAngle(armPositions::wallStake);
-            wallIntakeTimer.set(300);
-            // wallIntakeTimer.resume();
-        } else if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
-            arm.moveToAngle(armPositions::allianceStake);
-        }
-
-        // Driver 1 arm down
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-            arm.moveToAngle(330);
-        }
-
-        // if (counter % 20 == 0) robot::printPose();
-        // master.print(0, 0, "ARM ANGLE: %d", arm.getAngle());
-        
-
         // Chassis
         int leftPower = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
         int turnPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
         chassis.arcade(leftPower, turnPower*0.85, false, 0.8);
+
         // chassis.tank(leftPower, rightPower);
         counter++;
         pros::delay(10);

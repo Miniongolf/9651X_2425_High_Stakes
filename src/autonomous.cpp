@@ -1,4 +1,3 @@
-#include "helperFuncts.hpp"
 #include "main.h"
 #include "autonFuncts.hpp"
 
@@ -21,21 +20,6 @@ void autonomous() {
     robot::releaseMogo();
     doinker.retract();
     robot::resumeTasks();
-    arm.moveToAngle(armPositions::standby, true);
-
-    auton::alternateAutoSkills();
-    // auton::tunePID(false);
-    // auton::soloAWP();
-    // auton::tunePID(true);
-    // auton::testBoomerang();
-    // auton::blueMogoRush();
-    // auton::redMogoRush();
-    // auton::safeSAWP();
-    // auton::autoSkills();
-// // //    auton::scoreMax();
-// //    auton::rushRush();
-// //    auton::rushWP();
-    // auton::BruteForceAutoSkills();
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
