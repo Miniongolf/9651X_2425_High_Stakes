@@ -1,12 +1,8 @@
 #pragma once
 
-#include "api.h"
-#include "lemlib/api.hpp"
-#include "lemlib/timer.hpp"
-#include "subsys/subsys.hpp"
-#include "robot/constants.hpp"
+#include "util.hpp"
 
-extern bool isRedAlliance;
+extern std::atomic<Alliance> robotAlliance;
 
 extern pros::adi::Pneumatics mogoMech;
 extern pros::adi::Pneumatics doinker;

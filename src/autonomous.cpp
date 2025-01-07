@@ -1,5 +1,6 @@
 #include "main.h"
 #include "autonFuncts.hpp"
+#include "robot/globals.hpp"
 
 /**
 * Runs the user autonomous code. This function will be started in its own task
@@ -13,7 +14,6 @@
 * from where it left off.
 */
 void autonomous() {
-    std::printf("isRedAlliance: %d\n", isRedAlliance);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
     chassis.setPose(0, 0, 0);

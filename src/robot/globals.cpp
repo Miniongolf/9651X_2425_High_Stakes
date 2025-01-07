@@ -3,7 +3,7 @@
 #include "pros/motors.h"
 #include <memory>
 
-bool isRedAlliance = true;
+std::atomic<Alliance> robotAlliance = Alliance::RED;
 
 pros::adi::Pneumatics mogoMech('B', false, false);
 pros::adi::Pneumatics doinker('C', false, false);

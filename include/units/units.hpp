@@ -4,6 +4,7 @@
 #include <cmath>
 #include <ratio>
 #include <iostream>
+#include <type_traits>
 #include <utility>
 #include <algorithm>
 
@@ -114,6 +115,21 @@ class Quantity {
         }
 };
 
+/* Number is a special type, because it can be implicitly converted to and from any arithmetic type */
+class Number : public Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
+                               std::ratio<0>, std::ratio<0>> {
+    public:
+        template <typename T> constexpr Number(T value)
+            : Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
+                       std::ratio<0>, std::ratio<0>>(double(value)) {}
+
+        constexpr Number(Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
+                                  std::ratio<0>, std::ratio<0>, std::ratio<0>>
+                             value)
+            : Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
+                       std::ratio<0>, std::ratio<0>>(value) {};
+};
+
 template <typename Q> struct LookupName {
         using Named = Q;
 };
@@ -221,12 +237,18 @@ template <isQuantity Q> constexpr Q operator*(double multiple, Q quantity) { ret
 
 template <isQuantity Q> constexpr Q operator/(Q quantity, double divisor) { return Q(quantity.internal() / divisor); }
 
-template <isQuantity Q1, isQuantity Q2, isQuantity Q3 = Multiplied<Q1, Q2>> Q3 constexpr operator*(Q1 lhs, Q2 rhs) {
-    return Q3(lhs.internal() * rhs.internal());
+template <isQuantity Q1, isQuantity Q2>
+std::conditional_t<std::is_same_v<Number, Multiplied<Q1, Q2>>, double, Multiplied<Q1, Q2>> constexpr operator*(Q1 lhs,
+                                                                                                               Q2 rhs) {
+    return std::conditional_t<std::is_same_v<Number, Multiplied<Q1, Q2>>, double, Multiplied<Q1, Q2>>(lhs.internal() *
+                                                                                                      rhs.internal());
 }
 
-template <isQuantity Q1, isQuantity Q2, isQuantity Q3 = Divided<Q1, Q2>> Q3 constexpr operator/(Q1 lhs, Q2 rhs) {
-    return Q3(lhs.internal() / rhs.internal());
+template <isQuantity Q1, isQuantity Q2>
+std::conditional_t<std::is_same_v<Number, Multiplied<Q1, Q2>>, double, Divided<Q1, Q2>> constexpr operator/(Q1 lhs,
+                                                                                                            Q2 rhs) {
+    return std::conditional_t<std::is_same_v<Number, Multiplied<Q1, Q2>>, double, Divided<Q1, Q2>>(lhs.internal() /
+                                                                                                   rhs.internal());
 }
 
 template <isQuantity Q, isQuantity R> constexpr bool operator==(const Q& lhs, const R& rhs)
@@ -316,21 +338,6 @@ template <isQuantity Q, isQuantity R> constexpr bool operator>(const Q& lhs, con
     NEW_UNIT_LITERAL(Name, u##base, base / 1E6)                                                                        \
     NEW_UNIT_LITERAL(Name, n##base, base / 1E9)
 
-/* Number is a special type, because it can be implicitly converted to and from any arithmetic type */
-class Number : public Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
-                               std::ratio<0>, std::ratio<0>> {
-    public:
-        template <typename T> constexpr Number(T value)
-            : Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
-                       std::ratio<0>, std::ratio<0>>(double(value)) {}
-
-        constexpr Number(Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
-                                  std::ratio<0>, std::ratio<0>, std::ratio<0>>
-                             value)
-            : Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
-                       std::ratio<0>, std::ratio<0>>(value) {};
-};
-
 template <> struct LookupName<Quantity<std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>, std::ratio<0>,
                                        std::ratio<0>, std::ratio<0>, std::ratio<0>>> {
         using Named = Number;
@@ -361,31 +368,38 @@ constexpr inline double to_num(Number quantity) { return quantity.internal(); }
     constexpr bool operator op(Number lhs, double rhs) { return (lhs.internal() op rhs); }                             \
     constexpr bool operator op(double lhs, Number rhs) { return (lhs op rhs.internal()); }
 
+namespace units_double_ops {
 NEW_NUM_TO_DOUBLE_COMPARISON(==)
 NEW_NUM_TO_DOUBLE_COMPARISON(!=)
 NEW_NUM_TO_DOUBLE_COMPARISON(<=)
 NEW_NUM_TO_DOUBLE_COMPARISON(>=)
 NEW_NUM_TO_DOUBLE_COMPARISON(<)
 NEW_NUM_TO_DOUBLE_COMPARISON(>)
+} // namespace units_double_ops
 
 #define NEW_NUM_AND_DOUBLE_OPERATION(op)                                                                               \
     constexpr Number operator op(Number lhs, double rhs) { return (lhs.internal() op rhs); }                           \
     constexpr Number operator op(double lhs, Number rhs) { return (lhs op rhs.internal()); }
 
+namespace units_double_ops {
 NEW_NUM_AND_DOUBLE_OPERATION(+)
 NEW_NUM_AND_DOUBLE_OPERATION(-)
 NEW_NUM_AND_DOUBLE_OPERATION(*)
 NEW_NUM_AND_DOUBLE_OPERATION(/)
+} // namespace units_double_ops
 
 #define NEW_NUM_AND_DOUBLE_ASSIGNMENT(op)                                                                              \
     constexpr void operator op##=(Number& lhs, double rhs) { lhs = lhs.internal() op rhs; }                            \
     constexpr void operator op##=(double& lhs, Number rhs) { lhs = lhs op rhs.internal(); }
 
+namespace units_double_ops {
 NEW_NUM_AND_DOUBLE_ASSIGNMENT(+)
 NEW_NUM_AND_DOUBLE_ASSIGNMENT(-)
 NEW_NUM_AND_DOUBLE_ASSIGNMENT(*)
 NEW_NUM_AND_DOUBLE_ASSIGNMENT(/)
+} // namespace units_double_ops
 
+namespace units_double_ops {
 constexpr Number& operator++(Number& lhs, int) {
     lhs += 1;
     return lhs;
@@ -407,6 +421,7 @@ constexpr Number operator--(Number& lhs) {
     lhs -= 1;
     return copy;
 }
+} // namespace units_double_ops
 
 NEW_UNIT_LITERAL(Number, percent, num / 100)
 
@@ -502,6 +517,12 @@ template <isQuantity Q, isQuantity R> constexpr Q min(const Q& lhs, const R& rhs
     return (lhs < rhs ? lhs : rhs);
 }
 
+template <isQuantity Q> constexpr Number sgn(const Q& lhs) {
+    if (lhs.internal() > 0) return 1;
+    if (lhs.internal() < 0) return -1;
+    return 0;
+}
+
 template <int R, isQuantity Q, isQuantity S = Exponentiated<Q, std::ratio<R>>> constexpr S pow(const Q& lhs) {
     return S(std::pow(lhs.internal(), R));
 }
@@ -534,11 +555,13 @@ template <isQuantity Q, isQuantity R> constexpr Q mod(const Q& lhs, const R& rhs
     return Q(std::fmod(lhs.internal(), rhs.internal()));
 }
 
+template <isQuantity Q, isQuantity R> constexpr Q remainder(const Q& lhs, const R& rhs) {
+    return Q(std::remainder(lhs.internal(), rhs.internal()));
+}
+
 template <isQuantity Q1, isQuantity Q2> constexpr Q1 copysign(const Q1& lhs, const Q2& rhs) {
     return Q1(std::copysign(lhs.internal(), rhs.internal()));
 }
-
-template <isQuantity Q> constexpr int sgn(const Q& lhs) { return lhs.internal() < 0 ? -1 : 1; }
 
 template <isQuantity Q> constexpr bool signbit(const Q& lhs) { return std::signbit(lhs.internal()); }
 
