@@ -297,7 +297,7 @@
                 "version": "8.3.8"
             },
             "units": {
-                "location": "/Users/nicholas.cheng/Library/Application Support/PROS/templates/units@0.5.2",
+                "location": "/Users/nicholas.cheng/Library/Application Support/PROS/templates/units@0.6.0",
                 "metadata": {
                     "origin": "local"
                 },
@@ -306,16 +306,16 @@
                 "supported_kernels": "^4.1.1",
                 "system_files": [
                     "include/units/Angle.hpp",
-                    "include/units/units.hpp",
-                    "include/units/Vector3D.hpp",
                     "include/units/Pose.hpp",
                     "include/units/Temperature.hpp",
+                    "include/units/Vector3D.hpp",
+                    "include/units/units.hpp",
                     "include/units/Vector2D.hpp",
                     "firmware/units.a"
                 ],
                 "target": "v5",
                 "user_files": [],
-                "version": "0.5.2"
+                "version": "0.6.0"
             }
         },
         "upload_options": {

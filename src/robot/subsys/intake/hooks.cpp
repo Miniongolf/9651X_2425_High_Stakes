@@ -7,7 +7,7 @@ void Hooks::initialize() {
 }
 
 bool Hooks::isJammed(int countThresh) const {
-    countThresh = std::clamp(countThresh, 1, 4);
+    countThresh = std::clamp(countThresh, 1, 5);
     int jamCount = 0;
     for (const auto& jammed : jamDetects) {
         if (jammed) jamCount++;
@@ -82,12 +82,17 @@ void Hooks::update(Alliance sortAlliance, Alliance detectedRing, bool isArmUp) {
         case states::REVERSE: setVoltage(-127); break;
         case states::IDLE: setVoltage(0); break;
         case states::UNJAM:
-            isBusy = true;
-            setVoltage(prevStateVoltage > 0 ? -50 : 50); // move in the opposite direction
-            pros::delay(50);
-            setVoltage(0);
-            isBusy = false;
-            m_state = prevState; // return to what it was doing before the jam
+            if (jamTimer.isPaused()) {
+                jamTimer.resume();
+                isBusy = true;
+                setVoltage(prevStateVoltage > 0 ? -50 : 50); // move in the opposite direction
+            } else if (jamTimer.isDone()) {
+                jamTimer.reset();
+                jamTimer.pause();
+                isBusy = false;
+                m_state = (prevState == states::UNJAM) ? states::IDLE : prevState; // return to what it was doing before the jam
+                // If the previous state is somehow unjam, set to idle to escape the loop
+            }
             break;
         case states::WAIT_FOR_RING:
             isBusy = true;

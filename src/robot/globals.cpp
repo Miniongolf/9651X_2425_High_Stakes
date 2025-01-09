@@ -5,7 +5,7 @@
 
 std::atomic<Alliance> robotAlliance = Alliance::RED;
 
-pros::adi::Pneumatics mogoMech('B', false, false);
+pros::adi::Pneumatics mogoMech('A', false, false);
 pros::adi::Pneumatics doinker('C', false, false);
 
 pros::MotorGroup leftDrive({0, 0, 0}, pros::v5::MotorGears::blue);

@@ -1,4 +1,12 @@
 #include "main.h"
+#include "pros/abstract_motor.hpp"
+#include "pros/adi.hpp"
+#include "pros/motors.h"
+#include "pros/motors.hpp"
+
+#define INTAKE_BUTTON pros::E_CONTROLLER_DIGITAL_R2
+#define OUTTAKE_BUTTON pros::E_CONTROLLER_DIGITAL_R1
+#define MOGO_BUTTON pros::E_CONTROLLER_DIGITAL_L1
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -18,6 +26,13 @@ void opcontrol() {
     pros::Controller master(pros::E_CONTROLLER_MASTER);
     pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
+
+    pros::Motor intakeMotor(-20, pros::MotorGears::blue);
+    pros::Motor prerollMotor(19, pros::MotorGears::green);
+    pros::Motor armMotor(-12, pros::MotorGears::green);
+
+    armMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
     printf("-- OPCONTROL STARTING --\n");
     lemlib::Timer wallIntakeTimer = 0;
     lemlib::Timer matchTimer = 105000;
@@ -32,6 +47,32 @@ void opcontrol() {
             master.rumble("...");
         }
         
+        // Intake
+        if (master.get_digital(INTAKE_BUTTON)) {
+            intakeMotor.move(127);
+            prerollMotor.move(127);
+        } else if (master.get_digital(OUTTAKE_BUTTON)) {
+            intakeMotor.move(-127);
+            prerollMotor.move(-127);
+        } else {
+            intakeMotor.move(0);
+            prerollMotor.move(0);
+        }
+
+        // Arm
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
+            armMotor.move(70);
+        } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
+            armMotor.move(-70);
+        } else {
+            armMotor.move_velocity(0);
+        }
+
+        // Mogo
+        if (master.get_digital_new_press(MOGO_BUTTON)) {
+            mogoMech.toggle();
+        }
+
         // Chassis
         int leftPower = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
