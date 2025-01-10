@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util.hpp"
+#include "robot/subsys/subsys.hpp"
 
 extern std::atomic<Alliance> robotAlliance;
 

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <queue>
+#include "pros/motors.h"
+#include "pros/rtos.h"
 #include "pros/rtos.hpp"
 #include "util.hpp"
-
 
 // class Hooks {
 //     public:
@@ -174,7 +175,88 @@
 
 class Hooks {
     public:
-        
+        Hooks(MotorPtr intakeMotor, OpticalPtr optical, int chainLength, std::vector<double> hookPositions)
+            : m_motor(std::move(intakeMotor)),
+              m_optical(std::move(optical)),
+              chainLength(chainLength),
+              hooks(hookPositions) {
+            m_motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            m_motor->set_encoder_units(pros::E_MOTOR_ENCODER_ROTATIONS);
+        }
+
+        enum class states { FORWARDS, REVERSE, IDLE, UNJAM };
+        enum class modes { CONTINUOUS, SMART };
+
+        void setState(states state) { currState = state; }
+
+        void forwards() { setState(states::FORWARDS); }
+
+        void reverse() { setState(states::REVERSE); }
+
+        void idle() { setState(states::IDLE); }
+
+        void initialize() { m_motor->tare_position(); }
+
+        [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }
+
+        [[nodiscard]] double getPosition(int hookNum = 0) const;
+
+        /**
+         * @brief Return the distance between two positions
+         *
+         * @param target
+         * @param position
+         * @param direction
+         * @return double
+         */
+        [[nodiscard]] double dist(double target, double position,
+                                  lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
+
+        [[nodiscard]] int getNearestHook(double target,
+                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
+
+        [[nodiscard]] bool isAtPosition(double target, int hook = -1, double tolerance = 0.5) const;
+
+        [[nodiscard]] double moveToPosition(double position, int hookNum = -1,
+                                            lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO);
+
+        [[nodiscard]] bool isJammed() const;
+
+        void update();
+    protected:
+        // Devices
+        MotorPtr m_motor = nullptr;
+        OpticalPtr m_optical = nullptr;
+
+        // Hook positions
+        int chainLength;
+        std::vector<double> hooks;
+
+        // State machines
+        states currState = states::IDLE, lastState = states::IDLE, prevState = states::IDLE;
+        modes mode = modes::CONTINUOUS;
+        int currVoltage = 0, prevVoltage = 0;
+
+        void setVoltage(int voltage) { currVoltage = voltage; }
+
+        // Jam detection
+        std::vector<bool> jamDetects = {false, false, false, false, false};
+        const std::pair<int, double> jamThresh = {900, 5};
+
+        // Task
+        pros::Task task = pros::Task {[&] {
+            int counter = 0;
+            while (true) {
+                pros::delay(10);
+                update();
+                if (counter % 10 == 0) {
+                    std::printf("hooks (%f, %f, %f, %f) --> %d\n", getPosition(0), getPosition(1), getPosition(2),
+                                getPosition(3), getNearestHook(0));
+                    std::printf("%d %f\n", m_motor->get_current_draw(), m_motor->get_actual_velocity());
+                    counter = 0;
+                }
+            }
+        }};
 };
 
 using HooksPtr = std::unique_ptr<Hooks>;

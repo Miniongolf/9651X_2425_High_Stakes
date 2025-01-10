@@ -4,7 +4,7 @@
 
 class Preroller {
     public:
-        Preroller(MotorGroupPtr prerollerMotor, DistancePtr distance)
+        Preroller(MotorPtr prerollerMotor, DistancePtr distance)
             : m_motor(std::move(prerollerMotor)),
               m_distance(std::move(distance)) {
             idle();
@@ -45,7 +45,7 @@ class Preroller {
             }
         }
     protected:
-        MotorGroupPtr m_motor = nullptr;
+        MotorPtr m_motor = nullptr;
         DistancePtr m_distance = nullptr;
 
         const int detectionDistance = 100;

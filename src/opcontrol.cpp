@@ -26,10 +26,12 @@ void opcontrol() {
     pros::Controller master(pros::E_CONTROLLER_MASTER);
     pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
-
-    pros::Motor intakeMotor(-20, pros::MotorGears::blue);
     pros::Motor prerollMotor(19, pros::MotorGears::green);
     pros::Motor armMotor(-12, pros::MotorGears::green);
+
+    Preroller preroll(makeMotor(19, pros::MotorGears::green), makeDistance(0));
+
+    Hooks hooks(makeMotor(-20, pros::MotorGears::blue), makeOptical(0), 74, {0, 18, 37, 55});
 
     armMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
@@ -46,16 +48,16 @@ void opcontrol() {
         } else if (std::fabs(matchTimer.getTimeLeft() - 16000) < 10) {
             master.rumble("...");
         }
-        
+
         // Intake
         if (master.get_digital(INTAKE_BUTTON)) {
-            intakeMotor.move(127);
+            hooks.forwards();
             prerollMotor.move(127);
         } else if (master.get_digital(OUTTAKE_BUTTON)) {
-            intakeMotor.move(-127);
+            hooks.reverse();
             prerollMotor.move(-127);
         } else {
-            intakeMotor.move(0);
+            hooks.idle();
             prerollMotor.move(0);
         }
 
@@ -63,24 +65,25 @@ void opcontrol() {
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
             armMotor.move(70);
         } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
-            armMotor.move(-70);
+            armMotor.move(-20);
         } else {
             armMotor.move_velocity(0);
         }
 
         // Mogo
-        if (master.get_digital_new_press(MOGO_BUTTON)) {
-            mogoMech.toggle();
-        }
+        if (master.get_digital_new_press(MOGO_BUTTON)) { mogoMech.toggle(); }
 
         // Chassis
         int leftPower = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
         int turnPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
-        chassis.arcade(leftPower, turnPower*0.85, false, 0.8);
+        chassis.arcade(leftPower, turnPower * 0.85, false, 0.8);
 
         // chassis.tank(leftPower, rightPower);
+
+        // Telemetry
+        if (std::remainder(counter, 10) == 0) {}
         counter++;
         pros::delay(10);
     }
