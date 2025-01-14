@@ -3,7 +3,11 @@
 #include "pros/motors.h"
 #include <memory>
 
-std::atomic<Alliance> robotAlliance = Alliance::RED;
+Alliance robotAlliance = Alliance::RED;
+
+Preroller preroller(makeMotor(19, pros::MotorGears::green), makeDistance(0));
+Hooks hooks(makeMotor(-20, pros::MotorGears::blue), makeOptical(0), 74, {0, 18, 37, 55});
+Intake intake(std::unique_ptr<Preroller>(&preroller), std::unique_ptr<Hooks>(&hooks), makeDistance(0));
 
 pros::adi::Pneumatics mogoMech('A', false, false);
 pros::adi::Pneumatics doinker('C', false, false);

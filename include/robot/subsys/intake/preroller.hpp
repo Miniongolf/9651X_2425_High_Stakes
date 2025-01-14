@@ -25,7 +25,7 @@ class Preroller {
          * @brief Detect if a ring is in the preroller
          *
          */
-        [[nodiscard]] bool detectRing() const { return m_distance->get() < detectionDistance; }
+        [[nodiscard]] bool hasRing() const { return m_distance->get() < detectionDistance; }
 
         void intake() { m_state = states::INTAKE; };
 
@@ -50,7 +50,7 @@ class Preroller {
 
         const int detectionDistance = 100;
 
-        std::atomic<states> m_state = states::IDLE;
+        states m_state = states::IDLE;
 };
 
 using PrerollerPtr = std::unique_ptr<Preroller>;

@@ -3,7 +3,11 @@
 #include "util.hpp"
 #include "robot/subsys/subsys.hpp"
 
-extern std::atomic<Alliance> robotAlliance;
+extern Alliance robotAlliance;
+
+extern Preroller preroller;
+extern Hooks hooks;
+extern Intake intake;
 
 extern pros::adi::Pneumatics mogoMech;
 extern pros::adi::Pneumatics doinker;
