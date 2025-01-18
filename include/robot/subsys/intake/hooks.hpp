@@ -1,9 +1,5 @@
 #pragma once
 
-#include <queue>
-#include "pros/motors.h"
-#include "pros/rtos.h"
-#include "pros/rtos.hpp"
 #include "util.hpp"
 
 class Hooks {

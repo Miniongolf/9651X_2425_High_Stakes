@@ -1,4 +1,5 @@
 #pragma once
+#include "lemlib/pid.hpp"
 
 namespace robot {
 constexpr double intakeOffset = 8.0;
@@ -37,3 +38,6 @@ enum class Alliance { RED, BLUE, NONE };
 bool inline isOpposite(const Alliance lhs, const Alliance rhs) {
     return lhs == Alliance::RED ? rhs == Alliance::BLUE : rhs == Alliance::RED;
 }
+
+extern lemlib::PID emptyLateralPID, emptyAngularPID;
+extern lemlib::PID mogoLateralPID, mogoAngularPID;

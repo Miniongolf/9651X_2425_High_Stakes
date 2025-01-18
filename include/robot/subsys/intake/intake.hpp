@@ -2,7 +2,6 @@
 
 #include "robot/subsys/intake/preroller.hpp"
 #include "robot/subsys/intake/hooks.hpp"
-#include <type_traits>
 
 class Intake {
     public:
@@ -44,7 +43,10 @@ class Intake {
          * @brief Initialize the intake
          *
          */
-        void initialize() { m_hooks->initialize(); }
+        void initialize() {
+            m_hooks->initialize();
+            pros::Task task([&](){taskFunct();});
+            }
 
         void forwards() {
             m_hooks->setState(Hooks::states::FORWARDS, false, true);
@@ -67,7 +69,7 @@ class Intake {
         modes m_mode = modes::CONTINUOUS;
         bool isArmUp = false;
 
-        pros::Task task = pros::Task {[&] {
+        void taskFunct() {
             int counter = 0;
             while (true) {
                 pros::delay(10);
@@ -78,5 +80,5 @@ class Intake {
                     counter = 0;
                 }
             }
-        }};
+        }
 };

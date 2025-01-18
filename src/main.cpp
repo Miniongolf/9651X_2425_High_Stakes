@@ -1,4 +1,5 @@
 #include "main.h"
+#include "gamepad/gamepad.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -7,17 +8,16 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    pros::Controller master(pros::E_CONTROLLER_MASTER);
+    Gamepad master(pros::E_CONTROLLER_MASTER);
 
     // Calibrate chassis    
 	chassis.calibrate();
     chassis.setPose(0, 0, 0);
 
     // Set pneumatics positions
-    mogoMech.retract();
-    doinker.retract();
+    mogoMech.release();
 
-    master.clear();
+    master.controller.clear();
 
     std::printf("Initialized\n");
     std::printf("Left motor temps: %f, %f, %f\n", leftDrive.get_temperature(0), leftDrive.get_temperature(1), leftDrive.get_temperature(2));
@@ -29,9 +29,7 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {
-    robot::suspendTasks();
-}
+void disabled() {}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field

@@ -1,7 +1,10 @@
 #pragma once
 
-#include "util.hpp"
-#include "robot/subsys/subsys.hpp"
+#include "subsys/clamp/clamp.hpp"
+#include "util.hpp" // IWYU pragma: keep
+#include "robot/constants.hpp"
+#include "robot/subsys/subsys.hpp" // IWYU pragma: keep
+#include "gamepad/gamepad.hpp" // IWYU pragma: keep
 
 extern Alliance robotAlliance;
 
@@ -9,17 +12,13 @@ extern Preroller preroller;
 extern Hooks hooks;
 extern Intake intake;
 
-extern pros::adi::Pneumatics mogoMech;
-extern pros::adi::Pneumatics doinker;
+extern Clamp mogoMech;
 
 extern pros::MotorGroup leftDrive, rightDrive;
 
 extern pros::IMU imu;
 extern pros::Rotation horizRot, vertRot;
 extern lemlib::TrackingWheel horizTracker, vertTracker;
-
-extern lemlib::PID emptyLateralPID, emptyAngularPID;
-extern lemlib::PID mogoLateralPID, mogoAngularPID;
 
 extern lemlib::OdomSensors odom;
 

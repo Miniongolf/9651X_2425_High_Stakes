@@ -1,19 +1,34 @@
 #include "robot/globals.hpp"
-#include "autonFuncts.hpp"
-#include "pros/motors.h"
 #include <memory>
 
 Alliance robotAlliance = Alliance::RED;
 
-Preroller preroller(makeMotor(19, pros::MotorGears::green), makeDistance(0));
-Hooks hooks(makeMotor(-20, pros::MotorGears::blue), makeOptical(0), 74, {0, 18, 37, 55});
-Intake intake(std::unique_ptr<Preroller>(&preroller), std::unique_ptr<Hooks>(&hooks), makeDistance(0));
+Preroller preroller(
+    makeMotor(19, pros::MotorGears::green), 
+    makeDistance(0)
+);
+Hooks hooks(
+    makeMotor(-20, pros::MotorGears::blue),
+    makeOptical(0),
+    74,
+    {0, 18, 37, 55}
+);
+Intake intake(
+    std::unique_ptr<Preroller>(&preroller),
+    std::unique_ptr<Hooks>(&hooks),
+    makeDistance(0)
+);
 
-pros::adi::Pneumatics mogoMech('A', false, false);
+Clamp mogoMech(
+    makePiston('A', false, false),
+    makeDistance(11),
+    &chassis
+);
+
 pros::adi::Pneumatics doinker('C', false, false);
 
-pros::MotorGroup leftDrive({0, 0, 0}, pros::v5::MotorGears::blue);
-pros::MotorGroup rightDrive({0, 0, 0}, pros::v5::MotorGears::blue);
+pros::MotorGroup leftDrive({17, -15, 13}, pros::v5::MotorGears::blue);
+pros::MotorGroup rightDrive({18, 16, -14}, pros::v5::MotorGears::blue);
 
 pros::IMU imu(0);
 

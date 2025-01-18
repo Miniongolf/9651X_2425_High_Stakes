@@ -2,9 +2,9 @@
 
 namespace auton {
 void tunePID(bool hasMogo) {
+    mogoMech.setState(hasMogo);
     std::printf("Lateral Gains (%f, %f, %f)", chassis.lateralPID.kP, chassis.lateralPID.kI, chassis.lateralPID.kD);
     std::printf("Angular Gains (%f, %f, %f)", chassis.angularPID.kP, chassis.angularPID.kI, chassis.angularPID.kD);
-    hasMogo ?  robot::clampMogo() : robot::releaseMogo();
     chassis.setPose(0, 0, 0);
     pros::delay(100);
     robot::printPose();

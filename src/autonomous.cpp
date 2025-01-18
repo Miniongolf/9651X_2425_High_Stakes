@@ -1,5 +1,5 @@
 #include "main.h"
-#include "autonFuncts.hpp"
+#include "autonFuncts.hpp" // IWYU pragma: keep
 #include "robot/globals.hpp"
 
 /**
@@ -17,9 +17,8 @@ void autonomous() {
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
 
     chassis.setPose(0, 0, 0);
-    robot::releaseMogo();
-    doinker.retract();
-    robot::resumeTasks();
+    mogoMech.reset();
+    mogoMech.cancelAutoClamp();
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

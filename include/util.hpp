@@ -1,12 +1,13 @@
 #pragma once
 
-#include <atomic>
 #include <memory>
-#include "api.h"
-#include "lemlib/api.hpp"
-#include "lemlib/timer.hpp"
-// #include "units/Vector2D.hpp"
-#include "robot/constants.hpp"
+#include <atomic> // IWYU pragma: keep
+#include <queue> // IWYU pragma: keep
+#include "api.h" // IWYU pragma: keep
+#include "lemlib/api.hpp" // IWYU pragma: keep
+#include "lemlib/timer.hpp" // IWYU pragma: keep
+#include "units/Vector2D.hpp" // IWYU pragma: keep
+#include "robot/constants.hpp" // IWYU pragma: keep
 
 // Macro to define a new device unique pointer alias
 #define NEW_DEVICE_PTR(device) using device##Ptr = std::unique_ptr<pros::device>;
