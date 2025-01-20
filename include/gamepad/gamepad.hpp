@@ -13,10 +13,20 @@ class Button {
             isHeld = pros::c::controller_get_digital(m_id, m_button);
             isPressed = isHeld && !isPrevHeld;
             isReleased = !isHeld && isPrevHeld;
+            
+            // Rising edge
             if (isPressed) {
-                holdTime = from_msec(pros::millis()) - holdStart;
+                holdStart = from_msec(pros::millis());
             }
-            holdStart = (isPressed) ? from_msec(pros::millis()) : -1_msec;
+            
+            // Falling edge
+            if (isReleased) {
+                lastHoldTime = holdTime; // set last hold time
+                holdStart = -1_msec;
+            }
+            
+            holdTime = (isHeld) ? from_msec(pros::millis()) - holdStart : -1_msec;
+
             isPrevHeld = isHeld;
         }
 
@@ -25,14 +35,16 @@ class Button {
         [[nodiscard]] bool released() const { return isReleased; }
 
         [[nodiscard]] Time getHoldTime() const { return holdTime; }
+        [[nodiscard]] Time getLastHoldTime() const { return lastHoldTime; }
+        [[nodiscard]] bool lastHeldFor(Time time) const { return getLastHoldTime() >= time; }
         [[nodiscard]] bool heldFor(Time time) const { return getHoldTime() >= time; }
 
         [[nodiscard]] explicit operator bool() const { return isHeld; }
         [[nodiscard]] explicit operator Time() const { return getHoldTime(); }
     protected:
         bool isPrevHeld = false, isHeld = false, isPressed = false, isReleased = false;
-        Time holdStart = 0_msec;
-        Time holdTime = 0_msec;
+        Time holdStart = 0_msec, holdTime = 0_msec;
+        Time lastHoldTime = 0_msec;
         pros::controller_id_e_t m_id;
         pros::controller_digital_e_t m_button;
 };
@@ -74,22 +86,22 @@ class Gamepad {
     public:
         Gamepad(const pros::controller_id_e_t id)
           : controller(pros::Controller(id)),
-            a(id, pros::E_CONTROLLER_DIGITAL_A),
-            b(id, pros::E_CONTROLLER_DIGITAL_B),
-            x(id, pros::E_CONTROLLER_DIGITAL_X),
-            y(id, pros::E_CONTROLLER_DIGITAL_Y),
-            d_up(id, pros::E_CONTROLLER_DIGITAL_UP),
-            d_down(id, pros::E_CONTROLLER_DIGITAL_DOWN),
-            d_left(id, pros::E_CONTROLLER_DIGITAL_LEFT),
-            d_right(id, pros::E_CONTROLLER_DIGITAL_RIGHT),
             l1(id, pros::E_CONTROLLER_DIGITAL_L1),
             l2(id, pros::E_CONTROLLER_DIGITAL_L2),
             r1(id, pros::E_CONTROLLER_DIGITAL_R1),
             r2(id, pros::E_CONTROLLER_DIGITAL_R2),
+            d_up(id, pros::E_CONTROLLER_DIGITAL_UP),
+            d_down(id, pros::E_CONTROLLER_DIGITAL_DOWN),
+            d_left(id, pros::E_CONTROLLER_DIGITAL_LEFT),
+            d_right(id, pros::E_CONTROLLER_DIGITAL_RIGHT),
+            x(id, pros::E_CONTROLLER_DIGITAL_X),
+            b(id, pros::E_CONTROLLER_DIGITAL_B),
+            y(id, pros::E_CONTROLLER_DIGITAL_Y),
+            a(id, pros::E_CONTROLLER_DIGITAL_A),
             stickLeft(id, JoyStick::StickSide::LEFT),
             stickRight(id, JoyStick::StickSide::RIGHT) {}
 
-        Button a, b, x, y, d_up, d_down, d_left, d_right, l1, l2, r1, r2;
+        Button l1, l2, r1, r2, d_up, d_down, d_left, d_right, x, b, y, a;
         JoyStick stickLeft, stickRight;
 
         void update() {

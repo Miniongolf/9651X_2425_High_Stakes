@@ -75,10 +75,11 @@ class Intake {
                 pros::delay(10);
                 m_preroller->update();
                 m_hooks->update(m_preroller->hasRing());
-                if (counter % 10 == 0) {
-                    std::cout << *m_hooks.get();
+                if (counter % 25 == 0) {
+                    // std::cout << *m_hooks.get();
                     counter = 0;
                 }
+                counter++;
             }
         }
 };

@@ -6,7 +6,7 @@
 #include "api.h" // IWYU pragma: keep
 #include "lemlib/api.hpp" // IWYU pragma: keep
 #include "lemlib/timer.hpp" // IWYU pragma: keep
-#include "units/Vector2D.hpp" // IWYU pragma: keep
+#include "units/pose.hpp" // IWYU pragma: keep
 #include "robot/constants.hpp" // IWYU pragma: keep
 
 // Macro to define a new device unique pointer alias

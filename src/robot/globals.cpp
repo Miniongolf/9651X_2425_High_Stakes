@@ -27,8 +27,8 @@ Clamp mogoMech(
 
 pros::adi::Pneumatics doinker('C', false, false);
 
-pros::MotorGroup leftDrive({17, -15, 13}, pros::v5::MotorGears::blue);
-pros::MotorGroup rightDrive({18, 16, -14}, pros::v5::MotorGears::blue);
+pros::MotorGroup leftDrive({17, -13, 15}, pros::v5::MotorGears::blue);
+pros::MotorGroup rightDrive({-18, 16, -14}, pros::v5::MotorGears::blue);
 
 pros::IMU imu(0);
 

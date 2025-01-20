@@ -14,7 +14,11 @@ void initialize() {
 	chassis.calibrate();
     chassis.setPose(0, 0, 0);
 
+    // Intake init
+    intake.initialize();
+
     // Set pneumatics positions
+    mogoMech.initialize();
     mogoMech.release();
 
     master.controller.clear();

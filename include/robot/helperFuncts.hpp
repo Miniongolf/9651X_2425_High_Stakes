@@ -1,4 +1,5 @@
 #pragma once
+#include "lemlib/chassis/chassis.hpp"
 #include "robot/globals.hpp" // IWYU pragma: keep
 
 struct PathPoint {
@@ -26,22 +27,21 @@ namespace robot {
      * @brief Prints the current pose of the robot
      */
     void printPose();
-    
-    /**
-     * @brief Suspends all subsystem tasks
-     */
-    void suspendTasks();
-
-    /**
-     * @brief Resumes all subsystem tasks
-     */
-    void resumeTasks();
 
     /**
      * @brief chassis.arcade() wrapper
      * 
      */
     void moveTimed(const double throttle, const double steering, const int time);
+
+    /**
+     * @brief Grab a mogo at a given pose
+     * 
+     * @param pose The pose of the mogo
+     * @param timeout The timeout of the first movement
+     * @param leadDist The distance to lead the mogo by
+     */
+    void grabMogo(units::Pose pose, Time timeout, Length leadDist = 10_in, lemlib::MoveToPoseParams params = {}, double approachSpeed = 50, bool forwards = false, Length earlyExit = 5_in);
 
     /**
      * @brief Follow a path of points, moving linearly from point to point

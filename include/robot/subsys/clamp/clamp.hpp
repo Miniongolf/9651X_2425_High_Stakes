@@ -1,8 +1,6 @@
 #pragma once
 
-#include "robot/constants.hpp"
 #include "util.hpp"
-
 
 class Clamp {
     public:
@@ -14,9 +12,17 @@ class Clamp {
          */
         Clamp(PistonPtr piston, DistancePtr sensor, lemlib::Chassis* chassis) : m_piston(std::move(piston)), m_sensor(std::move(sensor)), m_chassis(chassis) {};
 
+        void reset() {
+            release();
+        }
+
         void initialize() {
             reset();
             pros::Task clampTask([&](){taskFunct();});
+        }
+
+        bool isClamped() {
+            return m_piston->is_extended();
         }
 
         void clamp() {
@@ -73,11 +79,6 @@ class Clamp {
          */
         void cancelAutoClamp() {
             isAutoClamping = false;
-        }
-
-        void reset() {
-            release();
-            cancelAutoClamp();
         }
     protected:
         void taskFunct() {

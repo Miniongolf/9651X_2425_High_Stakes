@@ -1,11 +1,12 @@
 #pragma once
 #include "lemlib/pid.hpp"
+#include "units/units.hpp" // IWYU pragma: keep
 
 namespace robot {
-constexpr double intakeOffset = 8.0;
-constexpr double mogoOffset = -5.0;
-constexpr double wallStakeOffset = 11.0;
-constexpr double allianceStakeOffset = 13.0;
+constexpr Length intakeOffset = 8.0_in;
+constexpr Length mogoOffset = -5.0_in;
+constexpr Length wallStakeOffset = 11.0_in;
+constexpr Length allianceStakeOffset = 13.0_in;
 } // namespace robot
 
 struct ColourRange {

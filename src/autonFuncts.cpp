@@ -24,4 +24,12 @@ void tunePID(bool hasMogo) {
     pros::delay(100);
     robot::printPose();
 }
+
+void autoTestStuffs() {
+    chassis.setPose(0, 0, 0);
+    robot::grabMogo(
+        {48_in, 48_in, 90_cDeg}, 1000_msec, 10_in, {},
+        50, false, 5_in
+    );
+}
 } // namespace auton

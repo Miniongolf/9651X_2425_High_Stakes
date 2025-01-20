@@ -3,14 +3,16 @@
 #include "pros/adi.hpp" // IWYU pragma: keep
 #include "pros/motors.h"
 #include "pros/motors.hpp"
+#include "units/units.hpp"
 
-#define INTAKE_BUTTON pros::E_CONTROLLER_DIGITAL_R2
-#define OUTTAKE_BUTTON pros::E_CONTROLLER_DIGITAL_R1
+Gamepad master(pros::E_CONTROLLER_MASTER);
+Button& INTAKE_BUTTON = master.r2;
+Button& OUTTAKE_BUTTON = master.r1;
 
-#define MOGO_BUTTON pros::E_CONTROLLER_DIGITAL_L1
+Button& MOGO_BUTTON = master.l1;
 
-#define ARM_UP_BUTTON pros::E_CONTROLLER_DIGITAL_X
-#define ARM_DOWN_BUTTON pros::E_CONTROLLER_DIGITAL_A
+Button& ARM_UP_BUTTON = master.x;
+Button& ARM_DOWN_BUTTON = master.a;
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -27,7 +29,6 @@
  */
 void opcontrol() {
     int counter = 0;
-    Gamepad master(pros::E_CONTROLLER_MASTER);
 
     intake.setMode(Intake::modes::CONTINUOUS);
 
@@ -51,30 +52,35 @@ void opcontrol() {
         }
 
         // Intake
-        if (master[INTAKE_BUTTON]) {
+        if (INTAKE_BUTTON) {
             intake.forwards();
-        } else if (master[OUTTAKE_BUTTON]) {
+        } else if (OUTTAKE_BUTTON) {
             intake.reverse();
         } else {
             intake.idle();
         }
 
         // Arm
-        if (master[ARM_UP_BUTTON]) {
-            armMotor.move(70);
-        } else if (master[ARM_DOWN_BUTTON]) {
+        if (ARM_UP_BUTTON) {
+            armMotor.move(90);
+        } else if (ARM_DOWN_BUTTON) {
             armMotor.move(-20);
         } else {
             armMotor.move_velocity(0);
         }
 
         // Mogo
-        if (master[MOGO_BUTTON]->heldFor(1000_msec)) {
+        if (MOGO_BUTTON) { // Auto clamp if button is down
             mogoMech.requestAutoClamp();
-        } else if (master[MOGO_BUTTON]->released()) {
-            mogoMech.toggle();
+        } else if (MOGO_BUTTON.released()) {
+            if (counter % 10 == 0) {
+                std::cout << "MOGO BUTTON: " << MOGO_BUTTON.getLastHoldTime() << '\n';
+            }
+            mogoMech.cancelAutoClamp(); // Cancel auto clamp if button is released
+            if (!MOGO_BUTTON.lastHeldFor(250_msec)) {
+                mogoMech.toggle(); // Toggle if button is tapped instead of held (manual clamp)
+            }
         }
-        if (master[MOGO_BUTTON]->released()) { mogoMech.cancelAutoClamp(); }
 
         // Chassis
         int leftPower = master.stickLeft.y();
@@ -86,6 +92,6 @@ void opcontrol() {
 
         // Telemetry
         counter++;
-        pros::delay(25);
+        pros::delay(20);
     }
 }
