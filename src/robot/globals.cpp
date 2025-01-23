@@ -11,12 +11,19 @@ Hooks hooks(
     makeMotor(-20, pros::MotorGears::blue),
     makeOptical(0),
     74,
-    {0, 18, 37, 55}
+    {0, 55, 37, 18}
 );
 Intake intake(
     std::unique_ptr<Preroller>(&preroller),
     std::unique_ptr<Hooks>(&hooks),
     makeDistance(0)
+);
+
+Arm arm(
+    makeMotor(12, pros::MotorGears::green),
+    lemlib::PID(0.5, 0, 0, 0, true),
+    0.0,
+    1
 );
 
 Clamp mogoMech(
@@ -44,7 +51,7 @@ lemlib::TrackingWheel horizTracker(
 
 lemlib::TrackingWheel vertTracker(
     &vertRot,
-    lemlib::Omniwheel::NEW_275,
+    2.75,
     0, // tune this
     1
 );

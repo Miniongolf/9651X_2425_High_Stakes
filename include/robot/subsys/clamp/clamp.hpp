@@ -61,7 +61,7 @@ class Clamp {
                     return true;
                 }
             }
-            return longCount >= distQueue.size() / 2 && shortCount >= 2;
+            return longCount >= std::max((int)distQueue.size() - 5, 0) && shortCount >= std::max((int)distQueue.size(), 3);
         }
 
         /**
@@ -84,7 +84,7 @@ class Clamp {
         void taskFunct() {
             pros::delay(10);
             distQueue.push_back(getDistance());
-            if (distQueue.size() > 10) {
+            if (distQueue.size() > 25) {
                 distQueue.erase(distQueue.begin());
             }
             if (isAutoClamping && seesMogo()) { clamp(); }
@@ -93,7 +93,7 @@ class Clamp {
         DistancePtr m_sensor = nullptr;
         lemlib::Chassis* m_chassis = nullptr;
 
-        static constexpr Length longDist = 750_mm, shortDist = 250_mm;
+        static constexpr Length longDist = 100_mm, shortDist = 40_mm;
         std::vector<Length> distQueue;
 
         bool isAutoClamping = false;

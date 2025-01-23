@@ -31,14 +31,6 @@ class Hooks {
 
         [[nodiscard]] double getPosition(int hookNum = 0) const;
 
-        /**
-         * @brief Return the distance between two positions
-         *
-         * @param target
-         * @param position
-         * @param direction
-         * @return double
-         */
         [[nodiscard]] double dist(double target, double position,
                                   lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
 
@@ -79,7 +71,7 @@ class Hooks {
 
         void setVoltage(int voltage) { currVoltage = voltage; }
 
-        lemlib::PID pid = {50, 0, 0};
+        lemlib::PID pid = {20, 0, 0};
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses

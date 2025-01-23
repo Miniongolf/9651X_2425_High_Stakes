@@ -41,7 +41,35 @@ namespace robot {
      * @param timeout The timeout of the first movement
      * @param leadDist The distance to lead the mogo by
      */
-    void grabMogo(units::Pose pose, Time timeout, Length leadDist = 10_in, lemlib::MoveToPoseParams params = {}, double approachSpeed = 50, bool forwards = false, Length earlyExit = 5_in);
+    void grabMogo(lemlib::Pose pose, Time timeout, Length leadDist = 10_in, lemlib::MoveToPoseParams params = {}, double approachSpeed = 50, bool forwards = false, Length earlyExit = 5_in);
+
+    /**
+     * @brief Spinny turn towards a point
+     * 
+     * @param point The point to turn towards
+     * @param timeout The timeout of the turn
+     * @param forwards Whether the motion starts forwards or backwards
+     *  @note flips directions while turning
+     * @param direction The direction to turn
+     *  @note don't use lemlib::AngularDirection::AUTO
+     * @param startSpeed The starting speed of the turn
+     * @param endSpeed The ending speed of the turn
+     */
+    void swagTurnToPoint(lemlib::Pose point, bool forwards, lemlib::AngularDirection direction, int startSpeed = 70, int endSpeed = 127);
+
+    /**
+     * @brief Spinny turn towards a point
+     * 
+     * @param heading The heading to match
+     * @param timeout The timeout of the turn
+     * @param forwards Whether the motion starts forwards or backwards
+     *  @note flips directions while turning
+     * @param direction The direction to turn
+     *  @note don't use lemlib::AngularDirection::AUTO
+     * @param startSpeed The starting speed of the turn
+     * @param endSpeed The ending speed of the turn
+     */
+    void swagTurnToHeading(double theta, bool forwards, lemlib::AngularDirection direction, int startSpeed = 70, int endSpeed = 127);
 
     /**
      * @brief Follow a path of points, moving linearly from point to point

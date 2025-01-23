@@ -70,24 +70,25 @@ void opcontrol() {
         }
 
         // Mogo
-        if (MOGO_BUTTON) { // Auto clamp if button is down
+        if (MOGO_BUTTON.heldFor(250_msec)) { // Auto clamp if button is down
             mogoMech.requestAutoClamp();
         } else if (MOGO_BUTTON.released()) {
-            if (counter % 10 == 0) {
-                std::cout << "MOGO BUTTON: " << MOGO_BUTTON.getLastHoldTime() << '\n';
-            }
             mogoMech.cancelAutoClamp(); // Cancel auto clamp if button is released
             if (!MOGO_BUTTON.lastHeldFor(250_msec)) {
                 mogoMech.toggle(); // Toggle if button is tapped instead of held (manual clamp)
             }
         }
 
+        if (counter % 10 == 0) {
+            // std::cout << "MOGO BUTTON: " << MOGO_BUTTON.getLastHoldTime() << '\n';
+            std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
+        }
+
         // Chassis
-        int leftPower = master.stickLeft.y();
-        int rightPower = master.stickRight.y();
+        int throttle = master.stickLeft.y();
         int turnPower = master.stickRight.x();
 
-        chassis.arcade(leftPower, turnPower * 0.85, false, 0.8);
+        chassis.arcade(throttle, turnPower * 0.85, false, 0.8);
         // chassis.tank(leftPower, rightPower);
 
         // Telemetry

@@ -1,4 +1,5 @@
 #include "autonFuncts.hpp"
+#include "robot/helperFuncts.hpp"
 
 namespace auton {
 void tunePID(bool hasMogo) {
@@ -9,18 +10,19 @@ void tunePID(bool hasMogo) {
     pros::delay(100);
     robot::printPose();
     pros::delay(100);
+    // Long turn
     chassis.turnToHeading(135, 4000);
     chassis.waitUntilDone();
     pros::delay(100);
     robot::printPose();
     pros::delay(100);
+    // Short turn
     chassis.turnToHeading(90, 4000);
     chassis.waitUntilDone();
     pros::delay(100);
     robot::printPose();
-    pros::delay(100);
-    chassis.moveToPoint(36, chassis.getPose().y, 5000);
-    chassis.waitUntilDone();
+    // Lateral
+    chassis.moveToPoint(36, chassis.getPose().y, 5000, {}, false);
     pros::delay(100);
     robot::printPose();
 }
@@ -28,7 +30,7 @@ void tunePID(bool hasMogo) {
 void autoTestStuffs() {
     chassis.setPose(0, 0, 0);
     robot::grabMogo(
-        {48_in, 48_in, 90_cDeg}, 1000_msec, 10_in, {},
+        {48, 48, 90}, 1000_msec, 10_in, {},
         50, false, 5_in
     );
 }
