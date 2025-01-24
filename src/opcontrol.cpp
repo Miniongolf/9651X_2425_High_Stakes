@@ -1,9 +1,4 @@
 #include "main.h"
-#include "pros/abstract_motor.hpp"
-#include "pros/adi.hpp" // IWYU pragma: keep
-#include "pros/motors.h"
-#include "pros/motors.hpp"
-#include "units/units.hpp"
 
 Gamepad master(pros::E_CONTROLLER_MASTER);
 Button& INTAKE_BUTTON = master.r2;
@@ -31,12 +26,15 @@ void opcontrol() {
     int counter = 0;
 
     intake.setMode(Intake::modes::CONTINUOUS);
+    mogoMech.cancelAutoClamp();
 
     pros::Motor armMotor(-12, pros::MotorGears::green);
     armMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     printf("-- OPCONTROL STARTING --\n");
     lemlib::Timer matchTimer = 105000;
+
+    bool mogoClampedOnPress;
 
     while (true) {
         // Update gamepad buttons and sticks
@@ -52,12 +50,13 @@ void opcontrol() {
         }
 
         // Intake
+        intake.setMode((master.l2) ? Intake::modes::HOLD : Intake::modes::CONTINUOUS);
         if (INTAKE_BUTTON) {
-            intake.forwards();
+            intake.forwards(true, true);
         } else if (OUTTAKE_BUTTON) {
-            intake.reverse();
+            intake.reverse(true, true);
         } else {
-            intake.idle();
+            intake.idle(false);
         }
 
         // Arm
@@ -70,26 +69,34 @@ void opcontrol() {
         }
 
         // Mogo
-        if (MOGO_BUTTON.heldFor(250_msec)) { // Auto clamp if button is down
-            mogoMech.requestAutoClamp();
+        // if (MOGO_BUTTON.pressed()) mogoMech.toggle();
+
+        if (MOGO_BUTTON.pressed()) {
+            mogoClampedOnPress = mogoMech.isClamped();
+            if (mogoMech.isClamped()) { mogoMech.release(); }
+            else { mogoMech.requestAutoClamp(); }
+        } else if (MOGO_BUTTON.heldFor(0.25_sec)) {
+            mogoMech.requestAutoClamp(false);
         } else if (MOGO_BUTTON.released()) {
-            mogoMech.cancelAutoClamp(); // Cancel auto clamp if button is released
-            if (!MOGO_BUTTON.lastHeldFor(250_msec)) {
-                mogoMech.toggle(); // Toggle if button is tapped instead of held (manual clamp)
+            mogoMech.cancelAutoClamp();
+            std::cout << "MOGO BUTTON RELEASED " << mogoClampedOnPress << '\n';
+            if (!MOGO_BUTTON.lastHeldFor(0.25_sec) && !mogoClampedOnPress) {
+                mogoMech.clamp();
             }
         }
 
         if (counter % 10 == 0) {
             // std::cout << "MOGO BUTTON: " << MOGO_BUTTON.getLastHoldTime() << '\n';
-            std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
+            // std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
         }
 
         // Chassis
         int throttle = master.stickLeft.y();
+        int rightPower = master.stickRight.y();
         int turnPower = master.stickRight.x();
 
-        chassis.arcade(throttle, turnPower * 0.85, false, 0.8);
-        // chassis.tank(leftPower, rightPower);
+        chassis.arcade(throttle, turnPower * 0.7, false, 0.8);
+        // chassis.tank(throttle, rightPower);
 
         // Telemetry
         counter++;

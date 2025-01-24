@@ -1,5 +1,5 @@
 #pragma once
 
-#include "robot/subsys/intake/intake.hpp"
-#include "robot/subsys/arm/arm.hpp"
-#include "robot/subsys/clamp/clamp.hpp"
+#include "robot/subsys/intake/intake.hpp" // IWYU pragma: keep
+#include "robot/subsys/arm/arm.hpp" // IWYU pragma: keep
+#include "robot/subsys/clamp/clamp.hpp" // IWYU pragma: keep

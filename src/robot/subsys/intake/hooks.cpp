@@ -63,9 +63,9 @@ int Hooks::getNearestHook(double target, lemlib::AngularDirection direction) con
 
 bool Hooks::isAtPosition(double target, int hookNum, double tolerance) const {
     // If hookNum is -1 (or otherwise invalid), use the nearest hook
-    double hookPose = (hookNum == std::clamp(hookNum, 0, (int)hooks.size() - 1)) ? getPosition(hookNum)
-                                                                                 : getPosition(getNearestHook(target));
-    return std::fabs(dist(target, getPosition(hookNum)) < tolerance);
+    if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target); }   
+    double hookPose =  getPosition(hookNum);
+    return std::fabs(dist(target, getPosition(hookNum))) < tolerance;
 }
 
 bool Hooks::isJammed() const {
@@ -77,10 +77,21 @@ bool Hooks::isJammed() const {
     return count >= 4;
 }
 
+void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange) {
+    // If hookNum is -1 (or otherwise invalid), use the nearest hook
+    if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target); }
+    // Check if the hook is settling
+    if (isAtPosition(target, hookNum, settleRange)) { direction = AngularDirection::AUTO; }
+    // Move the hook to the target position
+    const double error = dist(target, getPosition(hookNum), direction);
+    const double voltage = pid.update(error);
+    setVoltage(voltage);
+};
+
 void Hooks::update(bool hasPrerollRing) {
     /** Jam detection
-     *  NOTE: the jam state is intermediary and will not be tracked by lastState or prevState
-     *  However, it will be tracked by prevVoltage
+     *  NOTE: the jam state is not a real state and will not be tracked by lastState or prevState
+     *  However, its effects will be tracked by prevVoltage
      */
     jamDetects.push_back(m_motor->get_current_draw() >= jamThresh.first &&
                          std::fabs(m_motor->get_actual_velocity()) <= jamThresh.second);
@@ -90,7 +101,7 @@ void Hooks::update(bool hasPrerollRing) {
     if (this->isJammed()) {
         std::printf("HOOKS JAMMED\n");
         // currVoltage at this stage is the most recently set voltage
-        setVoltage(lemlib::sgn(currVoltage) * -100);
+        setVoltage(lemlib::sgn(currVoltage) * -70);
         m_motor->move(currVoltage);
         // clear the jam detections
         jamDetects = {false, false, false, false, false};
@@ -103,43 +114,43 @@ void Hooks::update(bool hasPrerollRing) {
     switch (currState) {
         case states::FORWARDS:
             setVoltage(127);
-            nextState();
+            isBusy = false;
             break;
         case states::REVERSE:
             setVoltage(-127);
-            nextState();
+            isBusy = false;
             break;
         case states::IDLE:
             if (this->isAtPosition(idlePose)) setVoltage(0);
-            else {
-                // Move the nearest hook to idle position, continuing in the current direction
-                setVoltage(pid.update(
-                    dist(idlePose, getPosition(getNearestHook(idlePose, currentDirection)), currentDirection)));
-            }
-            nextState();
+            else { moveTowards(idlePose, -1, currentDirection); }
+            isBusy = false;
             break;
         case states::WAIT_FOR_RING:
+            isBusy = true;
+            // reset ring wait flag when the state is first set
+            if (prevState != states::WAIT_FOR_RING) { ringWaitFlag = false; }
+            // update flag with ring detection from function param
+            if (hasPrerollRing) ringWaitFlag = true;
+
             // Move into position first even if there is a ring already
-            if (!this->isAtPosition(idlePose)) {
-                // Move the nearest hook to idle position, moving forwards
-                setVoltage(pid.update(
-                    dist(idlePose, getPosition(getNearestHook(idlePose, lemlib::AngularDirection::CW_CLOCKWISE)),
-                         lemlib::AngularDirection::CW_CLOCKWISE)));
-            } else if (!hasPrerollRing) {
+            if (!this->isAtPosition(idlePose, -1, 1)) {
+                moveTowards(idlePose, -1, AngularDirection::CW_CLOCKWISE);
+            } else if (!ringWaitFlag) {
                 setVoltage(0);
             } else {
-                // Go if there is a ring and the hooks are in position
-                nextState();
+                // Hooks are in position and a ring was detected, continue
+                isBusy = false;
             }
             break;
         case states::MOVE:
+            /** NOTE: idrk if this is necessary at all, just immediately switches to idle for now */
             setState(states::IDLE);
-            nextState();
+            isBusy = false;
             break;
     }
-
     m_motor->move(currVoltage);
     prevVoltage = currVoltage;
     prevState = (lastState == currState) ? prevState : lastState;
     lastState = currState;
+    if (!isBusy) nextState();
 };

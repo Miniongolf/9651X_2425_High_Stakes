@@ -44,23 +44,32 @@ class Intake {
          *
          */
         void initialize() {
+            std::printf("intake init\n");
             m_hooks->initialize();
             pros::Task task([&](){taskFunct();});
-            }
+        }
 
-        void forwards() {
-            m_hooks->setState(Hooks::states::FORWARDS, false, true);
+        void waitUntilDone() {
+            while (m_hooks->busy()) { pros::delay(10); }
+        }
+
+        void forwards(bool force, bool clearQueue = true) {
             m_preroller->intake();
+            if (m_mode == modes::CONTINUOUS) {
+                m_hooks->setState(Hooks::states::FORWARDS, force, clearQueue);
+            } else {
+                m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, clearQueue);
+            }
         }
 
-        void reverse() {
-            m_hooks->setState(Hooks::states::REVERSE, false, true);
+        void reverse(bool force, bool clearQueue = true) {
             m_preroller->outtake();
+            m_hooks->setState(Hooks::states::REVERSE, force, clearQueue);
         }
 
-        void idle() {
-            m_hooks->setState(Hooks::states::IDLE, false, true);
+        void idle(bool force) {
             m_preroller->idle();
+            m_hooks->setState(Hooks::states::IDLE, force, (m_hooks->busy()) ? false : true);
         }
     protected:
         PrerollerPtr m_preroller = nullptr;

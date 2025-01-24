@@ -74,7 +74,7 @@ void swagTurnToPoint(lemlib::Pose point, bool forwards, lemlib::AngularDirection
 
     chassis.swingToHeading(firstSwingHeading, lockedSide, 1000, {.minSpeed = (float)startSpeed, .earlyExitRange = 30}, false);
     chassis.turnToHeading(targetHeading - 45*angleMult, 750, {.direction = direction, .minSpeed = 127, .earlyExitRange = 10}, false);
-    chassis.swingToPoint(point.x, point.y, oppSide, 1000, {.forwards=forwards, .direction = direction, .minSpeed = (float)endSpeed}, false);
+    chassis.swingToPoint(point.x, point.y, oppSide, 1000, {.forwards=!forwards, .direction = direction, .minSpeed = (float)endSpeed}, false);
 }
 
 void swagTurnToHeading(double theta, bool forwards, lemlib::AngularDirection direction, int startSpeed, int endSpeed) {
@@ -102,7 +102,7 @@ void swagTurnToHeading(double theta, bool forwards, lemlib::AngularDirection dir
 
     chassis.swingToHeading(firstSwingHeading, lockedSide, 1000, {.minSpeed = (float)startSpeed, .earlyExitRange = 30}, false);
     chassis.turnToHeading(targetTheta - 45*angleMult, 750, {.direction = direction, .minSpeed = 127, .earlyExitRange = 10}, false);
-    chassis.swingToHeading((forwards) ? targetTheta : 180-targetTheta, oppSide, 1000, {.direction = direction, .minSpeed = (float)endSpeed}, false);
+    chassis.swingToHeading((!forwards) ? targetTheta : 180-targetTheta, oppSide, 1000, {.direction = direction, .minSpeed = (float)endSpeed}, false);
 }
 
 

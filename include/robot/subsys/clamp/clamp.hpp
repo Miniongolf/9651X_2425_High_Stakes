@@ -18,7 +18,8 @@ class Clamp {
 
         void initialize() {
             reset();
-            pros::Task clampTask([&](){taskFunct();});
+            std::printf("mogo clamp init\n");
+            pros::Task clampTask([&](){ taskFunct(); });
         }
 
         bool isClamped() {
@@ -44,7 +45,7 @@ class Clamp {
         }
 
         void toggle() {
-            setState(!m_piston->is_extended());
+            setState(!isClamped());
         }
 
         Length getDistance() {
@@ -52,25 +53,24 @@ class Clamp {
         }
 
         bool seesMogo() {
-            if (getDistance() > longDist) {
+            if (distQueue.back() > longDist) {
                 return false;
             }
             int longCount = 0, shortCount = 0;
-            for (Length dist : distQueue) {
-                if (dist < longDist) {
-                    return true;
-                }
+            for (Length& dist : distQueue) {
+                longCount += (dist < longDist);
+                shortCount += (dist < shortDist);
             }
-            return longCount >= std::max((int)distQueue.size() - 5, 0) && shortCount >= std::max((int)distQueue.size(), 3);
+            return longCount >= std::min((int)distQueue.size(), 5) && shortCount >= std::min((int)distQueue.size(), 2);
         }
 
         /**
          * @brief Request the clamp to automatically clamp when it sees a mogo
-         * @note Opens the clamp if it is closed at this point
+         * @param openClamp Opens the clamp if it is closed at this point
          */
-        void requestAutoClamp() {
+        void requestAutoClamp(bool openClamp = true) {
+            if (openClamp) { release(); }
             isAutoClamping = true;
-            release();
         }
 
         /**
@@ -80,20 +80,32 @@ class Clamp {
         void cancelAutoClamp() {
             isAutoClamping = false;
         }
+
+        bool isAuto() {
+            return isAutoClamping;
+        }
     protected:
         void taskFunct() {
-            pros::delay(10);
-            distQueue.push_back(getDistance());
-            if (distQueue.size() > 25) {
-                distQueue.erase(distQueue.begin());
+            int counter = 0;
+            while (true) {
+                pros::delay(10);
+                distQueue.push_back(getDistance());
+                if (distQueue.size() > 10) {
+                    distQueue.erase(distQueue.begin());
+                }
+                if (isAutoClamping && seesMogo()) { clamp(); }
+
+                if (counter % 10 == 0) {
+                    // std::cout << "mogo dists: " << distQueue[0] << distQueue[1] << distQueue[2] << distQueue[3] << distQueue[4] << distQueue[5] << distQueue[6] << distQueue[7] << distQueue[8] << distQueue[9] << '\n';
+                }
+                counter++;
             }
-            if (isAutoClamping && seesMogo()) { clamp(); }
         }
         PistonPtr m_piston = nullptr;
         DistancePtr m_sensor = nullptr;
         lemlib::Chassis* m_chassis = nullptr;
 
-        static constexpr Length longDist = 100_mm, shortDist = 40_mm;
+        static constexpr Length longDist = 120_mm, shortDist = 60_mm;
         std::vector<Length> distQueue;
 
         bool isAutoClamping = false;

@@ -1,5 +1,4 @@
 #include "main.h"
-#include "gamepad/gamepad.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -8,8 +7,6 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    Gamepad master(pros::E_CONTROLLER_MASTER);
-
     // Calibrate chassis    
 	chassis.calibrate();
     chassis.setPose(0, 0, 0);
@@ -17,11 +14,11 @@ void initialize() {
     // Intake init
     intake.initialize();
 
-    // Set pneumatics positions
+    // Mogo mech init
     mogoMech.initialize();
-    mogoMech.release();
 
-    master.controller.clear();
+    // Arm init
+    /** TODO: add here */
 
     std::printf("Initialized\n");
     std::printf("Left motor temps: %f, %f, %f\n", leftDrive.get_temperature(0), leftDrive.get_temperature(1), leftDrive.get_temperature(2));
