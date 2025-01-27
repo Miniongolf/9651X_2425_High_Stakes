@@ -26,7 +26,10 @@ class Arm {
 
         Angle getPosition() { return from_stDeg(m_motor->get_position() * m_ratio) + offset; }
 
-        bool isAtPosition(Angle target, double tolerance = 1.5) { return std::fabs(lemlib::angleError(to_stRad(target), to_stRad(getPosition()))) < tolerance; }
+        bool isAtPosition(Angle target, AngleRange tolerance = 1.5_stDeg) {
+            double error = lemlib::angleError(to_stRad(target), to_stRad(getPosition()));
+            return std::fabs(error) < to_stRad(tolerance);
+        }
 
         void moveToPosition(Angle angle) { targetPose = angle; }
     protected:
@@ -34,13 +37,13 @@ class Arm {
         lemlib::PID m_pid;
         double kF;
         double m_ratio;
-        Angle offset = 0_stRad;
+        Angle offset = 0_stDeg;
 
-        Angle targetPose = 0_stRad;
+        Angle targetPose = 0_stDeg;
 
         void taskFunct() {
             while (true) {
-                if (targetPose == idle && isAtPosition(idle, 10)) {
+                if (targetPose == idle && isAtPosition(idle, 10_stDeg)) {
                     m_motor->move(0);
                     continue;
                 }

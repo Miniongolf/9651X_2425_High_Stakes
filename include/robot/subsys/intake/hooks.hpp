@@ -14,72 +14,85 @@ class Hooks {
             m_motor->set_encoder_units(pros::E_MOTOR_ENCODER_ROTATIONS);
         }
 
+        // Init
+        void initialize() {
+            std::printf("hooks init\n");
+            m_motor->tare_position();
+        }
+
+        // State machine
         enum class states { FORWARDS, REVERSE, IDLE, WAIT_FOR_RING, MOVE };
 
         states getState() const { return currState; }
-
         void setState(states state, bool forceInstant = false, bool clearQueue = false);
-
         bool atState(states state) const { return currState == state; }
         bool atState(std::vector<states> stateList) const { return std::find(stateList.begin(), stateList.end(), currState) != stateList.end(); }
 
         bool busy() const { return isBusy; }
 
         void forwards() { setState(states::FORWARDS); }
-
         void reverse() { setState(states::REVERSE); }
-
         void idle() { setState(states::IDLE); }
-
-        void initialize() {
-            std::printf("hooks init\n");
-            m_motor->tare_position();
-        }
-
-        [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }
-
-        [[nodiscard]] double getPosition(int hookNum = 0) const;
-
-        [[nodiscard]] double dist(double target, double position,
-                                  lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
-
-        [[nodiscard]] int getNearestHook(double target,
-                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
-
-        [[nodiscard]] bool isAtPosition(double target, int hookNum = -1, double tolerance = 1) const;
-
-
-        [[nodiscard]] bool isJammed() const;
 
         void update(bool hasPrerollRing);
 
+        // Position utils
+        [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }
+        [[nodiscard]] double dist(double target, double position,
+                                  lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
+        [[nodiscard]] double getPosition(int hookNum = 0) const;
+        [[nodiscard]] int getNearestHook(double target,
+                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
+        [[nodiscard]] bool isAtPosition(double target, int hookNum = -1, double tolerance = 1) const;
+
+        // Antijam
+        [[nodiscard]] bool isJammed() const;
+
+        // Colour sort
+        [[nodiscard]] Alliance ringDetect() const { 
+            const double ringHue = m_optical->get_hue();
+            const int ringProx = m_optical->get_proximity();
+            // Proximity check
+            if (ringProx > proxRange) return Alliance::NONE;
+            
+            if (red.inRange(ringHue)) return Alliance::RED;
+            else if (blue.inRange(ringHue)) return Alliance::BLUE;
+            else return Alliance::NONE;
+        }
+        bool colourSortEnabled = true;
+
+        // Telemetry
         friend std::ostream& operator<<(std::ostream& os, const Hooks& hooks) {
             os << "Hooks pose (" << hooks.getPosition(0) << ", " << hooks.getPosition(1) << ", " << hooks.getPosition(2) << ", "
                << hooks.getPosition(3) << ") --> " << hooks.getNearestHook(hooks.idlePose) << "\n";
             return os;
         }
     protected:
-        void moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange = 3);
         // Devices
         MotorPtr m_motor = nullptr;
         OpticalPtr m_optical = nullptr;
 
-        // Hook positions
-        const int chainLength;
-        const std::vector<double> hooks;
-        const double idlePose = 0, colourSortPose = 40;
-
-        // State machines
+        // State machine
         states currState = states::IDLE, lastState = states::IDLE, prevState = states::IDLE;
         std::deque<states> stateQueue;
         void nextState();
         bool isBusy = false;
         bool ringWaitFlag = false;
 
+        // Hook positions
+        const int chainLength;
+        const std::vector<double> hooks;
+        const double idlePose = 0, colourSortPose = 40;
+        void moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange = 3);
+
+        // Colour sort
+        const int proxRange = 100; // Tune this
+        bool colourSorting = false;
+        int colourDetectHook = 0;
+
         // Voltage utils
         int currVoltage = 0, prevVoltage = 0;
         void setVoltage(int voltage) { currVoltage = voltage; }
-
         lemlib::PID pid = {10, 0, 0};
 
         // Jam detection

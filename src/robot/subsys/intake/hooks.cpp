@@ -1,6 +1,8 @@
 #include "robot/subsys/intake/hooks.hpp"
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/util.hpp"
+#include "robot/constants.hpp"
+#include "robot/globals.hpp"
 
 void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
     if (forceInstant) {
@@ -111,10 +113,25 @@ void Hooks::update(bool hasPrerollRing) {
     lemlib::AngularDirection currentDirection =
         currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE : AngularDirection::CCW_COUNTERCLOCKWISE;
 
+    // Only colour sort if state is forwards
+    if (currState != states::FORWARDS) { colourSorting = false; }
+
     switch (currState) {
         case states::FORWARDS:
             setVoltage(127);
-            isBusy = false;
+            // Detect colour sorts
+            if (colourSortEnabled && !colourSorting && isOpposite(ringDetect(), robotAlliance)) {
+                colourSorting = true;
+                colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
+            }
+            // Do the colour sort thingy if it's detected and the hook is in position
+            if (colourSorting && dist(colourSortPose, getPosition(colourDetectHook)) < 0) {
+                colourSorting = false;
+                m_motor->move(-10);
+                pros::delay(50);
+                m_motor->move(127);
+            }
+            isBusy = colourSorting;
             break;
         case states::REVERSE:
             setVoltage(-127);
