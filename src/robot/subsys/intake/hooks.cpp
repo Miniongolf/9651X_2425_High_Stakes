@@ -3,6 +3,7 @@
 #include "lemlib/util.hpp"
 #include "robot/constants.hpp"
 #include "robot/globals.hpp"
+#include <cerrno>
 
 void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
     if (forceInstant) {
@@ -82,6 +83,10 @@ bool Hooks::isJammed() const {
 Alliance Hooks::ringDetect() const {
     const double ringHue = m_optical->get_hue();
     const int ringProx = m_optical->get_proximity();
+    // Error handling for invalid or dced optical
+    if (ringProx == ENODEV || ringProx == ENXIO) {
+        return Alliance::NONE;
+    }
     // Proximity check
     if (ringProx > proxRange) return Alliance::NONE;
     if (red.inRange(ringHue)) return Alliance::RED;

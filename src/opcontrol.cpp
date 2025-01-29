@@ -28,9 +28,6 @@ void opcontrol() {
     intake.setMode(Intake::modes::CONTINUOUS);
     mogoMech.cancelAutoClamp();
 
-    pros::Motor armMotor(-12, pros::MotorGears::green);
-    armMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
     printf("-- OPCONTROL STARTING --\n");
     lemlib::Timer matchTimer = 105000;
 
@@ -65,11 +62,9 @@ void opcontrol() {
 
         // Arm
         if (ARM_UP_BUTTON) {
-            armMotor.move(90);
+            arm.moveToPosition(Arm::wall);
         } else if (ARM_DOWN_BUTTON) {
-            armMotor.move(-20);
-        } else {
-            armMotor.move_velocity(0);
+            arm.moveToPosition(Arm::idle);
         }
 
         // Mogo
@@ -89,7 +84,7 @@ void opcontrol() {
             }
         }
 
-        if (counter % 10 == 0) {
+        if (counter % 20 == 0) {
             // std::cout << "MOGO BUTTON: " << MOGO_BUTTON.getLastHoldTime() << '\n';
             // std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
         }
@@ -99,11 +94,11 @@ void opcontrol() {
         int rightPower = master.stickRight.y();
         int turnPower = master.stickRight.x();
 
-        chassis.arcade(throttle, turnPower * 0.7, false, 0.8);
+        chassis.arcade(throttle, turnPower * 0.7, false, 0.7);
         // chassis.tank(throttle, rightPower);
 
         // Telemetry
         counter++;
-        pros::delay(20);
+        pros::delay(10);
     }
 }

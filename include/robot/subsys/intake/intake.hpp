@@ -49,7 +49,7 @@ class Intake {
         void initialize() {
             std::printf("intake init\n");
             m_hooks->initialize();
-            pros::Task task([&](){taskFunct();});
+            pros::Task task([&]() { taskFunct(); });
         }
 
         void waitUntilDone() {
@@ -57,22 +57,25 @@ class Intake {
         }
 
         void forwards(bool force, bool clearQueue = true) {
-            m_preroller->forwards();
-            if (m_mode == modes::CONTINUOUS) {
-                m_hooks->setState(Hooks::states::FORWARDS, force, clearQueue);
-            } else {
-                m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, clearQueue);
-            }
+            m_state = states::FORWARDS;
+            // m_preroller->forwards();
+            // if (m_mode == modes::CONTINUOUS) {
+            //     m_hooks->setState(Hooks::states::FORWARDS, force, clearQueue);
+            // } else {
+            //     m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, clearQueue);
+            // }
         }
 
         void reverse(bool force, bool clearQueue = true) {
-            m_preroller->reverse();
-            m_hooks->setState(Hooks::states::REVERSE, force, clearQueue);
+            m_state = states::REVERSE;
+            // m_preroller->reverse();
+            // m_hooks->setState(Hooks::states::REVERSE, force, clearQueue);
         }
 
         void idle(bool force) {
-            m_preroller->idle();
-            m_hooks->setState(Hooks::states::IDLE, force, (m_hooks->busy()) ? false : true);
+            m_state = states::IDLE;
+            // m_preroller->idle();
+            // m_hooks->setState(Hooks::states::IDLE, force, (m_hooks->busy()) ? false : true);
         }
 
         void forceIndex() {
@@ -95,7 +98,7 @@ class Intake {
                 bool force = (m_mode == modes::CONTINUOUS) ? true : false;
                 bool isArmDown = m_arm->isAtPosition(Arm::idle);
                 bool isArmUp = m_arm->isAtPosition(Arm::wall);
-                
+
                 switch (m_state) {
                     case states::IDLE:
                         m_preroller->idle();
@@ -108,7 +111,6 @@ class Intake {
                         } else {
                             m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, force);
                         }
-                        forwards(false);
                         break;
                     case states::REVERSE:
                         m_preroller->reverse();

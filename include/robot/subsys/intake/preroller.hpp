@@ -25,7 +25,11 @@ class Preroller {
          * @brief Detect if a ring is in the preroller
          *
          */
-        [[nodiscard]] bool hasRing() const { return m_distance->get() < detectionDistance; }
+        [[nodiscard]] bool hasRing() const { 
+            const int dist = m_distance->get();
+            if (dist == ENODEV || dist == ENXIO) { return false; };
+            return dist < detectionDistance;
+        }
 
         void forwards() { m_state = states::INTAKE; };
 

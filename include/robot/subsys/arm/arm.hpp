@@ -14,43 +14,54 @@ class Arm {
             m_motor->set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
         }
 
-        constexpr static Angle idle = -50_stDeg;
-        constexpr static Angle wall = 60_stDeg;
+        constexpr static double idle = -50;
+        constexpr static double wall = 37;
 
         void initialize() {
-            setPosition(idle);
+            m_motor->tare_position();
+            // setPosition(idle);
             pros::Task task([&](){taskFunct();});
         }
 
-        void setPosition(Angle position) { offset = position - getPosition(); }
+        void setPosition(double position) { offset = position - getPosition() - offset; }
 
-        Angle getPosition() { return from_stDeg(m_motor->get_position() * m_ratio) + offset; }
+        // In degrees
+        double getPosition(bool radians = false) { return lemlib::sanitizeAngle(m_motor->get_position() * m_ratio + offset, radians); }
 
-        bool isAtPosition(Angle target, AngleRange tolerance = 1.5_stDeg) {
-            double error = lemlib::angleError(to_stRad(target), to_stRad(getPosition()));
-            return std::fabs(error) < to_stRad(tolerance);
+        bool isAtPosition(double target, double tolerance = 1.5) {
+            double error = lemlib::angleError(lemlib::degToRad(target), lemlib::degToRad(getPosition()));
+            return std::fabs(error) < lemlib::degToRad(tolerance);
         }
 
-        void moveToPosition(Angle angle) { targetPose = angle; }
+        // In degrees
+        void moveToPosition(double angle) { targetPose = lemlib::sanitizeAngle(angle, false); }
     protected:
         MotorPtr m_motor = nullptr;
         lemlib::PID m_pid;
         double kF;
         double m_ratio;
-        Angle offset = 0_stDeg;
+        double offset = idle;
 
-        Angle targetPose = 0_stDeg;
+        double targetPose = idle;
 
         void taskFunct() {
+            int counter = 0;
             while (true) {
-                if (targetPose == idle && isAtPosition(idle, 10_stDeg)) {
+                if (targetPose == idle && isAtPosition(idle, 10)) {
                     m_motor->move(0);
                     continue;
                 }
-                double error = lemlib::angleError(to_stRad(targetPose), to_stRad(getPosition()));
-                double voltage = m_pid.update(error) + kF * units::cos(getPosition()).internal();
+                double error = -lemlib::angleError(targetPose, getPosition(), false);
+                double voltage = m_pid.update(error) + kF * cos(getPosition(true));
                 voltage = std::clamp(voltage, -127.0, 127.0);
                 m_motor->move(voltage);
+                // std::printf("Arm stuffs: %f, voltage: %f\n", error, voltage);
+                if (counter % 10 == 0) {
+                    // std::printf("Arm angle: %f\n", getPosition());
+                    // std::printf("Arm error: %f, voltage: %f\n", error, voltage);
+                    std::printf("Arm angle: %f\n", getPosition());
+                }
+                counter++;
             }
         }
 };
