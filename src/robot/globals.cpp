@@ -1,7 +1,13 @@
 #include "robot/globals.hpp"
-#include <memory>
 
 Alliance robotAlliance = Alliance::RED;
+
+Arm arm(
+    makeMotor(12, pros::MotorGears::green),
+    lemlib::PID(0, 0, 0, 0, true),
+    10.0,
+    1
+);
 
 Preroller preroller(
     makeMotor(19, pros::MotorGears::green), 
@@ -11,20 +17,9 @@ Hooks hooks(
     makeMotor(-20, pros::MotorGears::blue),
     makeOptical(0),
     74,
-    {0, 55, 37, 18}
+    {0, 19, 37, 56}
 );
-Intake intake(
-    std::unique_ptr<Preroller>(&preroller),
-    std::unique_ptr<Hooks>(&hooks),
-    makeDistance(0)
-);
-
-Arm arm(
-    makeMotor(12, pros::MotorGears::green),
-    lemlib::PID(0.5, 0, 0, 0, true),
-    0.0,
-    1
-);
+Intake intake{PrerollerPtr(&preroller), HooksPtr(&hooks), ArmPtr(&arm)};
 
 Clamp mogoMech(
     makePiston('A', false, false),

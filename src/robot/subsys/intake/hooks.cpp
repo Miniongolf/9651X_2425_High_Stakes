@@ -79,6 +79,16 @@ bool Hooks::isJammed() const {
     return count >= 4;
 }
 
+Alliance Hooks::ringDetect() const {
+    const double ringHue = m_optical->get_hue();
+    const int ringProx = m_optical->get_proximity();
+    // Proximity check
+    if (ringProx > proxRange) return Alliance::NONE;
+    if (red.inRange(ringHue)) return Alliance::RED;
+    else if (blue.inRange(ringHue)) return Alliance::BLUE;
+    else return Alliance::NONE;
+}
+
 void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange) {
     // If hookNum is -1 (or otherwise invalid), use the nearest hook
     if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target); }
@@ -90,7 +100,7 @@ void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection dir
     setVoltage(voltage);
 };
 
-void Hooks::update(bool hasPrerollRing) {
+void Hooks::update(bool hasPrerollRing, bool isArmUp) {
     /** Jam detection
      *  NOTE: the jam state is not a real state and will not be tracked by lastState or prevState
      *  However, its effects will be tracked by prevVoltage
@@ -116,9 +126,11 @@ void Hooks::update(bool hasPrerollRing) {
     // Only colour sort if state is forwards
     if (currState != states::FORWARDS) { colourSorting = false; }
 
+    int maxVolt = (isArmUp) ? 127 : 70;
+
     switch (currState) {
         case states::FORWARDS:
-            setVoltage(127);
+            setVoltage(maxVolt);
             // Detect colour sorts
             if (colourSortEnabled && !colourSorting && isOpposite(ringDetect(), robotAlliance)) {
                 colourSorting = true;
@@ -129,12 +141,12 @@ void Hooks::update(bool hasPrerollRing) {
                 colourSorting = false;
                 m_motor->move(-10);
                 pros::delay(50);
-                m_motor->move(127);
+                m_motor->move(maxVolt);
             }
             isBusy = colourSorting;
             break;
         case states::REVERSE:
-            setVoltage(-127);
+            setVoltage(-maxVolt);
             isBusy = false;
             break;
         case states::IDLE:
@@ -144,6 +156,7 @@ void Hooks::update(bool hasPrerollRing) {
             break;
         case states::WAIT_FOR_RING:
             isBusy = true;
+            if (isArmUp) setState(states::IDLE, true, true);
             // reset ring wait flag when the state is first set
             if (prevState != states::WAIT_FOR_RING) { ringWaitFlag = false; }
             // update flag with ring detection from function param

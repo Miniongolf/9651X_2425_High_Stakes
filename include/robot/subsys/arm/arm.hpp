@@ -54,3 +54,5 @@ class Arm {
             }
         }
 };
+
+using ArmPtr = std::unique_ptr<Arm>;

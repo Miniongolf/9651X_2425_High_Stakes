@@ -2,14 +2,17 @@
 
 #include "robot/subsys/intake/preroller.hpp"
 #include "robot/subsys/intake/hooks.hpp"
+#include "robot/subsys/arm/arm.hpp"
 
 class Intake {
     public:
-        Intake(PrerollerPtr preroller, HooksPtr hooks, DistancePtr distance)
+        Intake(PrerollerPtr preroller, HooksPtr hooks, ArmPtr arm)
             : m_preroller(std::move(preroller)),
-              m_hooks(std::move(hooks)) {}
+              m_hooks(std::move(hooks)),
+              m_arm(std::move(arm)) {}
 
         enum class modes { CONTINUOUS, HOLD };
+        enum class states { IDLE, FORWARDS, REVERSE };
 
         /**
          * @brief Get the current mode
@@ -54,7 +57,7 @@ class Intake {
         }
 
         void forwards(bool force, bool clearQueue = true) {
-            m_preroller->intake();
+            m_preroller->forwards();
             if (m_mode == modes::CONTINUOUS) {
                 m_hooks->setState(Hooks::states::FORWARDS, force, clearQueue);
             } else {
@@ -63,7 +66,7 @@ class Intake {
         }
 
         void reverse(bool force, bool clearQueue = true) {
-            m_preroller->outtake();
+            m_preroller->reverse();
             m_hooks->setState(Hooks::states::REVERSE, force, clearQueue);
         }
 
@@ -71,19 +74,55 @@ class Intake {
             m_preroller->idle();
             m_hooks->setState(Hooks::states::IDLE, force, (m_hooks->busy()) ? false : true);
         }
+
+        void forceIndex() {
+            if (m_mode == modes::HOLD) isIndexForced = true;
+        }
     protected:
         PrerollerPtr m_preroller = nullptr;
         HooksPtr m_hooks = nullptr;
+        ArmPtr m_arm = nullptr;
 
         modes m_mode = modes::CONTINUOUS;
-        bool isArmUp = false;
+        states m_state = states::IDLE;
+
+        bool isIndexForced = false;
 
         void taskFunct() {
             int counter = 0;
             while (true) {
                 pros::delay(10);
+                bool force = (m_mode == modes::CONTINUOUS) ? true : false;
+                bool isArmDown = m_arm->isAtPosition(Arm::idle);
+                bool isArmUp = m_arm->isAtPosition(Arm::wall);
+                
+                switch (m_state) {
+                    case states::IDLE:
+                        m_preroller->idle();
+                        m_hooks->setState(Hooks::states::IDLE, force, force);
+                        break;
+                    case states::FORWARDS:
+                        m_preroller->forwards();
+                        if (m_mode == modes::CONTINUOUS) {
+                            m_hooks->setState(Hooks::states::FORWARDS, force, force);
+                        } else {
+                            m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, force);
+                        }
+                        forwards(false);
+                        break;
+                    case states::REVERSE:
+                        m_preroller->reverse();
+                        if (m_mode == modes::CONTINUOUS) {
+                            m_hooks->setState(Hooks::states::REVERSE, force, force);
+                        } else {
+                            m_hooks->setState(Hooks::states::IDLE, force, force);
+                        }
+                        break;
+                }
+
                 m_preroller->update();
-                m_hooks->update(m_preroller->hasRing());
+                m_hooks->update(m_preroller->hasRing() || isIndexForced, isArmUp);
+                isIndexForced = false;
                 if (counter % 25 == 0) {
                     // std::cout << *m_hooks.get();
                     counter = 0;

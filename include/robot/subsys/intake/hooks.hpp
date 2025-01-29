@@ -34,7 +34,7 @@ class Hooks {
         void reverse() { setState(states::REVERSE); }
         void idle() { setState(states::IDLE); }
 
-        void update(bool hasPrerollRing);
+        void update(bool hasPrerollRing, bool isArmUp);
 
         // Position utils
         [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }
@@ -49,16 +49,7 @@ class Hooks {
         [[nodiscard]] bool isJammed() const;
 
         // Colour sort
-        [[nodiscard]] Alliance ringDetect() const { 
-            const double ringHue = m_optical->get_hue();
-            const int ringProx = m_optical->get_proximity();
-            // Proximity check
-            if (ringProx > proxRange) return Alliance::NONE;
-            
-            if (red.inRange(ringHue)) return Alliance::RED;
-            else if (blue.inRange(ringHue)) return Alliance::BLUE;
-            else return Alliance::NONE;
-        }
+        [[nodiscard]] Alliance ringDetect() const;
         bool colourSortEnabled = true;
 
         // Telemetry
@@ -90,6 +81,9 @@ class Hooks {
         bool colourSorting = false;
         int colourDetectHook = 0;
 
+        // Hold mode flags
+        bool sawPrerollRing = false;
+
         // Voltage utils
         int currVoltage = 0, prevVoltage = 0;
         void setVoltage(int voltage) { currVoltage = voltage; }
@@ -97,7 +91,7 @@ class Hooks {
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses
-        const std::pair<int, double> jamThresh = {900, 5};
+        const std::pair<int, double> jamThresh = {900, 5}; // {current, velocity}
 };
 
 using HooksPtr = std::unique_ptr<Hooks>;

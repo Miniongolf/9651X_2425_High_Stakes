@@ -7,6 +7,8 @@
 
 extern Alliance robotAlliance;
 
+extern Arm arm;
+
 extern Preroller preroller;
 extern Hooks hooks;
 extern Intake intake;

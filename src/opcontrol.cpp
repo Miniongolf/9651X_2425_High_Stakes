@@ -50,6 +50,10 @@ void opcontrol() {
         }
 
         // Intake
+        if (master.d_up) {
+            intake.forceIndex();
+        }
+
         intake.setMode((master.l2) ? Intake::modes::HOLD : Intake::modes::CONTINUOUS);
         if (INTAKE_BUTTON) {
             intake.forwards(true, true);

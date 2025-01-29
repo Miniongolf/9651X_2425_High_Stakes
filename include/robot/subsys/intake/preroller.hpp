@@ -27,9 +27,9 @@ class Preroller {
          */
         [[nodiscard]] bool hasRing() const { return m_distance->get() < detectionDistance; }
 
-        void intake() { m_state = states::INTAKE; };
+        void forwards() { m_state = states::INTAKE; };
 
-        void outtake() { m_state = states::OUTTAKE; };
+        void reverse() { m_state = states::OUTTAKE; };
 
         void idle() { m_state = states::IDLE; };
 
