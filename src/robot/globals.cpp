@@ -5,8 +5,8 @@ Alliance robotAlliance = Alliance::RED;
 Arm arm( //
     makeMotor(12, pros::MotorGears::green), //
     lemlib::PID(3, 0, 0, 0, true), //
-    0.0, //
-    -1.0 / 6 //
+    10, //
+    1.0 / 6 //
 );
 
 Preroller preroller( //

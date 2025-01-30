@@ -23,14 +23,16 @@ class Arm {
             pros::Task task([&](){taskFunct();});
         }
 
+        // don't use, probably buggy (but in degrees if you do)
         void setPosition(double position) { offset = position - getPosition() - offset; }
 
         // In degrees
         double getPosition(bool radians = false) { return lemlib::sanitizeAngle(m_motor->get_position() * m_ratio + offset, radians); }
 
+        // both in degrees
         bool isAtPosition(double target, double tolerance = 1.5) {
-            double error = lemlib::angleError(lemlib::degToRad(target), lemlib::degToRad(getPosition()));
-            return std::fabs(error) < lemlib::degToRad(tolerance);
+            double error = lemlib::angleError(target, getPosition(), false);
+            return std::fabs(error) < tolerance;
         }
 
         // In degrees
@@ -51,7 +53,7 @@ class Arm {
                     m_motor->move(0);
                     continue;
                 }
-                double error = -lemlib::angleError(targetPose, getPosition(), false);
+                double error = lemlib::angleError(targetPose, getPosition(), false);
                 double voltage = m_pid.update(error) + kF * cos(getPosition(true));
                 voltage = std::clamp(voltage, -127.0, 127.0);
                 m_motor->move(voltage);
