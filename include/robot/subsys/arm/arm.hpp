@@ -1,6 +1,5 @@
 #pragma once
 
-#include "lemlib/util.hpp"
 #include "util.hpp"
 
 class Arm {
@@ -15,8 +14,7 @@ class Arm {
         }
 
         constexpr static double idle = -50;
-        constexpr static double wall = 37;
-
+        constexpr static double wall = 47;
         void initialize() {
             m_motor->tare_position();
             // setPosition(idle);
@@ -30,7 +28,7 @@ class Arm {
         double getPosition(bool radians = false) { return lemlib::sanitizeAngle(m_motor->get_position() * m_ratio + offset, radians); }
 
         // both in degrees
-        bool isAtPosition(double target, double tolerance = 1.5) {
+        bool isAtPosition(double target, double tolerance = 5) {
             double error = lemlib::angleError(target, getPosition(), false);
             return std::fabs(error) < tolerance;
         }
@@ -49,20 +47,20 @@ class Arm {
         void taskFunct() {
             int counter = 0;
             while (true) {
+                double error = lemlib::angleError(targetPose, getPosition(), false);
+                double voltage = m_pid.update(error) + kF * cos(getPosition(true));
+                if (counter % 10 == 0) {
+                    // std::printf("Arm angle: %f\n", getPosition());
+                    // std::printf("Arm error: %f, voltage: %f\n", error, voltage);
+                    std::printf("Arm angle: %f | %f\n", getPosition(), error);
+                    std::printf("isArmUp: %d\n", isAtPosition(wall));
+                }
                 if (targetPose == idle && isAtPosition(idle, 10)) {
                     m_motor->move(0);
                     continue;
                 }
-                double error = lemlib::angleError(targetPose, getPosition(), false);
-                double voltage = m_pid.update(error) + kF * cos(getPosition(true));
                 voltage = std::clamp(voltage, -127.0, 127.0);
                 m_motor->move(voltage);
-                // std::printf("Arm stuffs: %f, voltage: %f\n", error, voltage);
-                if (counter % 10 == 0) {
-                    // std::printf("Arm angle: %f\n", getPosition());
-                    // std::printf("Arm error: %f, voltage: %f\n", error, voltage);
-                    std::printf("Arm angle: %f\n", getPosition());
-                }
                 counter++;
             }
         }

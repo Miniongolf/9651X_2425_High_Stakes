@@ -37,7 +37,8 @@ enum class Alliance { RED, BLUE, NONE };
  * @return bool
  */
 bool inline isOpposite(const Alliance lhs, const Alliance rhs) {
-    return lhs == Alliance::RED ? rhs == Alliance::BLUE : rhs == Alliance::RED;
+    if (lhs == Alliance::NONE || rhs == Alliance::NONE) return false;
+    return lhs != rhs;
 }
 
 extern lemlib::PID emptyLateralPID, emptyAngularPID;

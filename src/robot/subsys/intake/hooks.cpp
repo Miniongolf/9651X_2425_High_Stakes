@@ -3,7 +3,6 @@
 #include "lemlib/util.hpp"
 #include "robot/constants.hpp"
 #include "robot/globals.hpp"
-#include <cerrno>
 
 void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
     if (forceInstant) {
@@ -84,7 +83,9 @@ Alliance Hooks::ringDetect() const {
     const double ringHue = m_optical->get_hue();
     const int ringProx = m_optical->get_proximity();
     // Error handling for invalid or dced optical
-    if (ringProx == ENODEV || ringProx == ENXIO) {
+    std::printf("%d\n", ringProx);
+    if (ringProx == 2147483647) {
+        std::printf("NO OPTICAL\n");
         return Alliance::NONE;
     }
     // Proximity check
@@ -131,18 +132,21 @@ void Hooks::update(bool hasPrerollRing, bool isArmUp) {
     // Only colour sort if state is forwards
     if (currState != states::FORWARDS) { colourSorting = false; }
 
-    int maxVolt = (isArmUp) ? 127 : 70;
+    int maxVolt = (isArmUp) ? 75 : 127;
+    std::printf("Voltage: %d\n", maxVolt);
 
     switch (currState) {
         case states::FORWARDS:
             setVoltage(maxVolt);
             // Detect colour sorts
             if (colourSortEnabled && !colourSorting && isOpposite(ringDetect(), robotAlliance)) {
+                std::printf("HOOKS COLOUR SORT INITIATED\n");
                 colourSorting = true;
                 colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
             }
             // Do the colour sort thingy if it's detected and the hook is in position
             if (colourSorting && dist(colourSortPose, getPosition(colourDetectHook)) < 0) {
+                std::printf("HOOKS COLOUR SORT DONE\n");
                 colourSorting = false;
                 m_motor->move(-10);
                 pros::delay(50);

@@ -3,8 +3,8 @@
 Alliance robotAlliance = Alliance::RED;
 
 Arm arm( //
-    makeMotor(12, pros::MotorGears::green), //
-    lemlib::PID(3, 0, 0, 0, true), //
+    makeMotor(-12, pros::MotorGears::green), //
+    lemlib::PID(7, 0, 2, 0, true), //
     10, //
     1.0 / 6 //
 );
