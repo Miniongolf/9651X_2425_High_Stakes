@@ -37,10 +37,11 @@ void autoTestStuffs() {
 }
 
 void safeShort() {
+    float s = -1;
     // Start position
-    chassis.setPose(-54, -26.4, -90);
+    chassis.setPose(-54*s, -26.4, -90*s);
     // Grab mogo
-    chassis.moveToPoint(-20, -26.4, 2000, {.forwards = false, .maxSpeed=55, .earlyExitRange=4});
+    chassis.moveToPoint(-20*s, -26.4, 2000, {.forwards = false, .maxSpeed=55, .earlyExitRange=4});
     robot::printPose();
     pros::delay(200);
     mogoMech.clamp();
@@ -48,18 +49,18 @@ void safeShort() {
     intake.forwards(true);
     pros::delay(450);
     // Ring 1
-    chassis.turnToPoint(-24, -42, 1000);
+    chassis.turnToPoint(-24*s, -42, 1000);
     pros::delay(350);
-    chassis.moveToPoint(-24, -42, 1000);
+    chassis.moveToPoint(-24*s, -42, 1000);
     robot::printPose();
     pros::delay(750);
     // Alliance ring
-    chassis.turnToPoint(-55, 0, 1000);
+    chassis.turnToPoint(-55*s, 0, 1000);
     pros::delay(300);
-    chassis.moveToPoint(-38, -27, 3000, {.maxSpeed=60});
+    chassis.moveToPoint(-38*s, -27, 3000, {.maxSpeed=60});
     pros::delay(100);
     // chassis.moveToPoint(-54, -7, 3000, {.maxSpeed=30});
-    chassis.moveToPoint(-52, -7, 3000, {.maxSpeed=30});
+    chassis.moveToPoint(-52*s, -7, 3000, {.maxSpeed=30});
     pros::delay(100);
     intake.setMode(Intake::modes::HOLD);
     arm.moveToPosition(Arm::wall-15);
@@ -72,9 +73,9 @@ void safeShort() {
     robot::moveTimed(60, 0, 300);
     intake.setMode(Intake::modes::CONTINUOUS);
     pros::delay(2000);
-    chassis.turnToPoint(-23, 0, 1000);
+    chassis.turnToPoint(-23*s, 0, 1000);
     pros::delay(300);
-    chassis.moveToPoint(-35, 0, 3000, {.maxSpeed=50});
+    chassis.moveToPoint(-35*s, 0, 3000, {.maxSpeed=50});
 }
 
 void soloAWP() {
@@ -109,5 +110,48 @@ void soloAWP() {
     chassis.turnToPoint(-24, 0, 1000, {}, false);
     pros::delay(200);
     robot::moveTimed(30, 0, 300);
+}
+
+void twoMogoSolo() {
+    float s = 1;
+    // Start position
+    chassis.setPose(-54*s, -26.4, -90*s);
+    // Grab mogo
+    chassis.moveToPoint(-20*s, -26.4, 2000, {.forwards = false, .maxSpeed=60});
+    robot::printPose();
+    mogoMech.clamp();
+    pros::delay(100);
+    // Preload
+    intake.forwards(true);
+    pros::delay(200);
+    // Ring 2
+    chassis.turnToPoint(-24*s, -40, 1000);
+    pros::delay(200);
+    chassis.moveToPoint(-24*s, -40, 1000);
+    robot::printPose();
+    pros::delay(300);
+    // Cross field
+    chassis.turnToPoint(-50*s, 12, 1000, {}, false);
+    pros::delay(200);
+    chassis.moveToPoint(-50*s, 12, 3000, {.maxSpeed=80}, true);
+    // Drop goal
+    chassis.waitUntil(24);
+    mogoMech.release();
+    pros::delay(100);
+    // Grab second goal
+    chassis.turnToPoint(-24*s, 18, 1000, {.forwards=false}, false);
+    pros::delay(200);
+    chassis.moveToPoint(-24*s, 18, 1000, {.forwards=false, .maxSpeed=70}, false);
+    mogoMech.clamp();
+    pros::delay(200);
+    chassis.turnToPoint(-37*s, 40, 1000, {}, false);
+    pros::delay(200);
+    // Grab last ring
+    chassis.moveToPoint(-37*s, 40, 1000, {}, false);
+    // Touch bar
+    chassis.turnToPoint(chassis.getPose().x, 0, 1000, {}, false);
+    robot::moveTimed(50, 0, 800);
+    intake.idle(true);
+    robot::moveTimed(30, 0, 1000);
 }
 } // namespace auton
