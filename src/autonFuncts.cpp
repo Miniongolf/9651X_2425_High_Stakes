@@ -78,19 +78,36 @@ void safeShort() {
 }
 
 void soloAWP() {
-    chassis.setPose(-59, -7, 180);
-    chassis.moveToPoint(-59, 2, 1000, {.forwards = false});
-    chassis.turnToPoint(0, 2, 1000);
-    chassis.moveToPoint(-65, 2, 1000, {.forwards = false});
-    chassis.moveToPoint(-60, 2, 1000, {.forwards = false});
-    pros::delay(350);
+    chassis.setPose(-59, -10, 180);
+    chassis.moveToPoint(-59, 0, 1000, {.forwards = false});
+    chassis.turnToHeading(90, 1000, {}, false);
+    // chassis.moveToPoint(-69, 0, 1500, {.forwards = false}, false);
+    robot::moveTimed(-30, 0, 750);
+    pros::delay(100);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+    robot::moveTimed(30, 0, 200);
+    // chassis.moveToPoint(-61, 2, 1000, {.forwards = false});
+    // chassis.waitUntilDone();
     intake.forwards(true);
+    pros::delay(500);
+    intake.reverse(true);
+    pros::delay(100);
+    robot::moveTimed(40, 30, 500);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+    chassis.turnToPoint(-24, -24, 1000, {.forwards = false});
+    pros::delay(250);
+    intake.forwards(true);
+    // chassis.moveToPoint(-32, -20, 1000, {.forwards = false});
+    chassis.moveToPoint(-24, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
     pros::delay(400);
-    chassis.moveToPoint(-57, 2, 1000, {.forwards = false});
-    chassis.turnToPoint(-32, -18.5, 1000, {.forwards = false});
-    chassis.moveToPoint(-37, -14, 1000, {.forwards = false});
-    chassis.moveToPoint(-28, -20, 1000, {.forwards = false, .maxSpeed = 35});
-    pros::delay(1600);
     mogoMech.clamp();
+    chassis.turnToPoint(-24, -48, 1000, {}, false);
+    pros::delay(200);
+    chassis.moveToPoint(-24, -48, 1000, {}, false);
+    chassis.moveToPoint(-24, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    pros::delay(200);
+    chassis.turnToPoint(-24, 0, 1000, {}, false);
+    pros::delay(200);
+    robot::moveTimed(30, 0, 300);
 }
 } // namespace auton
