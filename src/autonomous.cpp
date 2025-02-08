@@ -1,6 +1,7 @@
 #include "main.h"
 #include "autonFuncts.hpp" // IWYU pragma: keep
 #include "robot/globals.hpp"
+#include "robot/helperFuncts.hpp" // IWYU pragma: keep
 
 /**
 * Runs the user autonomous code. This function will be started in its own task
@@ -14,11 +15,16 @@
 * from where it left off.
 */
 void autonomous() {
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
-
+    // Reset stuffs
     chassis.setPose(0, 0, 0);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     mogoMech.reset();
-    mogoMech.cancelAutoClamp();
+    intake.idle(true);
 
+    // Put the auton to run here
+    auton::safeShort();
+    // auton::tunePID(true);
+
+    intake.idle(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

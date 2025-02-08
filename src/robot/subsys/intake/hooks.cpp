@@ -132,8 +132,8 @@ void Hooks::update(bool hasPrerollRing, bool isArmUp) {
     // Only colour sort if state is forwards
     if (currState != states::FORWARDS) { colourSorting = false; }
 
-    int maxVolt = (isArmUp) ? 75 : 127;
-    std::printf("Voltage: %d\n", maxVolt);
+    int maxVolt = 127;
+    // int maxVolt = (isArmUp) ? 90 : 127;
 
     switch (currState) {
         case states::FORWARDS:

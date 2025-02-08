@@ -9,8 +9,8 @@
 
 namespace robot {
 void printPose() {
+    chassis.waitUntilDone();
     std::cout << "Chassis pose &t=" << pros::millis() << ": " << format_as(chassis.getPose()) << "\n";
-    std::printf("Pose: (%f, %f, %f)\n", chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta);
 }
 
 void moveTimed(const double throttle, const double steering, const int time) {

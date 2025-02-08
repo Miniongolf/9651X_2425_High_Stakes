@@ -14,7 +14,7 @@ class Arm {
         }
 
         constexpr static double idle = -50;
-        constexpr static double wall = 47;
+        constexpr static double wall = 58;
         void initialize() {
             m_motor->tare_position();
             // setPosition(idle);
@@ -34,7 +34,14 @@ class Arm {
         }
 
         // In degrees
-        void moveToPosition(double angle) { targetPose = lemlib::sanitizeAngle(angle, false); }
+        void moveToPosition(double angle) {
+            if (angle == idle) {
+                idleNeedsPause = true;
+            } else {
+                idleNeedsPause = false;
+            }
+            targetPose = lemlib::sanitizeAngle(angle, false);
+        }
     protected:
         MotorPtr m_motor = nullptr;
         lemlib::PID m_pid;
@@ -44,22 +51,36 @@ class Arm {
 
         double targetPose = idle;
 
+        bool idleNeedsPause = false;
+
         void taskFunct() {
             int counter = 0;
             while (true) {
+                pros::delay(10);
                 double error = lemlib::angleError(targetPose, getPosition(), false);
                 double voltage = m_pid.update(error) + kF * cos(getPosition(true));
-                if (counter % 10 == 0) {
-                    // std::printf("Arm angle: %f\n", getPosition());
-                    // std::printf("Arm error: %f, voltage: %f\n", error, voltage);
-                    std::printf("Arm angle: %f | %f\n", getPosition(), error);
-                    std::printf("isArmUp: %d\n", isAtPosition(wall));
+                double maxVolt = 127;
+                if (counter % 20 == 0) {
+                    // std::printf("Arm angle: %f | %f\n", getPosition(), error);
+                    // std::printf("isArmUp: %d\n", isAtPosition(wall));
                 }
-                if (targetPose == idle && isAtPosition(idle, 10)) {
-                    m_motor->move(0);
-                    continue;
+                if (targetPose == idle) {
+                    // std::printf("Arm pause: %d\n", idleNeedsPause);
+                    maxVolt = 10;
+                    if (idleNeedsPause) {//} && isAtPosition(30, 20)) {
+                        std::printf("ARM IDLE PAUSING\n");
+                        m_motor->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+                        m_motor->move_velocity(0);
+                        pros::delay(500);
+                        idleNeedsPause = false;
+                        m_motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+                    }
+                    if (isAtPosition(idle, 10)) {
+                        m_motor->move(0);
+                        continue;
+                    }
                 }
-                voltage = std::clamp(voltage, -127.0, 127.0);
+                voltage = std::clamp(voltage, -maxVolt, maxVolt);
                 m_motor->move(voltage);
                 counter++;
             }

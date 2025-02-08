@@ -61,9 +61,9 @@ void opcontrol() {
         }
 
         // Arm
-        if (ARM_UP_BUTTON) {
+        if (ARM_UP_BUTTON.pressed()) {
             arm.moveToPosition(Arm::wall);
-        } else if (ARM_DOWN_BUTTON) {
+        } else if (ARM_DOWN_BUTTON.pressed()) {
             arm.moveToPosition(Arm::idle);
         }
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "robot/helperFuncts.hpp"
+#include "robot/helperFuncts.hpp" // IWYU pragma: keep
 
 namespace auton {
 void tunePID(bool hasMogo);
+void safeShort();
 }
