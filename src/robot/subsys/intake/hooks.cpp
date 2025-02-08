@@ -85,7 +85,6 @@ Alliance Hooks::ringDetect() const {
     // Error handling for invalid or dced optical
     std::printf("%d\n", ringProx);
     if (ringProx == 2147483647) {
-        std::printf("NO OPTICAL\n");
         return Alliance::NONE;
     }
     // Proximity check
@@ -106,7 +105,7 @@ void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection dir
     setVoltage(voltage);
 };
 
-void Hooks::update(bool hasPrerollRing, bool isArmUp) {
+void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
     /** Jam detection
      *  NOTE: the jam state is not a real state and will not be tracked by lastState or prevState
      *  However, its effects will be tracked by prevVoltage
@@ -134,6 +133,10 @@ void Hooks::update(bool hasPrerollRing, bool isArmUp) {
 
     int maxVolt = 127;
     // int maxVolt = (isArmUp) ? 90 : 127;
+
+    if (forcedIndex) {
+        setState(states::WAIT_FOR_RING, true, true);
+    }
 
     switch (currState) {
         case states::FORWARDS:
@@ -169,7 +172,7 @@ void Hooks::update(bool hasPrerollRing, bool isArmUp) {
             // reset ring wait flag when the state is first set
             if (prevState != states::WAIT_FOR_RING) { ringWaitFlag = false; }
             // update flag with ring detection from function param
-            if (hasPrerollRing) ringWaitFlag = true;
+            if (hasPrerollRing || forcedIndex) ringWaitFlag = true;
 
             // Move into position first even if there is a ring already
             if (!this->isAtPosition(idlePose, -1, 1)) {

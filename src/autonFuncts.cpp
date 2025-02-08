@@ -37,31 +37,32 @@ void autoTestStuffs() {
 }
 
 void safeShort() {
+    // Start position
     chassis.setPose(-54, -26.4, -90);
-    // mogoMech.requestAutoClamp();
+    // Grab mogo
     chassis.moveToPoint(-20, -26.4, 2000, {.forwards = false, .maxSpeed=55, .earlyExitRange=4});
-    // chassis.moveToPoint(-20, -22, 2000, {.forwards = false, .maxSpeed = 40});
     robot::printPose();
     pros::delay(200);
     mogoMech.clamp();
     pros::delay(100);
     intake.forwards(true);
     pros::delay(450);
+    // Ring 1
     chassis.turnToPoint(-24, -42, 1000);
     pros::delay(350);
     chassis.moveToPoint(-24, -42, 1000);
     robot::printPose();
     pros::delay(750);
+    // Alliance ring
     chassis.turnToPoint(-55, 0, 1000);
     pros::delay(300);
     chassis.moveToPoint(-38, -27, 3000, {.maxSpeed=60});
     pros::delay(100);
     // chassis.moveToPoint(-54, -7, 3000, {.maxSpeed=30});
     chassis.moveToPoint(-52, -7, 3000, {.maxSpeed=30});
-    pros::delay(300);
+    pros::delay(100);
     intake.setMode(Intake::modes::HOLD);
-    // pros::delay(200);
-    arm.moveToPosition(Arm::wall-13.5);
+    arm.moveToPosition(Arm::wall-15);
     robot::printPose();
     pros::delay(250);
     robot::moveTimed(-60, 0, 300);

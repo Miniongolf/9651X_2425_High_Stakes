@@ -62,7 +62,7 @@ void opcontrol() {
         }
 
         // Force index
-        if (master.d_down) {
+        if (master.d_down.pressed()) {
             intake.forceIndex();
         }
 

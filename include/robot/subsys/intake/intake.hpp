@@ -63,7 +63,7 @@ class Intake {
         void idle(bool force) { m_state = states::IDLE; }
 
         void forceIndex() {
-            if (m_mode == modes::HOLD) isIndexForced = true;
+            if (m_mode == modes::HOLD || m_mode == modes::INDEX) isIndexForced = true;
         }
 
         void trimHooks(int amount) { m_hooks->poseOffset += amount; }
@@ -113,7 +113,7 @@ class Intake {
                 }
 
                 m_preroller->update();
-                m_hooks->update(m_preroller->hasRing() || isIndexForced, isArmUp);
+                m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmUp);
                 isIndexForced = false;
                 if (counter % 25 == 0) {
                     // std::cout << *m_hooks.get();

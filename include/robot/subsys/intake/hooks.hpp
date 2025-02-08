@@ -34,7 +34,7 @@ class Hooks {
         void reverse() { setState(states::REVERSE); }
         void idle() { setState(states::IDLE); }
 
-        void update(bool hasPrerollRing, bool isArmUp);
+        void update(bool hasPrerollRing, bool forcedIndex, bool isArmUp);
 
         // Position utils
         [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }

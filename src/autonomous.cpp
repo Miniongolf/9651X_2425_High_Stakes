@@ -22,8 +22,8 @@ void autonomous() {
     intake.idle(true);
 
     // Put the auton to run here
-    // auton::safeShort();
-    auton::soloAWP();
+    auton::safeShort();
+    // auton::soloAWP();
     // auton::tunePID(true);
 
     intake.idle(true);
