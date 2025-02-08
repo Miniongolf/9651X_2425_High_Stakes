@@ -37,34 +37,59 @@ void autoTestStuffs() {
 }
 
 void safeShort() {
-    chassis.setPose(-54, -28.5, -90);
+    chassis.setPose(-54, -26.4, -90);
     // mogoMech.requestAutoClamp();
-    chassis.moveToPoint(-26, -28.5, 2000, {.forwards = false, .minSpeed=40, .earlyExitRange=4});
-    chassis.moveToPoint(-20, -22, 2000, {.forwards = false, .maxSpeed = 40});
+    chassis.moveToPoint(-20, -26.4, 2000, {.forwards = false, .maxSpeed=55, .earlyExitRange=4});
+    // chassis.moveToPoint(-20, -22, 2000, {.forwards = false, .maxSpeed = 40});
     robot::printPose();
+    pros::delay(200);
     mogoMech.clamp();
-    intake.forwards(true);
     pros::delay(100);
+    intake.forwards(true);
+    pros::delay(450);
     chassis.turnToPoint(-24, -42, 1000);
     pros::delay(350);
     chassis.moveToPoint(-24, -42, 1000);
     robot::printPose();
     pros::delay(750);
-    chassis.turnToPoint(-54, -7, 1000);
+    chassis.turnToPoint(-55, 0, 1000);
     pros::delay(300);
-    chassis.moveToPoint(-54, -7, 3000, {.maxSpeed=30});
+    chassis.moveToPoint(-38, -27, 3000, {.maxSpeed=60});
+    pros::delay(100);
+    // chassis.moveToPoint(-54, -7, 3000, {.maxSpeed=30});
+    chassis.moveToPoint(-52, -7, 3000, {.maxSpeed=30});
     pros::delay(300);
     intake.setMode(Intake::modes::HOLD);
-    pros::delay(200);
-    arm.moveToPosition(Arm::wall-13);
+    // pros::delay(200);
+    arm.moveToPosition(Arm::wall-13.5);
     robot::printPose();
     pros::delay(250);
-    robot::moveTimed(-50, 0, 300);
+    robot::moveTimed(-60, 0, 300);
     pros::delay(150);
     arm.moveToPosition(Arm::idle);
-    intake.forwards(true);
-    robot::moveTimed(50, 0, 300);
+    // intake.forwards(true);
+    robot::moveTimed(60, 0, 300);
     intake.setMode(Intake::modes::CONTINUOUS);
+    pros::delay(2000);
+    chassis.turnToPoint(-23, 0, 1000);
+    pros::delay(300);
+    chassis.moveToPoint(-35, 0, 3000, {.maxSpeed=50});
 }
 
+void soloAWP() {
+    chassis.setPose(-59, -7, 180);
+    chassis.moveToPoint(-59, 2, 1000, {.forwards = false});
+    chassis.turnToPoint(0, 2, 1000);
+    chassis.moveToPoint(-65, 2, 1000, {.forwards = false});
+    chassis.moveToPoint(-60, 2, 1000, {.forwards = false});
+    pros::delay(350);
+    intake.forwards(true);
+    pros::delay(400);
+    chassis.moveToPoint(-57, 2, 1000, {.forwards = false});
+    chassis.turnToPoint(-32, -18.5, 1000, {.forwards = false});
+    chassis.moveToPoint(-37, -14, 1000, {.forwards = false});
+    chassis.moveToPoint(-28, -20, 1000, {.forwards = false, .maxSpeed = 35});
+    pros::delay(1600);
+    mogoMech.clamp();
+}
 } // namespace auton
