@@ -28,7 +28,7 @@ double Hooks::getPosition(int hookNum) const {
     hookNum = std::clamp(hookNum, 0, (int)hooks.size() - 1); // Sanitize hooknum input
     // Using motor position in revolutions on a 12t sprocket
     // Return sanitized position of chain links moved (revs * sprocket teeth)
-    return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum]);
+    return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum] + poseOffset);
 }
 
 double Hooks::dist(double target, double position, lemlib::AngularDirection direction) const {

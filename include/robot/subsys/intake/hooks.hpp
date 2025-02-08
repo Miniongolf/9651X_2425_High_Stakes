@@ -44,6 +44,7 @@ class Hooks {
         [[nodiscard]] int getNearestHook(double target,
                                          lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
         [[nodiscard]] bool isAtPosition(double target, int hookNum = -1, double tolerance = 1) const;
+        int poseOffset = 0;
 
         // Antijam
         [[nodiscard]] bool isJammed() const;
@@ -58,6 +59,7 @@ class Hooks {
                << hooks.getPosition(3) << ") --> " << hooks.getNearestHook(hooks.idlePose) << "\n";
             return os;
         }
+        
     protected:
         // Devices
         MotorPtr m_motor = nullptr;

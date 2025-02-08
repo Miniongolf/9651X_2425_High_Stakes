@@ -13,11 +13,10 @@ class Arm {
             m_motor->set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
         }
 
-        constexpr static double idle = -50;
-        constexpr static double wall = 58;
+        static double idle;
+        static double wall;
         void initialize() {
             m_motor->tare_position();
-            // setPosition(idle);
             pros::Task task([&](){taskFunct();});
         }
 
@@ -26,6 +25,7 @@ class Arm {
 
         // In degrees
         double getPosition(bool radians = false) { return lemlib::sanitizeAngle(m_motor->get_position() * m_ratio + offset, radians); }
+        double getTargetPosition(bool radians = false) { return lemlib::sanitizeAngle(targetPose); }
 
         // both in degrees
         bool isAtPosition(double target, double tolerance = 5) {
@@ -35,12 +35,13 @@ class Arm {
 
         // In degrees
         void moveToPosition(double angle) {
-            if (angle == idle) {
-                idleNeedsPause = true;
-            } else {
-                idleNeedsPause = false;
-            }
+            idleNeedsPause = (angle == idle);
             targetPose = lemlib::sanitizeAngle(angle, false);
+        }
+
+        // In degrees
+        void moveRelative(double angle) {
+            moveToPosition(getPosition() + angle);
         }
     protected:
         MotorPtr m_motor = nullptr;

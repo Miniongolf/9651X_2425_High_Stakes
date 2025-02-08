@@ -11,7 +11,7 @@ class Intake {
               m_hooks(std::move(hooks)),
               m_arm(std::move(arm)) {}
 
-        enum class modes { CONTINUOUS, HOLD };
+        enum class modes { CONTINUOUS, INDEX, HOLD };
         enum class states { IDLE, FORWARDS, REVERSE };
 
         /**
@@ -56,31 +56,19 @@ class Intake {
             while (m_hooks->busy()) { pros::delay(10); }
         }
 
-        void forwards(bool force, bool clearQueue = true) {
-            m_state = states::FORWARDS;
-            // m_preroller->forwards();
-            // if (m_mode == modes::CONTINUOUS) {
-            //     m_hooks->setState(Hooks::states::FORWARDS, force, clearQueue);
-            // } else {
-            //     m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, clearQueue);
-            // }
-        }
+        void forwards(bool force, bool clearQueue = true) { m_state = states::FORWARDS; }
 
-        void reverse(bool force, bool clearQueue = true) {
-            m_state = states::REVERSE;
-            // m_preroller->reverse();
-            // m_hooks->setState(Hooks::states::REVERSE, force, clearQueue);
-        }
+        void reverse(bool force, bool clearQueue = true) { m_state = states::REVERSE; }
 
-        void idle(bool force) {
-            m_state = states::IDLE;
-            // m_preroller->idle();
-            // m_hooks->setState(Hooks::states::IDLE, force, (m_hooks->busy()) ? false : true);
-        }
+        void idle(bool force) { m_state = states::IDLE; }
 
         void forceIndex() {
             if (m_mode == modes::HOLD) isIndexForced = true;
         }
+
+        void trimHooks(int amount) { m_hooks->poseOffset += amount; }
+
+        void resetHooksOffset() { m_hooks->poseOffset = 0; }
     protected:
         PrerollerPtr m_preroller = nullptr;
         HooksPtr m_hooks = nullptr;
@@ -95,7 +83,7 @@ class Intake {
             int counter = 0;
             while (true) {
                 pros::delay(10);
-                bool force = (m_mode == modes::CONTINUOUS) ? true : false;
+                bool force = (m_mode == modes::INDEX) ? false : true;
                 bool isArmDown = m_arm->isAtPosition(Arm::idle);
                 bool isArmUp = m_arm->isAtPosition(Arm::wall);
 
@@ -108,8 +96,10 @@ class Intake {
                         m_preroller->forwards();
                         if (m_mode == modes::CONTINUOUS) {
                             m_hooks->setState(Hooks::states::FORWARDS, force, force);
-                        } else {
+                        } else if (m_mode == modes::INDEX) {
                             m_hooks->setState(Hooks::states::WAIT_FOR_RING, force, force);
+                        } else {
+                            m_hooks->setState(Hooks::states::IDLE, force, force);
                         }
                         break;
                     case states::REVERSE:
