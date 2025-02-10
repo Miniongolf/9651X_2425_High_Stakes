@@ -5,17 +5,17 @@ Alliance robotAlliance = Alliance::RED;
 Arm arm( //
     makeMotor(-1, pros::MotorGears::green), //
     lemlib::PID(7, 0, 2, 0, true), //
-    10, //
+    15, //
     1.0 / 6 //
 );
 
 Preroller preroller( //
-    makeMotor(19, pros::MotorGears::green), //
+    makeMotor(9, pros::MotorGears::green), //
     makeDistance(0) //
 );
 
 Hooks hooks( //
-    makeMotor(-21, pros::MotorGears::blue), //
+    makeMotor(-20, pros::MotorGears::blue), //
     makeOptical(0), //
     74, //
     {0, 19, 37, 56} //
@@ -31,8 +31,8 @@ Clamp mogoMech(makePiston('A', false, false), makeDistance(11), &chassis);
 
 pros::adi::Pneumatics doinker('C', false, false);
 
-pros::MotorGroup leftDrive({17, -13, 15}, pros::v5::MotorGears::blue);
-pros::MotorGroup rightDrive({-18, 16, -14}, pros::v5::MotorGears::blue);
+pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
+pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);
 
 pros::IMU imu(12);
 

@@ -1,3 +1,4 @@
+#include "lemlib/util.hpp"
 #include "main.h"
 
 /**
@@ -15,7 +16,7 @@
  */
 void opcontrol() {
     int counter = 0;
-    
+
     // Gamepad init
     Gamepad master(pros::E_CONTROLLER_MASTER);
     Gamepad partner(pros::E_CONTROLLER_PARTNER);
@@ -52,7 +53,16 @@ void opcontrol() {
         }
 
         /** Intake */
-        intake.setMode((master.l2) ? Intake::modes::HOLD : Intake::modes::CONTINUOUS);
+        if (master.l2.getHoldTime() >= 250_msec) {
+            if (OUTTAKE_BUTTON) {
+                intake.setMode(Intake::modes::HOLD);
+            } else {
+                intake.setMode(Intake::modes::INDEX);
+            }
+        } else {
+            intake.setMode(Intake::modes::CONTINUOUS);
+        }
+
         if (INTAKE_BUTTON) {
             intake.forwards(true, true);
         } else if (OUTTAKE_BUTTON) {
@@ -62,9 +72,7 @@ void opcontrol() {
         }
 
         // Force index
-        if (master.d_down.pressed()) {
-            intake.forceIndex();
-        }
+        if (master.d_down.pressed()) { intake.forceIndex(); }
 
         // Hooks position trim
         if (partner.d_up) {
@@ -76,46 +84,47 @@ void opcontrol() {
         }
 
         /** Arm */
-        if (ARM_UP_BUTTON.pressed()) {
-            arm.moveToPosition(Arm::wall);
-        } else if (ARM_DOWN_BUTTON.pressed()) {
-            arm.moveToPosition(Arm::idle);
+        if (master.l2.released() && master.l2.getLastHoldTime() < 250_msec) {
+            double lastTarget = arm.getTargetPosition();
+            double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::wall : Arm::idle;
+            std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
+            arm.moveToPosition(target);
         }
 
         // Second controller manual control + position saving
-        if (partner.l2) {
-            if (partner.x.heldFor(250_msec)) {
-                arm.wall = arm.getTargetPosition();
-            } else if (partner.a.heldFor(250_msec)) {
-                arm.idle = arm.getTargetPosition();
-            }
-        } else {
-            if (partner.x) {
-                arm.moveRelative(4);
-            } else if (partner.a) {
-                arm.moveRelative(-4);
-            }
-        }
+        // if (partner.l2) {
+        //     if (partner.x.heldFor(250_msec)) {
+        //         arm.wall = arm.getTargetPosition();
+        //     } else if (partner.a.heldFor(250_msec)) {
+        //         arm.idle = arm.getTargetPosition();
+        //     }
+        // } else {
+        //     if (partner.x) {
+        //         arm.moveRelative(4);
+        //     } else if (partner.a) {
+        //         arm.moveRelative(-4);
+        //     }
+        // }
 
         // Mogo
         // if (MOGO_BUTTON.pressed()) mogoMech.toggle();
 
         if (MOGO_BUTTON.pressed()) {
             mogoClampedOnPress = mogoMech.isClamped();
-            if (mogoMech.isClamped()) { mogoMech.release(); }
-            else { mogoMech.requestAutoClamp(); }
+            if (mogoMech.isClamped()) {
+                mogoMech.release();
+            } else {
+                mogoMech.requestAutoClamp();
+            }
         } else if (MOGO_BUTTON.heldFor(0.25_sec)) {
             mogoMech.requestAutoClamp(false);
         } else if (MOGO_BUTTON.released()) {
             mogoMech.cancelAutoClamp();
             std::cout << "MOGO BUTTON RELEASED " << mogoClampedOnPress << '\n';
-            if (!MOGO_BUTTON.lastHeldFor(0.25_sec) && !mogoClampedOnPress) {
-                mogoMech.clamp();
-            }
+            if (!MOGO_BUTTON.lastHeldFor(0.25_sec) && !mogoClampedOnPress) { mogoMech.clamp(); }
         }
 
         if (counter % 20 == 0) {
-            // std::cout << "MOGO BUTTON: " << MOGO_BUTTON.getLastHoldTime() << '\n';
             // std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
         }
 

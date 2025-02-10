@@ -25,8 +25,8 @@ class Button {
                 holdStart = -1_msec;
             }
             
+            prevHoldTime = holdTime;
             holdTime = (isHeld) ? from_msec(pros::millis()) - holdStart : -1_msec;
-
             isPrevHeld = isHeld;
         }
 
@@ -37,7 +37,8 @@ class Button {
         [[nodiscard]] Time getHoldTime() const { return holdTime; }
         [[nodiscard]] Time getLastHoldTime() const { return lastHoldTime; }
         [[nodiscard]] bool lastHeldFor(Time time) const { return getLastHoldTime() >= time; }
-        [[nodiscard]] bool heldFor(Time time) const { return getHoldTime() >= time; }
+        // Only activates once, for a continuous output compare target with `getHoldTime()`
+        [[nodiscard]] bool heldFor(Time time) const { return prevHoldTime < time && getHoldTime() >= time; }
 
         [[nodiscard]] explicit operator bool() const { return isHeld; }
         [[nodiscard]] explicit operator Time() const { return getHoldTime(); }
@@ -45,6 +46,7 @@ class Button {
         bool isPrevHeld = false, isHeld = false, isPressed = false, isReleased = false;
         Time holdStart = 0_msec, holdTime = 0_msec;
         Time lastHoldTime = 0_msec;
+        Time prevHoldTime = 0_msec;
         pros::controller_id_e_t m_id;
         pros::controller_digital_e_t m_button;
 };
