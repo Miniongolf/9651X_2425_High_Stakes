@@ -7,4 +7,5 @@ void tunePID(bool hasMogo);
 void safeShort();
 void soloAWP();
 void twoMogoSolo();
+void elims();
 }

@@ -1,5 +1,6 @@
 #include "autonFuncts.hpp"
 #include "lemlib/chassis/chassis.hpp"
+#include "pros/motors.h"
 #include "robot/globals.hpp"
 #include "robot/helperFuncts.hpp"
 #include "robot/subsys/intake/intake.hpp"
@@ -79,37 +80,57 @@ void safeShort() {
 }
 
 void soloAWP() {
-    chassis.setPose(-59, -10, 180);
-    chassis.moveToPoint(-59, 0, 1000, {.forwards = false});
-    chassis.turnToHeading(90, 1000, {}, false);
-    // chassis.moveToPoint(-69, 0, 1500, {.forwards = false}, false);
-    robot::moveTimed(-30, 0, 750);
+    float s = -1;
+    // Alliance stake
+    chassis.setPose(-59*s, -10, 180*s);
+    chassis.moveToPoint(-59*s, 0, 1000, {.forwards = false});
+    chassis.turnToHeading(90*s, 1000, {}, false);
+    robot::moveTimed(-40, 0, 750);
     pros::delay(100);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
-    robot::moveTimed(30, 0, 200);
-    // chassis.moveToPoint(-61, 2, 1000, {.forwards = false});
-    // chassis.waitUntilDone();
+    robot::moveTimed(30, 0, 150);
     intake.forwards(true);
     pros::delay(500);
     intake.reverse(true);
     pros::delay(100);
-    robot::moveTimed(40, 30, 500);
+    robot::moveTimed(40, 30*s, 500);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-    chassis.turnToPoint(-24, -24, 1000, {.forwards = false});
+    // Mogo
+    chassis.turnToPoint(-24*s, -24, 1000, {.forwards = false});
     pros::delay(250);
     intake.forwards(true);
     // chassis.moveToPoint(-32, -20, 1000, {.forwards = false});
-    chassis.moveToPoint(-24, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    chassis.moveToPoint(-24*s, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
     pros::delay(400);
     mogoMech.clamp();
-    chassis.turnToPoint(-24, -48, 1000, {}, false);
+    // Ring 3
+    chassis.turnToPoint(-24*s, -48, 1000, {}, false);
     pros::delay(200);
-    chassis.moveToPoint(-24, -48, 1000, {}, false);
-    chassis.moveToPoint(-24, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    chassis.moveToPoint(-24*s, -45, 1000, {}, false);
+    // Corner
+    chassis.turnToPoint(-50*s, -65, 1000, {}, false);
     pros::delay(200);
-    chassis.turnToPoint(-24, 0, 1000, {}, false);
+    chassis.moveToPoint(-50*s, -65, 2000, {.earlyExitRange=10}, true);
+    // Arm lift
+    intake.setMode(Intake::modes::HOLD);
+    arm.moveToPosition(Arm::wall-14.4);
+    robot::moveTimed(60, 0, 600);
+    pros::delay(250);
+    robot::moveTimed(-50, 0, 500);
+    arm.moveToPosition(Arm::idle);
+    pros::delay(100);
+    robot::moveTimed(50, 0, 500);
+    intake.setMode(Intake::modes::CONTINUOUS);
+    intake.forwards(true);
+    pros::delay(500);
+    chassis.turnToPoint(-30*s, -60, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE}, true);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+    chassis.moveToPoint(-30*s, -60, 1000, {}, true);
     pros::delay(200);
-    robot::moveTimed(30, 0, 300);
+    intake.idle(true);
+    chassis.waitUntilDone();
+    chassis.arcade(0, 0);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
 
 void twoMogoSolo() {
@@ -154,4 +175,43 @@ void twoMogoSolo() {
     intake.idle(true);
     robot::moveTimed(30, 0, 1000);
 }
+
+void elims() {
+    float s = 1;
+    // Start position
+    chassis.setPose(-52*s, 26.4, -90*s);
+    // Grab mogo
+    chassis.moveToPoint(-20*s, 26.4, 2000, {.forwards = false, .maxSpeed=60, .earlyExitRange=4});
+    robot::printPose();
+    mogoMech.clamp();
+    pros::delay(100);
+    intake.forwards(true);
+    pros::delay(300);
+    // Ring 1
+    chassis.turnToPoint(-24*s, 42, 1000);
+    pros::delay(200);
+    chassis.moveToPoint(-24*s, 42, 1000);
+    robot::printPose();
+    pros::delay(400);
+    // Corner ring
+    chassis.turnToPoint(-63*s, 65, 1000, {}, false);
+    pros::delay(300);
+    intake.setMode(Intake::modes::HOLD);
+    arm.moveToPosition(Arm::wall-10);
+    chassis.moveToPoint(-63*s, 65, 3000, {.earlyExitRange=10});
+    chassis.moveToPoint(-63*s, 63, 3000, {.maxSpeed=50}, false);
+    pros::delay(250);
+    robot::moveTimed(-50, 0, 300);
+    arm.moveToPosition(Arm::idle);
+    pros::delay(500);
+    robot::moveTimed(50, 0, 300);
+    intake.setMode(Intake::modes::CONTINUOUS);
+    intake.forwards(true);
+    pros::delay(500);
+    chassis.turnToPoint(-65, -65, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE}, true);
+    pros::delay(200);
+    intake.idle(true);
+    chassis.moveToPoint(chassis.getPose().x, 0, 1000);
+}
+
 } // namespace auton

@@ -124,7 +124,7 @@ void opcontrol() {
         int rightPower = master.stickRight.y();
         int turnPower = master.stickRight.x();
 
-        chassis.arcade(throttle, turnPower * 0.7, false, 0.7);
+        chassis.arcade(throttle, turnPower * 0.75, false, 0.7);
         // chassis.tank(throttle, rightPower);
 
         // Telemetry

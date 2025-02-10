@@ -22,9 +22,10 @@ void autonomous() {
     intake.idle(true);
 
     // Put the auton to run here
+    // auton::elims();
     // auton::safeShort();
-    auton::twoMogoSolo();
-    // auton::soloAWP();
+    // auton::twoMogoSolo();
+    auton::soloAWP();
     // auton::tunePID(true);
 
     intake.idle(true);

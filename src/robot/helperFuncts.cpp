@@ -14,6 +14,7 @@ void printPose() {
 }
 
 void moveTimed(const double throttle, const double steering, const int time) {
+    chassis.waitUntilDone();
     chassis.arcade(throttle, steering, true, 0);
     pros::delay(time);
     chassis.arcade(0, 0);
