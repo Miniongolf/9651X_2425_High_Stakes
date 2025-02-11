@@ -17,6 +17,7 @@ class Hooks {
         // Init
         void initialize() {
             std::printf("hooks init\n");
+            m_optical->set_led_pwm(100);
             m_motor->tare_position();
         }
 
@@ -75,11 +76,11 @@ class Hooks {
         // Hook positions
         const int chainLength;
         const std::vector<double> hooks;
-        const double idlePose = 0, colourSortPose = 40;
+        const double idlePose = 0, colourSortPose = 3.5;
         void moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange = 3);
 
         // Colour sort
-        const int proxRange = 100; // Tune this
+        const int proxRange = 200; // Tune this
         bool colourSorting = false;
         int colourDetectHook = 0;
 

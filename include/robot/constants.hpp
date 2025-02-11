@@ -24,8 +24,8 @@ struct ColourRange {
         [[nodiscard]] bool inRange(double value) const { return value >= min && value <= max; }
 };
 
-const ColourRange red(0, 25);
-const ColourRange blue(150, 250);
+const ColourRange red(0, 50);
+const ColourRange blue(160, 240);
 
 enum class Alliance { RED, BLUE, NONE };
 

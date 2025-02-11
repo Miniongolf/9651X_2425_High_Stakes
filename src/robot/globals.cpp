@@ -16,9 +16,9 @@ Preroller preroller( //
 
 Hooks hooks( //
     makeMotor(-20, pros::MotorGears::blue), //
-    makeOptical(0), //
+    makeOptical(12), //
     74, //
-    {0, 19, 37, 56} //
+    {0, 55, 37, 18} //
 );
 
 Intake intake {
@@ -34,7 +34,7 @@ pros::adi::Pneumatics doinker('C', false, false);
 pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);
 
-pros::IMU imu(12);
+pros::IMU imu(11);
 
 pros::Rotation horizRot(0);
 pros::Rotation vertRot(0);
@@ -57,15 +57,15 @@ lemlib::Drivetrain drivetrain(&leftDrive, &rightDrive,
                               11.25, // measure this
                               lemlib::Omniwheel::NEW_275, 600, 2);
 
-lemlib::OdomSensors odom(nullptr, nullptr, nullptr, nullptr, &imu);
+lemlib::OdomSensors odom(&vertTracker, nullptr, nullptr, nullptr, &imu);
 
 /**
  * @note take out 2 zeroes from timeouts (100 and 500)
  * increase timeouts when tuning PID
  */
-lemlib::Chassis chassis(drivetrain,
-                        {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(),
-                         1, 100, 3, 500, 5},
-                        {emptyAngularPID.kP, emptyAngularPID.kI, emptyAngularPID.kD, emptyAngularPID.getWindupRange(),
-                         1, 100, 3, 500, 0},
-                        odom);
+CustomChassis chassis( //
+    drivetrain,
+    {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(), 1, 100, 3, 500, 5},
+    {emptyAngularPID.kP, emptyAngularPID.kI, emptyAngularPID.kD, emptyAngularPID.getWindupRange(), 1, 100, 3, 500, 0},
+    odom //
+);

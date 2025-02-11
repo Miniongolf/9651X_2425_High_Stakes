@@ -26,7 +26,15 @@ class Intake {
          *
          * @param mode
          */
-        void setMode(modes mode) { m_mode = mode; }
+        void setMode(modes mode) {
+            m_mode = mode;
+            grabTwoFlag = false;
+        }
+
+        void grabTwo() {
+            setMode(modes::INDEX);
+            grabTwoFlag = true;
+        }
 
         /**
          * @brief Get the state of the hooks
@@ -78,6 +86,7 @@ class Intake {
         states m_state = states::IDLE;
 
         bool isIndexForced = false;
+        bool grabTwoFlag = false;
 
         void taskFunct() {
             int counter = 0;
@@ -114,10 +123,13 @@ class Intake {
 
                 m_preroller->update();
                 m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmUp);
+                if (grabTwoFlag && m_preroller->hasRing()) {
+                    m_hooks->setState(Hooks::states::IDLE, force, force);
+                    grabTwoFlag = false;
+                }
                 isIndexForced = false;
                 if (counter % 25 == 0) {
                     // std::cout << *m_hooks.get();
-                    counter = 0;
                 }
                 counter++;
             }

@@ -8,9 +8,7 @@ void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
     if (forceInstant) {
         currState = state;
     } else {
-        if (clearQueue) {
-            stateQueue.clear();
-        }
+        if (clearQueue) { stateQueue.clear(); }
         stateQueue.push_back(state);
     };
 }
@@ -65,8 +63,8 @@ int Hooks::getNearestHook(double target, lemlib::AngularDirection direction) con
 
 bool Hooks::isAtPosition(double target, int hookNum, double tolerance) const {
     // If hookNum is -1 (or otherwise invalid), use the nearest hook
-    if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target); }   
-    double hookPose =  getPosition(hookNum);
+    if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target); }
+    double hookPose = getPosition(hookNum);
     return std::fabs(dist(target, getPosition(hookNum))) < tolerance;
 }
 
@@ -83,12 +81,10 @@ Alliance Hooks::ringDetect() const {
     const double ringHue = m_optical->get_hue();
     const int ringProx = m_optical->get_proximity();
     // Error handling for invalid or dced optical
-    std::printf("%d\n", ringProx);
-    if (ringProx == 2147483647) {
-        return Alliance::NONE;
-    }
+    // std::printf("hooks ringDetect: %f %d\n", ringHue, ringProx);
+    if (ringProx == 2147483647) { return Alliance::NONE; }
     // Proximity check
-    if (ringProx > proxRange) return Alliance::NONE;
+    if (ringProx < proxRange) return Alliance::NONE;
     if (red.inRange(ringHue)) return Alliance::RED;
     else if (blue.inRange(ringHue)) return Alliance::BLUE;
     else return Alliance::NONE;
@@ -134,28 +130,41 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
     int maxVolt = 127;
     // int maxVolt = (isArmUp) ? 90 : 127;
 
-    if (forcedIndex) {
-        setState(states::WAIT_FOR_RING, true, true);
-    }
+    if (forcedIndex) { setState(states::WAIT_FOR_RING, true, true); }
+
+    std::printf("HOOKS DETECT: %d\n", ringDetect());
 
     switch (currState) {
         case states::FORWARDS:
             setVoltage(maxVolt);
             // Detect colour sorts
-            if (colourSortEnabled && !colourSorting && isOpposite(ringDetect(), robotAlliance)) {
+            if (colourSortEnabled && isOpposite(robotAlliance, ringDetect())) {
                 std::printf("HOOKS COLOUR SORT INITIATED\n");
-                colourSorting = true;
-                colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
-            }
-            // Do the colour sort thingy if it's detected and the hook is in position
-            if (colourSorting && dist(colourSortPose, getPosition(colourDetectHook)) < 0) {
-                std::printf("HOOKS COLOUR SORT DONE\n");
-                colourSorting = false;
-                m_motor->move(-10);
-                pros::delay(50);
+                pros::delay(60);
+                m_motor->move(-20);
+                pros::delay(200);
                 m_motor->move(maxVolt);
+                // colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
             }
-            isBusy = colourSorting;
+            // if (colourSortEnabled && !colourSorting) {
+            //     if (isOpposite(robotAlliance, ringDetect())) {
+            //         std::printf("HOOKS COLOUR SORT INITIATED\n");
+            //         colourSorting = true;
+            //         colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
+            //     }
+            //     std::printf("HOOKS COLOUR SORT INITIATED\n");
+            //     colourSorting = true;
+            //     colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
+            // }
+            // // Do the colour sort thingy if it's detected and the hook is in position
+            // if (colourSorting && dist(colourSortPose, getPosition(colourDetectHook)) < 0) {
+            //     std::printf("HOOKS COLOUR SORT DONE\n");
+            //     colourSorting = false;
+            //     m_motor->move(-50);
+            //     pros::delay(100);
+            //     m_motor->move(maxVolt);
+            // }
+            // isBusy = colourSorting;
             break;
         case states::REVERSE:
             setVoltage(-maxVolt);
@@ -172,7 +181,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
             // reset ring wait flag when the state is first set
             if (prevState != states::WAIT_FOR_RING) { ringWaitFlag = false; }
             // update flag with ring detection from function param
-            if (hasPrerollRing || forcedIndex) ringWaitFlag = true;
+            if (hasPrerollRing || forcedIndex) { ringWaitFlag = true; }
 
             // Move into position first even if there is a ring already
             if (!this->isAtPosition(idlePose, -1, 1)) {

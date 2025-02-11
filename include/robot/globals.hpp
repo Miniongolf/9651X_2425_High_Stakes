@@ -25,4 +25,4 @@ extern lemlib::OdomSensors odom;
 
 extern lemlib::Drivetrain drivetrain;
 
-extern lemlib::Chassis chassis;
+extern CustomChassis chassis;
