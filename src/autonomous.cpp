@@ -26,7 +26,9 @@ void autonomous() {
     // auton::safeShort();
     // auton::twoMogoSolo();
     // auton::soloAWP();
-    auton::tunePID(false);
+    // auton::tunePID(false);
+    chassis.moveDistance(48, 1000, {}, false);
+    robot::printPose();
 
     intake.idle(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

@@ -1,4 +1,3 @@
-#include "lemlib/util.hpp"
 #include "robot/chassis/chassis.hpp"
 
 void CustomChassis::moveDistance(float distance, int timeout, MoveToPointParams params, bool async) {
