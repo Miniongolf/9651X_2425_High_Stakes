@@ -34,7 +34,7 @@ class Arm {
 
         // both in degrees
         bool isAtPosition(double target, double tolerance = 5) {
-            double error = lemlib::angleError(target, getPosition(), false);
+            double error = lemlib::angleError(target, getPosition(false), false);
             return std::fabs(error) < tolerance;
         }
 

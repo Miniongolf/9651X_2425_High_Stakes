@@ -36,15 +36,15 @@ pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);
 
 pros::IMU imu(11);
 
-pros::Rotation horizRot(0);
-pros::Rotation vertRot(0);
+pros::Rotation horizRot(-2);
+pros::Rotation vertRot(19);
 
 lemlib::TrackingWheel horizTracker(&horizRot, 2,
                                    0, // tune this
                                    1);
 
 lemlib::TrackingWheel vertTracker(&vertRot, 2.75,
-                                  0, // tune this
+                                  3.6, // tune this
                                   1);
 
 lemlib::PID emptyLateralPID(6, 0, 0, 3, true);
@@ -57,7 +57,7 @@ lemlib::Drivetrain drivetrain(&leftDrive, &rightDrive,
                               11.25, // measure this
                               lemlib::Omniwheel::NEW_275, 600, 2);
 
-lemlib::OdomSensors odom(&vertTracker, nullptr, nullptr, nullptr, &imu);
+lemlib::OdomSensors odom(&vertTracker, nullptr, &horizTracker, nullptr, &imu);
 
 /**
  * @note take out 2 zeroes from timeouts (100 and 500)

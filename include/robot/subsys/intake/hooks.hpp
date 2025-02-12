@@ -18,6 +18,7 @@ class Hooks {
         void initialize() {
             std::printf("hooks init\n");
             m_optical->set_led_pwm(100);
+            m_optical->set_integration_time(8);
             m_motor->tare_position();
         }
 

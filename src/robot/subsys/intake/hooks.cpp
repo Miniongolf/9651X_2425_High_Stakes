@@ -140,31 +140,20 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
             // Detect colour sorts
             if (colourSortEnabled && isOpposite(robotAlliance, ringDetect())) {
                 std::printf("HOOKS COLOUR SORT INITIATED\n");
-                pros::delay(60);
-                m_motor->move(-20);
+                // pros::delay(10);
+                // m_motor->move(-10);
+                // pros::delay(200);
+                // m_motor->move(maxVolt);
+                colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
+                lemlib::Timer colourSortTimer(500);
+                while (dist(colourSortPose, getPosition(colourDetectHook)) > 0 && !colourSortTimer.isDone()) {
+                    pros::delay(10);
+                }
+                std::printf("EJECTING RING\n");
+                m_motor->move(-10);
                 pros::delay(200);
                 m_motor->move(maxVolt);
-                // colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
             }
-            // if (colourSortEnabled && !colourSorting) {
-            //     if (isOpposite(robotAlliance, ringDetect())) {
-            //         std::printf("HOOKS COLOUR SORT INITIATED\n");
-            //         colourSorting = true;
-            //         colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
-            //     }
-            //     std::printf("HOOKS COLOUR SORT INITIATED\n");
-            //     colourSorting = true;
-            //     colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
-            // }
-            // // Do the colour sort thingy if it's detected and the hook is in position
-            // if (colourSorting && dist(colourSortPose, getPosition(colourDetectHook)) < 0) {
-            //     std::printf("HOOKS COLOUR SORT DONE\n");
-            //     colourSorting = false;
-            //     m_motor->move(-50);
-            //     pros::delay(100);
-            //     m_motor->move(maxVolt);
-            // }
-            // isBusy = colourSorting;
             break;
         case states::REVERSE:
             setVoltage(-maxVolt);

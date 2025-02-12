@@ -25,8 +25,8 @@ void autonomous() {
     // auton::elims();
     // auton::safeShort();
     // auton::twoMogoSolo();
-    auton::soloAWP();
-    // auton::tunePID(true);
+    // auton::soloAWP();
+    auton::tunePID(false);
 
     intake.idle(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

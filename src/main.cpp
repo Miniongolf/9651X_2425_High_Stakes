@@ -1,4 +1,5 @@
 #include "main.h"
+#include "liblvgl/llemu.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -8,6 +9,23 @@
  */
 void initialize() {
     std::printf("--INITIALIZING--\n");
+
+    pros::lcd::initialize();
+
+    // thread to for brain screen and position logging
+    pros::Task screenTask([&]() {
+        while (true) {
+            // print robot location to the brain screen
+            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // log position telemetry
+            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            // delay to save resources
+            pros::delay(100);
+        }
+    });
+
     // Calibrate chassis    
 	chassis.calibrate();
     chassis.setPose(0, 0, 0);
