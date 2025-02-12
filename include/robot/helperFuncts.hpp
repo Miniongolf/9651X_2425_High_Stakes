@@ -1,5 +1,4 @@
 #pragma once
-#include "lemlib/chassis/chassis.hpp"
 #include "robot/globals.hpp" // IWYU pragma: keep
 
 namespace robot {
