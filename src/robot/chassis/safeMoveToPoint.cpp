@@ -8,3 +8,7 @@ void CustomChassis::safeMoveToPoint(Waypoint wayPoint, bool async) {
 void CustomChassis::safeMoveToPoint(float x, float y, int turnTimeout, int moveTimeout, TurnToPointParams turnParams, MoveToPointParams moveParams, bool async) {
     safeMoveToPoint(Waypoint(x, y, turnTimeout, moveTimeout, turnParams, moveParams), async);
 }
+
+void CustomChassis::safeMoveToPoint(float x, float y, int moveTimeout, MoveToPointParams moveParams, bool async) {
+    safeMoveToPoint(Waypoint(x, y, 500, moveTimeout, {.forwards = moveParams.forwards}, moveParams), async);
+}

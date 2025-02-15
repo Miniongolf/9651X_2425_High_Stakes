@@ -4,6 +4,7 @@
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/util.hpp"
 #include "pros/rtos.hpp"
+#include "subsys/intake/intake.hpp"
 #include "units/units.hpp"
 #include <cmath>
 
@@ -48,5 +49,20 @@ void grabMogo(lemlib::Pose pose, Time timeout, Length leadDist, lemlib::MoveToPo
     // Clamp anyways even if no mogo is detected
     mogoMech.clamp();
     pros::delay(20);
+}
+
+void safeGrabMogo(float x, float y, int timeout) {
+    chassis.safeMoveToPoint(x, y, timeout, {.forwards=false, .earlyExitRange=7}, true);
+    chassis.moveToPoint(x, y, timeout, {.forwards=false, .maxSpeed=60}, false);
+    mogoMech.clamp(true);
+}
+
+void scoreAllianceStake() {
+    intake.setMode(Intake::modes::CONTINUOUS);
+    intake.idle();
+    chassis.moveTimed(50, 0, 300, false);
+    intake.forwards();
+    pros::delay(500);
+    intake.idle();
 }
 } // namespace robot

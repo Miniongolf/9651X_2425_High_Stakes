@@ -26,18 +26,20 @@ class Clamp {
             return m_piston->is_extended();
         }
 
-        void clamp() {
+        void clamp(bool wait = false) {
             m_piston->extend();
             m_chassis->lateralPID.setGains(mogoLateralPID);
             m_chassis->angularPID.setGains(mogoAngularPID);
             cancelAutoClamp();
+            if (wait) { pros::delay(50); }
         }
 
-        void release() {
+        void release(bool wait = false) {
             m_piston->retract();
             m_chassis->lateralPID.setGains(emptyLateralPID);
             m_chassis->angularPID.setGains(emptyAngularPID);
             cancelAutoClamp();
+            if (wait) { pros::delay(50); }
         }
 
         void setState(bool isClamped) {

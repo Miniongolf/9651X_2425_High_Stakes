@@ -28,6 +28,7 @@ class Intake {
          */
         void setMode(modes mode) {
             m_mode = mode;
+            idle();
             grabTwoFlag = false;
         }
 
@@ -64,11 +65,11 @@ class Intake {
             while (m_hooks->busy()) { pros::delay(10); }
         }
 
-        void forwards(bool force, bool clearQueue = true) { m_state = states::FORWARDS; }
+        void forwards(bool force = true, bool clearQueue = true) { m_state = states::FORWARDS; }
 
-        void reverse(bool force, bool clearQueue = true) { m_state = states::REVERSE; }
+        void reverse(bool force = true, bool clearQueue = true) { m_state = states::REVERSE; }
 
-        void idle(bool force) { m_state = states::IDLE; }
+        void idle(bool force = true) { m_state = states::IDLE; }
 
         void forceIndex() {
             if (m_mode == modes::HOLD || m_mode == modes::INDEX) isIndexForced = true;
@@ -95,6 +96,8 @@ class Intake {
                 bool force = (m_mode == modes::INDEX) ? false : true;
                 bool isArmDown = m_arm->isAtPosition(Arm::idle);
                 bool isArmUp = m_arm->isAtPosition(Arm::wall);
+                
+                if (isArmUp) { setMode(modes::CONTINUOUS); }
 
                 switch (m_state) {
                     case states::IDLE:

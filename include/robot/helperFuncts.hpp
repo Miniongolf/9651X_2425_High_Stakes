@@ -21,4 +21,8 @@ namespace robot {
      * @param leadDist The distance to lead the mogo by
      */
     void grabMogo(lemlib::Pose pose, Time timeout, Length leadDist = 10_in, lemlib::MoveToPoseParams params = {}, double approachSpeed = 50, bool forwards = false, Length earlyExit = 5_in);
+
+    void safeGrabMogo(float x, float y, int timeout);
+
+    void scoreAllianceStake();
 }
