@@ -1,4 +1,3 @@
-#include "lemlib/chassis/chassis.hpp"
 #include "robot/chassis/chassis.hpp"
 
 void CustomChassis::chainTurnToHeading(float theta, bool startForwards, bool endForwards, int timeout, ChainTurnParams params, bool async) {
