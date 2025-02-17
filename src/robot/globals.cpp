@@ -1,5 +1,7 @@
 #include "robot/globals.hpp"
 
+int hangLevel = 0;
+
 Alliance robotAlliance = Alliance::RED;
 
 Arm arm( //

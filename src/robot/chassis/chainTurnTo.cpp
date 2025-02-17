@@ -108,4 +108,13 @@ void CustomChassis::chainTurnToHeading(float theta, bool startForwards, bool end
             motorMove(drivetrain.rightMotors, -motorPower);
         }
     }
+    // reset all brake modes
+    drivetrain.leftMotors->set_brake_mode_all(stdBrakeMode);
+    drivetrain.rightMotors->set_brake_mode_all(stdBrakeMode);
+    // stop the drivetrain
+    drivetrain.leftMotors->move(0);
+    drivetrain.rightMotors->move(0);
+    // set distTraveled to -1 to indicate that the function has finished
+    distTraveled = -1;
+    this->endMotion();
 }

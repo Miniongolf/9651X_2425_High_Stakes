@@ -1,9 +1,12 @@
 #pragma once
 
 #include "util.hpp" // IWYU pragma: keep
-#include "robot/constants.hpp"
-#include "robot/subsys/subsys.hpp" // IWYU pragma: keep
 #include "gamepad/gamepad.hpp" // IWYU pragma: keep
+#include "robot/constants.hpp"
+#include "robot/chassis/chassis.hpp" // IWYU pragma: keep
+#include "robot/subsys/subsys.hpp" // IWYU pragma: keep
+
+extern int hangLevel;
 
 extern Alliance robotAlliance;
 

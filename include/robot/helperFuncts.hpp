@@ -13,16 +13,9 @@ namespace robot {
      */
     void moveTimed(const double throttle, const double steering, const int time);
 
-    /**
-     * @brief Grab a mogo at a given pose
-     * 
-     * @param pose The pose of the mogo
-     * @param timeout The timeout of the first movement
-     * @param leadDist The distance to lead the mogo by
-     */
-    void grabMogo(lemlib::Pose pose, Time timeout, Length leadDist = 10_in, lemlib::MoveToPoseParams params = {}, double approachSpeed = 50, bool forwards = false, Length earlyExit = 5_in);
-
     void safeGrabMogo(float x, float y, int timeout);
 
     void scoreAllianceStake();
+
+    void hangTier3();
 }

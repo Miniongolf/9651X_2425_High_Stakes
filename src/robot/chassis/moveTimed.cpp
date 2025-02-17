@@ -11,7 +11,7 @@ void CustomChassis::moveTimed(float throttle, float steering, int time, bool asy
         return;
     }
 
-    this->arcade(throttle, steering);
+    this->arcade(throttle, steering, true);
     pros::delay(time);
     this->arcade(0, 0);
 };
