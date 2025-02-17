@@ -1,2 +1,2 @@
-#include "robot/chassis/chassis.hpp" // IWYU pragma: keep
+#include "robot/chassis/chassis.hpp"
 
