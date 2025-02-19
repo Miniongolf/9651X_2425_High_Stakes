@@ -15,11 +15,12 @@ class Hooks {
         }
 
         // Init
-        void initialize() {
+        void initialize(Alliance alliance) {
             std::printf("hooks init\n");
             m_optical->set_led_pwm(100);
             m_optical->set_integration_time(8);
             m_motor->tare_position();
+            sortingAlliance = alliance;
         }
 
         // State machine
@@ -54,6 +55,7 @@ class Hooks {
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
         bool colourSortEnabled = true;
+        Alliance sortingAlliance = Alliance::RED;
 
         // Telemetry
         friend std::ostream& operator<<(std::ostream& os, const Hooks& hooks) {
