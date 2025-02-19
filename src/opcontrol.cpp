@@ -1,5 +1,7 @@
 #include "lemlib/util.hpp"
 #include "main.h"
+#include "pros/motors.h"
+#include "robot/helperFuncts.hpp"
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -30,6 +32,7 @@ void opcontrol() {
     Button& ARM_DOWN_BUTTON = master.a;
 
     // Subsys init
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     intake.setMode(Intake::modes::CONTINUOUS);
     mogoMech.cancelAutoClamp();
 
@@ -43,6 +46,10 @@ void opcontrol() {
         master.update();
         partner.update();
 
+        if (master.d_up.pressed()) {
+            robot::scoreAllianceStake();
+        }
+
         /** Timed haptics (45s, 32s, 31s buzz) */
         if (std::fabs(matchTimer.getTimeLeft() - 45000) < 10) {
             master.controller.rumble("-.");
@@ -53,7 +60,7 @@ void opcontrol() {
         }
 
         /** Intake */
-        if (master.l2.getHoldTime() >= 250_msec) {
+        if (master.l2) {
             if (OUTTAKE_BUTTON) {
                 intake.setMode(Intake::modes::HOLD);
             } else {
@@ -105,9 +112,6 @@ void opcontrol() {
         //         arm.moveRelative(-4);
         //     }
         // }
-
-        // Mogo
-        // if (MOGO_BUTTON.pressed()) mogoMech.toggle();
 
         if (MOGO_BUTTON.pressed()) {
             mogoClampedOnPress = mogoMech.isClamped();

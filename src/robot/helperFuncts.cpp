@@ -1,4 +1,5 @@
 #include "robot/helperFuncts.hpp"
+#include "pros/motors.h"
 
 namespace robot {
 void printPose() {
@@ -20,12 +21,16 @@ void safeGrabMogo(float x, float y, int timeout) {
 }
 
 void scoreAllianceStake() {
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
-    chassis.moveTimed(50, 0, 300, false);
+    chassis.moveTimed(-30, 0, 100);
+    chassis.moveTimed(50, 0, 250, false);
+    chassis.brake();
     intake.forwards();
-    pros::delay(500);
+    pros::delay(300);
     intake.idle();
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }
 
 void hangTier3() {

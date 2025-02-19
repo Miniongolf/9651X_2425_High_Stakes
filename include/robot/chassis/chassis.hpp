@@ -40,9 +40,9 @@ struct Waypoint {
 };
 
 struct ChainTurnParams {
-    float minSpeed;
-    float maxSpeed;
-    float swingAngle;
+        float minSpeed;
+        float maxSpeed;
+        float swingAngle;
 };
 
 class CustomChassis : public lemlib::Chassis {
@@ -54,13 +54,19 @@ class CustomChassis : public lemlib::Chassis {
 
         void moveTimed(float throttle, float steering, int time, bool async = true);
 
+        void brake() {
+            drivetrain.leftMotors->brake();
+            drivetrain.rightMotors->brake();
+        };
+
         void moveDistance(float distance, int timeout, MoveToPointParams params, bool async = true);
 
         void swagTurnToHeading(float theta, DriveSide startLockide, int timeout, TurnToHeadingParams params,
                                bool async = true);
         void swagTurnToPoint(float x, float y, int timeout, TurnToHeadingParams params, bool async = true);
 
-        void chainTurnToHeading(float theta, bool startForwards, bool endForwards, int timeout, ChainTurnParams params = {}, bool async = true);
+        void chainTurnToHeading(float theta, bool startForwards, bool endForwards, int timeout,
+                                ChainTurnParams params = {}, bool async = true);
 
         void safeMoveToPoint(Waypoint waypoint, bool async = true);
         void safeMoveToPoint(float x, float y, int turnTimeout, int moveTimeout, TurnToPointParams turnParams = {},

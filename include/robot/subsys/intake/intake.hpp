@@ -28,7 +28,6 @@ class Intake {
          */
         void setMode(modes mode) {
             m_mode = mode;
-            idle();
             grabTwoFlag = false;
         }
 

@@ -31,10 +31,6 @@ void tunePID(bool hasMogo) {
 
 void autoTestStuffs() {
     chassis.setPose(0, 0, 0);
-    robot::grabMogo(
-        {48, 48, 90}, 1000_msec, 10_in, {},
-        50, false, 5_in
-    );
 }
 
 void safeShort() {
