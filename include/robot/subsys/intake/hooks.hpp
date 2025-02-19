@@ -5,9 +5,10 @@
 
 class Hooks {
     public:
-        Hooks(MotorPtr intakeMotor, OpticalPtr optical, int chainLength, std::vector<double> hookPositions)
+        Hooks(MotorPtr intakeMotor, OpticalPtr optical, RotationPtr rotSensor, int chainLength, std::vector<double> hookPositions)
             : m_motor(std::move(intakeMotor)),
               m_optical(std::move(optical)),
+              m_rotSensor(std::move(rotSensor)),
               chainLength(chainLength),
               hooks(hookPositions) {
             m_motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -68,6 +69,7 @@ class Hooks {
         // Devices
         MotorPtr m_motor = nullptr;
         OpticalPtr m_optical = nullptr;
+        RotationPtr m_rotSensor = nullptr;
 
         // State machine
         states currState = states::IDLE, lastState = states::IDLE, prevState = states::IDLE;

@@ -19,6 +19,7 @@ Preroller preroller( //
 Hooks hooks( //
     makeMotor(-20, pros::MotorGears::blue), //
     makeOptical(12), //
+    makeRotation(0), //
     74, //
     {0, 55, 37, 18} //
 );
