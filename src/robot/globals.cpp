@@ -40,7 +40,7 @@ Doinker doinker( //
 pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);
 
-pros::IMU imu(11);
+pros::IMU imu(6);
 
 pros::Rotation horizRot(-2);
 pros::Rotation vertRot(19);
