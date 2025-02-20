@@ -52,7 +52,7 @@ class Preroller {
         MotorPtr m_motor = nullptr;
         DistancePtr m_distance = nullptr;
 
-        const int detectionDistance = 100;
+        const int detectionDistance = 75;
 
         states m_state = states::IDLE;
 };

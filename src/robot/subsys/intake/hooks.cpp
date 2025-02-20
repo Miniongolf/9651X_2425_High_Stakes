@@ -11,7 +11,7 @@ void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
 
 void Hooks::nextState() {
     if (stateQueue.empty()) {
-        return;
+        currState = states::IDLE;
     } else {
         currState = stateQueue.front();
         stateQueue.pop_front();
@@ -22,13 +22,13 @@ double Hooks::getPosition(int hookNum) const {
     hookNum = std::clamp(hookNum, 0, (int)hooks.size() - 1); // Sanitize hooknum input
     // Using motor position in revolutions on a 12t sprocket
     // Return sanitized position of chain links moved (revs * sprocket teeth)
-    float sensorRotations = m_rotSensor->get_position() * (1.0/36000);
+    float sensorRotations = m_rotSensor->get_position() * (1.0 / 36000);
     if (m_rotSensor->get_position() == 2147483647) {
         // Sensor dc handling, use motor encoders (might drift)
         return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum] + poseOffset);
     } else {
         // Using rotation sensor
-        return sanitizePosition(m_rotSensor->get_position() * (1.0/36000) * 12 + hooks[hookNum] + poseOffset);
+        return sanitizePosition(m_rotSensor->get_position() * (1.0 / 36000) * 12 + hooks[hookNum] + poseOffset);
     }
 }
 
@@ -133,9 +133,9 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
     int maxVolt = 127;
     // int maxVolt = (isArmUp) ? 90 : 127;
 
-    if (forcedIndex) { setState(states::WAIT_FOR_RING, true, true); }
+    if (forcedIndex) { setState(states::INDEX, true, true); }
 
-    std::printf("HOOKS DETECT: %d\n", ringDetect());
+    // std::printf("HOOKS DETECT: %d\n", ringDetect());
 
     switch (currState) {
         case states::FORWARDS:
@@ -167,28 +167,28 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
             else { moveTowards(idlePose, -1, currentDirection); }
             isBusy = false;
             break;
-        case states::WAIT_FOR_RING:
-            isBusy = true;
+        case states::INDEX:
             if (isArmUp) setState(states::IDLE, true, true);
             // reset ring wait flag when the state is first set
-            if (prevState != states::WAIT_FOR_RING) { ringWaitFlag = false; }
+            if (prevState != states::INDEX) { sawPrerollRing = false; }
             // update flag with ring detection from function param
-            if (hasPrerollRing || forcedIndex) { ringWaitFlag = true; }
+            if (hasPrerollRing || forcedIndex) { sawPrerollRing = true; }
 
             // Move into position first even if there is a ring already
             if (!this->isAtPosition(idlePose, -1, 1)) {
+                indexHook = getNearestHook(idlePose);
                 moveTowards(idlePose, -1, AngularDirection::CW_CLOCKWISE);
-            } else if (!ringWaitFlag) {
+            } else if (!sawPrerollRing) {
                 setVoltage(0);
             } else {
-                // Hooks are in position and a ring was detected, continue
-                isBusy = false;
+                isBusy = true;
+                if (!this->isAtPosition(18, indexHook)) {
+                    moveTowards(18, indexHook, currentDirection);
+                } else {
+                    isBusy = false;
+                    sawPrerollRing = false;
+                };
             }
-            break;
-        case states::MOVE:
-            /** NOTE: idrk if this is necessary at all, just immediately switches to idle for now */
-            setState(states::IDLE);
-            isBusy = false;
             break;
     }
     m_motor->move(currVoltage);

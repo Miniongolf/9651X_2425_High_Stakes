@@ -1,4 +1,5 @@
 #pragma once
+#include "pros/motors.h"
 #include "robot/globals.hpp" // IWYU pragma: keep
 
 namespace robot {
@@ -15,7 +16,7 @@ namespace robot {
 
     void safeGrabMogo(float x, float y, int timeout);
 
-    void scoreAllianceStake();
+    void scoreAllianceStake(pros::motor_brake_mode_e brakeMode = pros::E_MOTOR_BRAKE_COAST);
 
     void hangTier3();
 }

@@ -34,6 +34,7 @@ void opcontrol() {
     // Subsys init
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     intake.setMode(Intake::modes::CONTINUOUS);
+    intake.idle(true);
     mogoMech.cancelAutoClamp();
 
     printf("-- OPCONTROL STARTING --\n");
@@ -47,7 +48,7 @@ void opcontrol() {
         partner.update();
 
         if (master.d_up.pressed()) {
-            robot::scoreAllianceStake();
+            robot::scoreAllianceStake(pros::E_MOTOR_BRAKE_COAST);
         }
 
         /** Timed haptics (45s, 32s, 31s buzz) */
@@ -71,7 +72,7 @@ void opcontrol() {
         }
 
         if (INTAKE_BUTTON) {
-            intake.forwards(true, true);
+            intake.forwards(!master.l2, true);
         } else if (OUTTAKE_BUTTON) {
             intake.reverse(true, true);
         } else {
@@ -97,21 +98,6 @@ void opcontrol() {
             std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
             arm.moveToPosition(target);
         }
-
-        // Second controller manual control + position saving
-        // if (partner.l2) {
-        //     if (partner.x.heldFor(250_msec)) {
-        //         arm.wall = arm.getTargetPosition();
-        //     } else if (partner.a.heldFor(250_msec)) {
-        //         arm.idle = arm.getTargetPosition();
-        //     }
-        // } else {
-        //     if (partner.x) {
-        //         arm.moveRelative(4);
-        //     } else if (partner.a) {
-        //         arm.moveRelative(-4);
-        //     }
-        // }
 
         if (MOGO_BUTTON.pressed()) {
             mogoClampedOnPress = mogoMech.isClamped();

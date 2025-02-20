@@ -5,7 +5,8 @@
 
 class Hooks {
     public:
-        Hooks(MotorPtr intakeMotor, OpticalPtr optical, RotationPtr rotSensor, int chainLength, std::vector<double> hookPositions)
+        Hooks(MotorPtr intakeMotor, OpticalPtr optical, RotationPtr rotSensor, int chainLength,
+              std::vector<double> hookPositions)
             : m_motor(std::move(intakeMotor)),
               m_optical(std::move(optical)),
               m_rotSensor(std::move(rotSensor)),
@@ -21,27 +22,36 @@ class Hooks {
             m_optical->set_led_pwm(100);
             m_optical->set_integration_time(8);
             m_motor->tare_position();
+            m_rotSensor->set_position(0);
             sortingAlliance = alliance;
         }
 
         // State machine
-        enum class states { FORWARDS, REVERSE, IDLE, WAIT_FOR_RING, MOVE };
+        enum class states { FORWARDS, REVERSE, IDLE, INDEX };
 
         states getState() const { return currState; }
+
         void setState(states state, bool forceInstant = false, bool clearQueue = false);
+
         bool atState(states state) const { return currState == state; }
-        bool atState(std::vector<states> stateList) const { return std::find(stateList.begin(), stateList.end(), currState) != stateList.end(); }
+
+        bool atState(std::vector<states> stateList) const {
+            return std::find(stateList.begin(), stateList.end(), currState) != stateList.end();
+        }
 
         bool busy() const { return isBusy; }
 
         void forwards() { setState(states::FORWARDS); }
+
         void reverse() { setState(states::REVERSE); }
+
         void idle() { setState(states::IDLE); }
 
         void update(bool hasPrerollRing, bool forcedIndex, bool isArmUp);
 
         // Position utils
         [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }
+
         [[nodiscard]] double dist(double target, double position,
                                   lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
         [[nodiscard]] double getPosition(int hookNum = 0) const;
@@ -60,11 +70,10 @@ class Hooks {
 
         // Telemetry
         friend std::ostream& operator<<(std::ostream& os, const Hooks& hooks) {
-            os << "Hooks pose (" << hooks.getPosition(0) << ", " << hooks.getPosition(1) << ", " << hooks.getPosition(2) << ", "
-               << hooks.getPosition(3) << ") --> " << hooks.getNearestHook(hooks.idlePose) << "\n";
+            os << "Hooks pose (" << hooks.getPosition(0) << ", " << hooks.getPosition(1) << ", " << hooks.getPosition(2)
+               << ", " << hooks.getPosition(3) << ") --> " << hooks.getNearestHook(hooks.idlePose) << "\n";
             return os;
         }
-        
     protected:
         // Devices
         MotorPtr m_motor = nullptr;
@@ -76,7 +85,6 @@ class Hooks {
         std::deque<states> stateQueue;
         void nextState();
         bool isBusy = false;
-        bool ringWaitFlag = false;
 
         // Hook positions
         const int chainLength;
@@ -91,11 +99,15 @@ class Hooks {
 
         // Hold mode flags
         bool sawPrerollRing = false;
+        int indexHook = 0;
+        lemlib::Timer moveTimer = {0};
 
         // Voltage utils
         int currVoltage = 0, prevVoltage = 0;
+
         void setVoltage(int voltage) { currVoltage = voltage; }
-        lemlib::PID pid = {10, 0, 0};
+
+        lemlib::PID pid = {20, 0, 0};
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses

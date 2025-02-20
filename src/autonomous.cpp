@@ -27,13 +27,13 @@ void autonomous() {
     // auton::twoMogoSolo();
     // auton::soloAWP();
     // auton::tunePID(false);
-    chassis.moveDistance(48, 1000, {}, false);
-    chassis.pathInterp({
-        {48, 48},
-        {0, 0},
-        {0, 48, 300, 1000, {.forwards=false}, {.forwards=false}},
-    }, false);
-    robot::printPose();
+    chassis.safeMoveToPoint(48, 48, 1000);
+    // chassis.pathInterp({
+    //     {48, 48},
+    //     {0, 0},
+    //     {0, 48, 300, 1000, {.forwards=false}, {.forwards=false}},
+    // }, false);
+    // robot::printPose();
 
     intake.idle(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

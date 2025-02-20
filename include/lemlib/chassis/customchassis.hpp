@@ -52,6 +52,14 @@ class CustomChassis : public lemlib::Chassis {
                       DriveCurve* steerCurve = &defaultDriveCurve)
             : Chassis(drivetrain, linearSettings, angularSettings, sensors, throttleCurve, steerCurve) {}
 
+        void brake(pros::motor_brake_mode_e mode) {
+            setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+            drivetrain.leftMotors->move_velocity(0);
+            drivetrain.rightMotors->move_velocity(0);
+            pros::delay(30);
+            setBrakeMode(mode);
+        };
+
         void moveTimed(float throttle, float steering, int time, bool async = true);
 
         void moveDistance(float distance, int timeout, MoveToPointParams params, bool async = true);
