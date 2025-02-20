@@ -52,9 +52,8 @@ lemlib::TrackingWheel horizTracker(&horizRot, 2,
 lemlib::TrackingWheel vertTracker(&vertRot, 2.75,
                                   3.6, // tune this
                                   1);
-
-lemlib::PID emptyLateralPID(6, 0, 0, 3, true);
-lemlib::PID emptyAngularPID(2, 0, 9.5, 5, true);
+lemlib::PID emptyLateralPID(2.8, 0.7, 0, 3, true);
+lemlib::PID emptyAngularPID(1.64, 0.5, 9.5, 5, true);
 
 lemlib::PID mogoLateralPID(5, 0, 2, 3, true);
 lemlib::PID mogoAngularPID(1.5, 0, 10, 5, true);
