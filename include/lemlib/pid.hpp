@@ -31,7 +31,7 @@ class PID {
          * @param kI 
          * @param kD 
          */
-        void setGains(float kP, float kI, float kD) {
+         void setGains(float kP, float kI, float kD) {
             this->kP = kP;
             this->kI = kI;
             this->kD = kD;
@@ -98,12 +98,11 @@ class PID {
         float kP;
         float kI;
         float kD;
-        
-    protected:
-        // optimizations
-        const float windupRange;
-        const bool signFlipReset;
 
+        // optimizations
+        float windupRange;
+        bool signFlipReset;
+    protected:
         float integral = 0;
         float prevError = 0;
 };

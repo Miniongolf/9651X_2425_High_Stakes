@@ -26,7 +26,6 @@ void scoreAllianceStake() {
     intake.idle();
     chassis.moveTimed(-30, 0, 100);
     chassis.moveTimed(50, 0, 250, false);
-    chassis.brake();
     intake.forwards();
     pros::delay(300);
     intake.idle();

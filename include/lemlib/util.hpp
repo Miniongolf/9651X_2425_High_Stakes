@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include <cmath> // IWYU pragma: keep
 #include <vector>
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/pose.hpp"
@@ -75,7 +75,7 @@ constexpr float degToRad(float deg) { return deg * M_PI / 180; }
  * sanitizeAngle(7 * M_PI); // returns pi
  * @endcode
  */
-float sanitizeAngle(float angle, bool radians = true);
+constexpr float sanitizeAngle(float angle, bool radians = true);
 
 /**
  * @brief Calculate the error between 2 angles. Useful when calculating the error between 2 headings
@@ -114,16 +114,15 @@ template <typename T> constexpr T sgn(T value) { return value < 0 ? -1 : 1; }
  * @brief Return the average of a vector of numbers
  *
  * @param values
- * @return T
+ * @return float
  *
  * @b Example
  * @code {.cpp}
- * std::vector<T> values = {1, 2, 3, 4, 5};
+ * std::vector<float> values = {1, 2, 3, 4, 5};
  * avg(values); // returns 3
  * @endcode
  */
-template <typename T>
-float avg(std::vector<T> values);
+float avg(std::vector<float> values);
 
 /**
  * @brief Exponential moving average
