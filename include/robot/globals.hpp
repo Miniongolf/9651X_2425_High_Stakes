@@ -18,6 +18,8 @@ extern Intake intake;
 
 extern Clamp mogoMech;
 
+extern Doinker doinker;
+
 extern pros::MotorGroup leftDrive, rightDrive;
 
 extern pros::IMU imu;

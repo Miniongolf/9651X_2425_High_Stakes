@@ -13,7 +13,7 @@ Arm arm( //
 
 Preroller preroller( //
     makeMotor(9, pros::MotorGears::green), //
-    makeDistance(11) //
+    makeDistance(3) //
 );
 
 Hooks hooks( //
@@ -30,9 +30,12 @@ Intake intake {
     ArmPtr(&arm) //
 };
 
-Clamp mogoMech(makePiston('A', false, false), makeDistance(11), &chassis);
+Clamp mogoMech(makePiston('B', false, false), makeDistance(11), &chassis);
 
-pros::adi::Pneumatics doinker('C', false, false);
+Doinker doinker( //
+    makePiston('A', false, false), //
+    makePiston('C', false, false) //
+);
 
 pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);

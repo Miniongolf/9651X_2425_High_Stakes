@@ -31,11 +31,15 @@ void opcontrol() {
     Button& ARM_UP_BUTTON = master.x;
     Button& ARM_DOWN_BUTTON = master.a;
 
+    Button& LEFT_DOINKER_BUTTON = master.d_left;
+    Button& RIGHT_DOINKER_BUTTON = master.d_right;
+
     // Subsys init
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle(true);
     mogoMech.cancelAutoClamp();
+    doinker.retract(Doinker::BOTH);
 
     printf("-- OPCONTROL STARTING --\n");
     lemlib::Timer matchTimer = 105000;
@@ -47,9 +51,7 @@ void opcontrol() {
         master.update();
         partner.update();
 
-        if (master.d_up.pressed()) {
-            robot::scoreAllianceStake(pros::E_MOTOR_BRAKE_COAST);
-        }
+        if (master.d_up.pressed()) { robot::scoreAllianceStake(pros::E_MOTOR_BRAKE_COAST); }
 
         /** Timed haptics (45s, 32s, 31s buzz) */
         if (std::fabs(matchTimer.getTimeLeft() - 45000) < 10) {
@@ -99,6 +101,7 @@ void opcontrol() {
             arm.moveToPosition(target);
         }
 
+        /** Mogo mech */
         if (MOGO_BUTTON.pressed()) {
             mogoClampedOnPress = mogoMech.isClamped();
             if (mogoMech.isClamped()) {
@@ -113,6 +116,10 @@ void opcontrol() {
             std::cout << "MOGO BUTTON RELEASED " << mogoClampedOnPress << '\n';
             if (!MOGO_BUTTON.lastHeldFor(0.25_sec) && !mogoClampedOnPress) { mogoMech.clamp(); }
         }
+
+        /** Doinker */
+        if (LEFT_DOINKER_BUTTON.pressed()) { doinker.toggle(Doinker::LEFT); }
+        if (RIGHT_DOINKER_BUTTON.pressed()) { doinker.toggle(Doinker::RIGHT); }
 
         if (counter % 20 == 0) {
             // std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
