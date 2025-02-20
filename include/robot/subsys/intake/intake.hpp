@@ -54,9 +54,9 @@ class Intake {
          * @brief Initialize the intake
          *
          */
-        void initialize() {
+        void initialize(Alliance alliance) {
             std::printf("intake init\n");
-            m_hooks->initialize();
+            m_hooks->initialize(alliance);
             pros::Task task([&]() { taskFunct(); });
         }
 

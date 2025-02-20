@@ -31,7 +31,7 @@ void initialize() {
     chassis.setPose(0, 0, 0);
 
     // Intake init
-    intake.initialize();
+    intake.initialize(robotAlliance);
 
     // Mogo mech init
     mogoMech.initialize();
