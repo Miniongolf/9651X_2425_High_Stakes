@@ -46,17 +46,18 @@ pros::Rotation horizRot(-2);
 pros::Rotation vertRot(19);
 
 lemlib::TrackingWheel horizTracker(&horizRot, 2,
-                                   0, // tune this
+                                   -1, // tune this
                                    1);
 
 lemlib::TrackingWheel vertTracker(&vertRot, 2.75,
-                                  3.6, // tune this
+                                  0, // tune this
                                   1);
-lemlib::PID emptyLateralPID(2.8, 0.7, 0, 3, true);
-lemlib::PID emptyAngularPID(1.64, 0.5, 9.5, 5, true);
 
-lemlib::PID mogoLateralPID(5, 0, 2, 3, true);
-lemlib::PID mogoAngularPID(1.5, 0, 10, 5, true);
+lemlib::PID emptyLateralPID(7, 0, 20, 3, true);
+lemlib::PID emptyAngularPID(1.6, 0, 8, 5, true);
+
+lemlib::PID mogoLateralPID(5, 0, 0, 3, true);
+lemlib::PID mogoAngularPID(1.5, 0, 0, 5, true);
 
 lemlib::Drivetrain drivetrain(&leftDrive, &rightDrive,
                               11.25, // measure this
@@ -70,7 +71,7 @@ lemlib::OdomSensors odom(&vertTracker, nullptr, &horizTracker, nullptr, &imu);
  */
 CustomChassis chassis( //
     drivetrain,
-    {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(), 1, 100, 3, 500, 5},
+    {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(), 1, 10000, 3, 50000, 10},
     {emptyAngularPID.kP, emptyAngularPID.kI, emptyAngularPID.kD, emptyAngularPID.getWindupRange(), 1, 100, 3, 500, 0},
     odom //
 );

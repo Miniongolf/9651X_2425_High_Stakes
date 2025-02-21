@@ -99,6 +99,7 @@ class Hooks {
 
         // Hold mode flags
         bool sawPrerollRing = false;
+        bool prevHasPrerollRing = false;
         int indexHook = 0;
         lemlib::Timer moveTimer = {0};
 
@@ -107,7 +108,7 @@ class Hooks {
 
         void setVoltage(int voltage) { currVoltage = voltage; }
 
-        lemlib::PID pid = {20, 0, 0};
+        lemlib::PID pid = {18, 0, 0};
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses

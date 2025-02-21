@@ -1,4 +1,5 @@
 #include "robot/subsys/intake/hooks.hpp"
+#include "lemlib/chassis/chassis.hpp"
 
 void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
     if (forceInstant) {
@@ -170,28 +171,27 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
         case states::INDEX:
             if (isArmUp) setState(states::IDLE, true, true);
             // reset ring wait flag when the state is first set
-            if (prevState != states::INDEX) { sawPrerollRing = false; }
-            // update flag with ring detection from function param
-            if (hasPrerollRing || forcedIndex) { sawPrerollRing = true; }
+            if (prevState != states::INDEX) {
+                sawPrerollRing = false;
+                indexHook = getNearestHook(idlePose);
+            }
+
+            if (!hasPrerollRing && prevHasPrerollRing) {
+                sawPrerollRing = true;
+            }
 
             // Move into position first even if there is a ring already
-            if (!this->isAtPosition(idlePose, -1, 1)) {
-                indexHook = getNearestHook(idlePose);
-                moveTowards(idlePose, -1, AngularDirection::CW_CLOCKWISE);
-            } else if (!sawPrerollRing) {
-                setVoltage(0);
+            if (hasPrerollRing && !sawPrerollRing) {
+                moveTowards(idlePose + 18, indexHook, AngularDirection::CW_CLOCKWISE);
+            } else if (sawPrerollRing && !this->isAtPosition(idlePose + 18, indexHook)) {
+                moveTowards(idlePose, -1, lemlib::AngularDirection::CW_CLOCKWISE);
             } else {
-                isBusy = true;
-                if (!this->isAtPosition(18, indexHook)) {
-                    moveTowards(18, indexHook, currentDirection);
-                } else {
-                    isBusy = false;
-                    sawPrerollRing = false;
-                };
+                setVoltage(0);
             }
             break;
     }
     m_motor->move(currVoltage);
+    prevHasPrerollRing = hasPrerollRing;
     prevVoltage = currVoltage;
     prevState = (lastState == currState) ? prevState : lastState;
     lastState = currState;
