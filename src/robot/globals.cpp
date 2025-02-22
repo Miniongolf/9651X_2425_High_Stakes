@@ -30,11 +30,11 @@ Intake intake {
     ArmPtr(&arm) //
 };
 
-Clamp mogoMech(makePiston('B', false, false), makeDistance(11), &chassis);
+Clamp mogoMech(makePiston('H', false, false), makeDistance(11), &chassis);
 
 Doinker doinker( //
-    makePiston('A', false, false), //
-    makePiston('C', false, false) //
+    makePiston('G', false, false), //
+    makePiston('Z', false, false) //
 );
 
 pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
@@ -56,11 +56,11 @@ lemlib::TrackingWheel vertTracker(&vertRot, 2.75,
 lemlib::PID emptyLateralPID(7, 0, 20, 3, true);
 lemlib::PID emptyAngularPID(1.6, 0, 8, 5, true);
 
-lemlib::PID mogoLateralPID(5, 0, 0, 3, true);
-lemlib::PID mogoAngularPID(1.5, 0, 0, 5, true);
+lemlib::PID mogoLateralPID(8, 0, 5, 3, true);
+lemlib::PID mogoAngularPID(2, 0, 15, 5, true);
 
 lemlib::Drivetrain drivetrain(&leftDrive, &rightDrive,
-                              11.25, // measure this
+                              11.25, // measu`re this
                               lemlib::Omniwheel::NEW_275, 600, 2);
 
 lemlib::OdomSensors odom(&vertTracker, nullptr, &horizTracker, nullptr, &imu);
@@ -71,7 +71,7 @@ lemlib::OdomSensors odom(&vertTracker, nullptr, &horizTracker, nullptr, &imu);
  */
 CustomChassis chassis( //
     drivetrain,
-    {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(), 1, 10000, 3, 50000, 10},
-    {emptyAngularPID.kP, emptyAngularPID.kI, emptyAngularPID.kD, emptyAngularPID.getWindupRange(), 1, 100, 3, 500, 0},
+    {emptyLateralPID.kP, emptyLateralPID.kI, emptyLateralPID.kD, emptyLateralPID.getWindupRange(), 1, 10000, 3, 50000, 5},
+    {emptyAngularPID.kP, emptyAngularPID.kI, emptyAngularPID.kD, emptyAngularPID.getWindupRange(), 1, 10000, 3, 50000, 20},
     odom //
 );

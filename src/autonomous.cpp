@@ -27,8 +27,9 @@ void autonomous() {
     // auton::twoMogoSolo();
     // auton::soloAWP();
     // chassis.chainTurnToHeading(45, true, false, 2000);
-    auton::tunePID(true);
-    // chassis.safeMoveToPoint(48, 48, 1000);
+    // auton::tunePID(true);
+    // auton::ringRush();
+    auton::skills();
     // chassis.pathInterp({
     //     {48, 48},
     //     {0, 0},

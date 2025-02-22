@@ -29,6 +29,31 @@ void tunePID(bool hasMogo) {
     robot::printPose();
 }
 
+void ringRush() {
+    // Side flipper
+    int s = robotAlliance == Alliance::RED ? 1 : -1;
+
+    chassis.setPose(-49, 26, 70.5);
+    doinker.extend(Doinker::LEFT);
+    intake.setMode(Intake::modes::HOLD);
+    intake.forwards();
+    chassis.moveTimed(127, 0, 750, false);
+    chassis.brake(pros::E_MOTOR_BRAKE_COAST);
+    chassis.swingToPoint(-24, 24, lemlib::DriveSide::RIGHT, 1000, {.forwards=false});
+    chassis.moveToPoint(-21, 18, 1000, {.forwards=false, .maxSpeed=70}, false);
+    chassis.moveTimed(-60, 0, 800);
+    mogoMech.clamp(true);
+    chassis.brake(pros::E_MOTOR_BRAKE_COAST);
+    pros::delay(700);
+    doinker.retract(Doinker::LEFT);
+    intake.setMode(Intake::modes::CONTINUOUS);
+    intake.forwards();
+    pros::delay(750);
+    chassis.safeMoveToPoint(-24, 48, 1000, {.maxSpeed=60});
+    chassis.safeMoveToPoint(-54, 54, 1000);
+    // chassis.brake(pros::E_MOTOR_BRAKE_COAST);
+}
+
 void autoTestStuffs() {
     chassis.setPose(0, 0, 0);
 }
