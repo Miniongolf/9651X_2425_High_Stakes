@@ -56,6 +56,8 @@ void ringRush() {
 
 void autoTestStuffs() {
     chassis.setPose(0, 0, 0);
+    chassis.chainTurnToHeading(45, true, false, 1000);
+    chassis.waitUntilDone();
 }
 
 void safeShort() {
