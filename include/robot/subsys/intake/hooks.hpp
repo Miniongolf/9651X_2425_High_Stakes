@@ -19,7 +19,7 @@ class Hooks {
         // Init
         void initialize(Alliance alliance) {
             std::printf("hooks init\n");
-            m_optical->set_integration_time(3);
+            m_optical->set_integration_time(8);
             m_optical->set_led_pwm(100);
             m_motor->tare_position();
             m_rotSensor->set_position(0);
