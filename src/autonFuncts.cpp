@@ -237,4 +237,38 @@ void elims() {
     chassis.moveToPoint(chassis.getPose().x, 0, 1000);
 }
 
+void goalRush() {
+// Side flipper
+int s = robotAlliance == Alliance::RED ? 1 : -1;
+
+chassis.setPose(-52, -31, 116);
+doinker.extend(Doinker::LEFT);
+intake.setMode(Intake::modes::HOLD);
+intake.forwards();
+chassis.moveTimed(127, 0, 580, false);
+// chassis.brake(pros::E_MOTOR_BRAKE_COAST);
+chassis.safeMoveToPoint(-38, -36, 1000, {.forwards=false});
+chassis.turnToHeading(180, 1000);
+doinker.retract(Doinker::LEFT);
+chassis.safeMoveToPoint(-11, -44, 1000, {.forwards=false, .maxSpeed=70}, false);
+robot::printPose();
+// chassis.swingToPoint(-15, -34, lemlib::DriveSide::RIGHT, 1000, {.forwards=false});
+// chassis.moveTimed(-60, 0, 800);
+mogoMech.clamp(true);
+intake.setMode(Intake::modes::CONTINUOUS);
+intake.forwards();
+chassis.safeMoveToPoint(-36, -59, 1000, {.forwards=false}, false);
+robot::printPose();
+mogoMech.release();
+chassis.moveToPoint(-22, -19, 1000, {.forwards=false, .maxSpeed=50}, false);
+robot::printPose();
+// pros::delay(100);
+mogoMech.clamp();
+chassis.safeMoveToPoint(-58, -58, 1000, {.forwards=true, .maxSpeed=70});
+intake.setMode(Intake::modes::CONTINUOUS);
+intake.forwards();
+chassis.safeMoveToPoint(-57, -57, 1000, {.forwards=true, .maxSpeed=70});
+chassis.safeMoveToPoint(-15, -46, 1000, {.forwards=false}, false);
+}
+
 } // namespace auton

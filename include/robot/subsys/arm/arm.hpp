@@ -15,6 +15,7 @@ class Arm {
 
         static double idle;
         static double wall;
+        static double hang;
 
         void initialize() {
             m_motor->tare_position();
