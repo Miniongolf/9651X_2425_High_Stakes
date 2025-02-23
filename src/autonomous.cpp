@@ -25,12 +25,12 @@ void autonomous() {
     // auton::elims();
     // auton::safeShort();
     // auton::twoMogoSolo();
-    // auton::soloAWP();
+    auton::soloAWP();
     // chassis.chainTurnToHeading(45, true, false, 2000);
     // auton::tunePID(true);
     // auton::ringRush();
     // auton::skills();
-    auton::goalRush();
+    // auton::goalRush();
     // chassis.pathInterp({
     //     {48, 48},
     //     {0, 0},

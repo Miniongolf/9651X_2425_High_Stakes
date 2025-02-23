@@ -65,8 +65,9 @@ class Hooks {
 
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
-        bool colourSortEnabled = true;
-        Alliance sortingAlliance = Alliance::RED;
+        bool colourSortEnabled = false;
+        Alliance sortingAlliance = Alliance::BLUE;
+
 
         // Telemetry
         friend std::ostream& operator<<(std::ostream& os, const Hooks& hooks) {

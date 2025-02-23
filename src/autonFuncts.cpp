@@ -131,12 +131,12 @@ void soloAWP() {
     pros::delay(200);
     chassis.moveToPoint(-24*s, -45, 1000, {}, false);
     // Corner
-    chassis.turnToPoint(-50*s, -65, 1000, {}, false);
+    chassis.turnToPoint(-55*s, -58, 1000, {}, false);
     pros::delay(200);
-    chassis.moveToPoint(-50*s, -65, 2000, {.earlyExitRange=10}, true);
+    chassis.moveToPoint(-58*s, -58, 2000, {.earlyExitRange=10}, true);
     // Arm lift
     intake.setMode(Intake::modes::HOLD);
-    arm.moveToPosition(Arm::wall-14.4);
+    // arm.moveToPosition(Arm::wall-14.4);
     robot::moveTimed(60, 0, 600);
     pros::delay(250);
     robot::moveTimed(-50, 0, 500);
@@ -241,34 +241,35 @@ void goalRush() {
 // Side flipper
 int s = robotAlliance == Alliance::RED ? 1 : -1;
 
-chassis.setPose(-52, -31, 116);
+chassis.setPose(-52*s, -31, 116);
 doinker.extend(Doinker::LEFT);
 intake.setMode(Intake::modes::HOLD);
 intake.forwards();
 chassis.moveTimed(127, 0, 580, false);
 // chassis.brake(pros::E_MOTOR_BRAKE_COAST);
-chassis.safeMoveToPoint(-38, -36, 1000, {.forwards=false});
-chassis.turnToHeading(180, 1000);
+chassis.safeMoveToPoint(-38*s, -36, 1600, {.forwards=false});
+chassis.turnToHeading(180*s, 1000);
 doinker.retract(Doinker::LEFT);
-chassis.safeMoveToPoint(-11, -44, 1000, {.forwards=false, .maxSpeed=70}, false);
+chassis.safeMoveToPoint(-11*s, -44, 1000, {.forwards=false, .maxSpeed=70}, false);
 robot::printPose();
 // chassis.swingToPoint(-15, -34, lemlib::DriveSide::RIGHT, 1000, {.forwards=false});
 // chassis.moveTimed(-60, 0, 800);
 mogoMech.clamp(true);
 intake.setMode(Intake::modes::CONTINUOUS);
 intake.forwards();
-chassis.safeMoveToPoint(-36, -59, 1000, {.forwards=false}, false);
+chassis.safeMoveToPoint(-36*s, -59, 1000, {.forwards=false}, false);
 robot::printPose();
 mogoMech.release();
-chassis.moveToPoint(-22, -19, 1000, {.forwards=false, .maxSpeed=50}, false);
+chassis.safeMoveToPoint(-22*s, -19, 1000, {.forwards=false, .maxSpeed=50}, false);
 robot::printPose();
 // pros::delay(100);
 mogoMech.clamp();
-chassis.safeMoveToPoint(-58, -58, 1000, {.forwards=true, .maxSpeed=70});
+chassis.safeMoveToPoint(-58*s, -58, 1000, {.forwards=true, .maxSpeed=70}, false);
 intake.setMode(Intake::modes::CONTINUOUS);
 intake.forwards();
-chassis.safeMoveToPoint(-57, -57, 1000, {.forwards=true, .maxSpeed=70});
-chassis.safeMoveToPoint(-15, -46, 1000, {.forwards=false}, false);
+chassis.safeMoveToPoint(-57*s, -57, 1000, {.forwards=true, .maxSpeed=70});
+chassis.safeMoveToPoint(-12*s, -30, 1000, {.forwards=true}, false);
+chassis.brake(pros::E_MOTOR_BRAKE_COAST);
 }
 
 } // namespace auton
