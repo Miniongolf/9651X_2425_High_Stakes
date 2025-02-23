@@ -2,6 +2,7 @@
 
 double Arm::idle = -50;
 double Arm::wall = 58;
+double Arm::hang = -15;
 
 void Arm::taskFunct() {
     int counter = 0;

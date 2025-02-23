@@ -100,6 +100,12 @@ void opcontrol() {
             std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
             arm.moveToPosition(target);
         }
+        else if (ARM_UP_BUTTON.pressed()) {
+            double lastTarget = arm.getTargetPosition();
+            double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::hang : Arm::idle;
+            std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
+            arm.moveToPosition(target);
+        }
 
         /** Mogo mech */
         if (MOGO_BUTTON.pressed()) {
