@@ -12,7 +12,7 @@ void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
 
 void Hooks::nextState() {
     if (stateQueue.empty()) {
-        currState = states::IDLE;
+        return;
     } else {
         currState = stateQueue.front();
         stateQueue.pop_front();
@@ -53,10 +53,13 @@ double Hooks::dist(double target, double position, lemlib::AngularDirection dire
     }
 }
 
-int Hooks::getNearestHook(double target, lemlib::AngularDirection direction) const {
+int Hooks::getNearestHook(double target, lemlib::AngularDirection direction, double tolerance) const {
     double minDist = chainLength;
     int minHook = 0;
     for (int i = 0; i < hooks.size(); i++) {
+        // Check for tolerance
+        if (std::fabs(dist(target, getPosition(i), lemlib::AngularDirection::AUTO)) < tolerance) { return i; }
+        // Search for nearest hook
         if (std::fabs(dist(target, getPosition(i), direction)) < minDist) {
             minDist = std::fabs(dist(target, getPosition(i), direction));
             minHook = i;
@@ -96,7 +99,7 @@ Alliance Hooks::ringDetect() const {
 
 void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange) {
     // If hookNum is -1 (or otherwise invalid), use the nearest hook
-    if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target); }
+    if (hookNum < 0 || hookNum >= (int)hooks.size()) { hookNum = getNearestHook(target, direction, settleRange); }
     // Check if the hook is settling
     if (isAtPosition(target, hookNum, settleRange)) { direction = AngularDirection::AUTO; }
     // Move the hook to the target position
@@ -127,9 +130,6 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
 
     lemlib::AngularDirection currentDirection =
         currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE : AngularDirection::CCW_COUNTERCLOCKWISE;
-
-    // Only colour sort if state is forwards
-    if (currState != states::FORWARDS) { colourSorting = false; }
 
     int maxVolt = 127;
     // int maxVolt = (isArmUp) ? 90 : 127;
@@ -173,18 +173,21 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
             // reset ring wait flag when the state is first set
             if (prevState != states::INDEX) {
                 sawPrerollRing = false;
-                indexHook = getNearestHook(idlePose);
+                indexHook = getNearestHook(idlePose, AngularDirection::CW_CLOCKWISE);
             }
 
-            if (!hasPrerollRing && prevHasPrerollRing) {
-                sawPrerollRing = true;
-            }
+            hasPrerollRing = hasPrerollRing || forcedIndex;
+            if (hasPrerollRing) sawPrerollRing = true;
 
             // Move into position first even if there is a ring already
-            if (hasPrerollRing && !sawPrerollRing) {
-                moveTowards(idlePose + 18, indexHook, AngularDirection::CW_CLOCKWISE);
-            } else if (sawPrerollRing && !this->isAtPosition(idlePose + 18, indexHook)) {
-                moveTowards(idlePose, -1, lemlib::AngularDirection::CW_CLOCKWISE);
+            if (dist(idlePose, getPosition(indexHook)) > 2) {
+                moveTowards(idlePose, indexHook);
+            } else if (sawPrerollRing) {
+                if (this->isAtPosition(idlePose + 18, indexHook)) {
+                    setState(states::IDLE, true, true);
+                } else {
+                    moveTowards(idlePose + 18, indexHook);
+                }
             } else {
                 setVoltage(0);
             }
@@ -195,5 +198,5 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
     prevVoltage = currVoltage;
     prevState = (lastState == currState) ? prevState : lastState;
     lastState = currState;
-    if (!isBusy) nextState();
+    // if (!isBusy) nextState();
 };

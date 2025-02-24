@@ -28,12 +28,10 @@ class Intake {
          */
         void setMode(modes mode) {
             m_mode = mode;
-            grabTwoFlag = false;
         }
 
         void grabTwo() {
             setMode(modes::INDEX);
-            grabTwoFlag = true;
         }
 
         /**
@@ -86,7 +84,6 @@ class Intake {
         states m_state = states::IDLE;
 
         bool isIndexForced = false;
-        bool grabTwoFlag = false;
 
         void taskFunct();
 };

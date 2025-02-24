@@ -2,6 +2,7 @@
 #include "main.h"
 #include "pros/motors.h"
 #include "robot/helperFuncts.hpp"
+#include "robot/subsys/arm/arm.hpp"
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -31,15 +32,14 @@ void opcontrol() {
     Button& ARM_UP_BUTTON = master.x;
     Button& ARM_DOWN_BUTTON = master.a;
 
-    Button& LEFT_DOINKER_BUTTON = master.d_left;
-    Button& RIGHT_DOINKER_BUTTON = master.d_right;
+    Button& DOINKER_BUTTON = master.d_left;
 
     // Subsys init
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle(true);
     mogoMech.cancelAutoClamp();
-    doinker.retract(Doinker::BOTH);
+    doinker.retract();
 
     printf("-- OPCONTROL STARTING --\n");
     lemlib::Timer matchTimer = 105000;
@@ -63,22 +63,18 @@ void opcontrol() {
         }
 
         /** Intake */
-        if (master.l2) {
-            if (OUTTAKE_BUTTON) {
-                intake.setMode(Intake::modes::HOLD);
-            } else {
-                intake.setMode(Intake::modes::INDEX);
-            }
+        if (OUTTAKE_BUTTON) {
+            intake.reverse(true, true);
+        } else if (INTAKE_BUTTON || master.l2) {
+            intake.forwards(true, true);
         } else {
-            intake.setMode(Intake::modes::CONTINUOUS);
+            intake.idle(true);
         }
 
-        if (INTAKE_BUTTON) {
-            intake.forwards(!master.l2, true);
-        } else if (OUTTAKE_BUTTON) {
-            intake.reverse(true, true);
+        if (master.l2 && !arm.isAtPosition(Arm::wall)) {
+            intake.setMode(INTAKE_BUTTON ? Intake::modes::INDEX : Intake::modes::HOLD);
         } else {
-            intake.idle(false);
+            intake.setMode(Intake::modes::CONTINUOUS);
         }
 
         // Force index
@@ -94,15 +90,9 @@ void opcontrol() {
         }
 
         /** Arm */
-        if (master.l2.released() && master.l2.getLastHoldTime() < 250_msec) {
+        if (master.x.pressed() || (master.l2.released() && master.l2.getLastHoldTime() < 250_msec)) {
             double lastTarget = arm.getTargetPosition();
             double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::wall : Arm::idle;
-            std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
-            arm.moveToPosition(target);
-        }
-        else if (ARM_UP_BUTTON.pressed()) {
-            double lastTarget = arm.getTargetPosition();
-            double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::hang : Arm::idle;
             std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
             arm.moveToPosition(target);
         }
@@ -124,8 +114,7 @@ void opcontrol() {
         }
 
         /** Doinker */
-        if (LEFT_DOINKER_BUTTON.pressed()) { doinker.toggle(Doinker::LEFT); }
-        if (RIGHT_DOINKER_BUTTON.pressed()) { doinker.toggle(Doinker::RIGHT); }
+        if (DOINKER_BUTTON.pressed()) { doinker.toggle(); }
 
         if (counter % 20 == 0) {
             // std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());

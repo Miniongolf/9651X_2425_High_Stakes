@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lemlib/chassis/chassis.hpp"
 #include "util.hpp"
 #include <algorithm>
 
@@ -31,7 +32,7 @@ class Hooks {
 
         states getState() const { return currState; }
 
-        void setState(states state, bool forceInstant = false, bool clearQueue = false);
+        void setState(states state, bool forceInstant = true, bool clearQueue = true);
 
         bool atState(states state) const { return currState == state; }
 
@@ -56,7 +57,7 @@ class Hooks {
                                   lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
         [[nodiscard]] double getPosition(int hookNum = 0) const;
         [[nodiscard]] int getNearestHook(double target,
-                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
+                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO, double tolerance = 3) const;
         [[nodiscard]] bool isAtPosition(double target, int hookNum = -1, double tolerance = 1) const;
         int poseOffset = 0;
 
@@ -91,11 +92,10 @@ class Hooks {
         const int chainLength;
         const std::vector<double> hooks;
         const double idlePose = 0, colourSortPose = 3.5;
-        void moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange = 3);
+        void moveTowards(double target, int hookNum, lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO, double settleRange = 3);
 
         // Colour sort
         const int proxRange = 200; // Tune this
-        bool colourSorting = false;
         int colourDetectHook = 0;
 
         // Hold mode flags
