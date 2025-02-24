@@ -4,6 +4,8 @@
 #include "lemlib/timer.hpp" // IWYU pragma: keep
 #include "lemlib/logger/logger.hpp" // IWYU pragma: keep
 #include "lemlib/chassis/chassis.hpp"
+#include "pros/abstract_motor.hpp"
+#include "lemlib/catlibUtils.hpp" // IWYU pragma: keep
 
 using namespace lemlib;
 
@@ -52,12 +54,17 @@ class CustomChassis : public lemlib::Chassis {
                       DriveCurve* steerCurve = &defaultDriveCurve)
             : Chassis(drivetrain, linearSettings, angularSettings, sensors, throttleCurve, steerCurve) {}
 
-        void brake(pros::motor_brake_mode_e mode) {
+        Eigen::Vector2d getEigenPoint() {
+            return Eigen::Vector2d(getPose(true, true).x, getPose(true, true).y);
+        };
+
+        void brake() {
+            pros::MotorBrake stdMode = drivetrain.leftMotors->get_brake_mode();
             setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
             drivetrain.leftMotors->move_velocity(0);
             drivetrain.rightMotors->move_velocity(0);
             pros::delay(30);
-            setBrakeMode(mode);
+            setBrakeMode(stdMode);
         };
 
         void moveTimed(float throttle, float steering, int time, bool async = true);
@@ -72,9 +79,13 @@ class CustomChassis : public lemlib::Chassis {
                                 ChainTurnParams params = {}, bool async = true);
 
         void safeMoveToPoint(Waypoint waypoint, bool async = true);
-        void safeMoveToPoint(float x, float y, int turnTimeout, int moveTimeout, TurnToPointParams turnParams = {},
-                             MoveToPointParams moveParams = {}, bool async = true);
+        void safeMoveToPoint(float x, float y, int turnTimeout, int moveTimeout,
+                             TurnToPointParams turnParams = {.earlyExitRange = 5}, MoveToPointParams moveParams = {},
+                             bool async = true);
         void safeMoveToPoint(float x, float y, int moveTimeout, MoveToPointParams moveParams = {}, bool async = true);
 
         void pathInterp(std::vector<Waypoint> path, bool async = true);
+
+        void followCurve(catlib::Curve path, int timeout, float lookahead, float speedRatio = 1, bool forwards = true,
+                         bool async = true);
 };

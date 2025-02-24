@@ -27,7 +27,7 @@ void scoreAllianceStake(pros::motor_brake_mode_e brakeMode) {
     chassis.moveTimed(50, 0, 100, false);
     chassis.brake(brakeMode);
     intake.forwards();
-    pros::delay(300);
+    pros::delay(750);
     intake.idle();
     chassis.setBrakeMode(brakeMode);
 }

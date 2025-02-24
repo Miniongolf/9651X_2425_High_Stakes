@@ -14,13 +14,13 @@ Arm arm( //
 
 Preroller preroller( //
     makeMotor(9, pros::MotorGears::green), //
-    makeDistance(3) //
+    makeDistance(5) //
 );
 
 Hooks hooks( //
     makeMotor(-20, pros::MotorGears::blue), //
     makeOptical(12), //
-    makeRotation(8), //
+    makeRotation(11), //
     74, //
     {0, 55, 37, 18} //
 );

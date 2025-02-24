@@ -65,13 +65,13 @@ void opcontrol() {
         /** Intake */
         if (OUTTAKE_BUTTON) {
             intake.reverse(true, true);
-        } else if (INTAKE_BUTTON || master.l2) {
+        } else if (INTAKE_BUTTON || (master.l2 && arm.isAtPosition(Arm::idle))) {
             intake.forwards(true, true);
         } else {
             intake.idle(true);
         }
 
-        if (master.l2 && !arm.isAtPosition(Arm::wall)) {
+        if (master.l2 && arm.isAtPosition(Arm::idle)) {
             intake.setMode(INTAKE_BUTTON ? Intake::modes::INDEX : Intake::modes::HOLD);
         } else {
             intake.setMode(Intake::modes::CONTINUOUS);
@@ -90,10 +90,13 @@ void opcontrol() {
         }
 
         /** Arm */
-        if (master.x.pressed() || (master.l2.released() && master.l2.getLastHoldTime() < 250_msec)) {
+        if (master.l2.released() && master.l2.getLastHoldTime() < 250_msec) {
             double lastTarget = arm.getTargetPosition();
             double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::wall : Arm::idle;
-            std::printf("Arm toggle %f --> %f\n", arm.getTargetPosition(), lemlib::sanitizeAngle(Arm::idle));
+            arm.moveToPosition(target);
+        } else if (master.x.pressed()) {
+            double lastTarget = arm.getTargetPosition();
+            double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::hang : Arm::idle;
             arm.moveToPosition(target);
         }
 

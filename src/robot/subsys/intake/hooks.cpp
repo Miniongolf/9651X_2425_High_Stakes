@@ -24,13 +24,14 @@ double Hooks::getPosition(int hookNum) const {
     // Using motor position in revolutions on a 12t sprocket
     // Return sanitized position of chain links moved (revs * sprocket teeth)
     float sensorRotations = m_rotSensor->get_position() * (1.0 / 36000);
-    if (m_rotSensor->get_position() == 2147483647) {
-        // Sensor dc handling, use motor encoders (might drift)
-        return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum] + poseOffset);
-    } else {
-        // Using rotation sensor
-        return sanitizePosition(m_rotSensor->get_position() * (1.0 / 36000) * 12 + hooks[hookNum] + poseOffset);
-    }
+    // if (m_rotSensor->get_position() == 2147483647) {
+    //     // Sensor dc handling, use motor encoders (might drift)
+    //     return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum] + poseOffset);
+    // } else {
+    //     // Using rotation sensor
+    //     return sanitizePosition(m_rotSensor->get_position() * (1.0 / 36000) * 12 + hooks[hookNum] + poseOffset);
+    // }
+    return sanitizePosition(m_rotSensor->get_position() * (1.0 / 36000) * 12 + hooks[hookNum] + poseOffset);
 }
 
 double Hooks::dist(double target, double position, lemlib::AngularDirection direction) const {
@@ -179,6 +180,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
             hasPrerollRing = hasPrerollRing || forcedIndex;
             if (hasPrerollRing) sawPrerollRing = true;
 
+            if (hasPrerollRing && !prevHasPrerollRing) { std::cout << "HOOKS INDEX DETECTED\n"; }
             // Move into position first even if there is a ring already
             if (dist(idlePose, getPosition(indexHook)) > 2) {
                 moveTowards(idlePose, indexHook);
