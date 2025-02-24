@@ -1,4 +1,5 @@
 #include "robot/globals.hpp"
+#include "pros/adi.hpp"
 
 int hangLevel = 0;
 
@@ -32,10 +33,7 @@ Intake intake {
 
 Clamp mogoMech(makePiston('H', false, false), makeDistance(11), &chassis);
 
-Doinker doinker( //
-    makePiston('G', false, false), //
-    makePiston('Z', false, false) //
-);
+pros::adi::Pneumatics doinker('G', false, false);
 
 pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);

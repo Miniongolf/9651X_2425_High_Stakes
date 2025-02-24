@@ -34,7 +34,7 @@ void ringRush() {
     int s = robotAlliance == Alliance::RED ? 1 : -1;
 
     chassis.setPose(-49, 26, 70.5);
-    doinker.extend(Doinker::LEFT);
+    doinker.extend();
     intake.setMode(Intake::modes::HOLD);
     intake.forwards();
     chassis.moveTimed(127, 0, 750, false);
@@ -45,7 +45,7 @@ void ringRush() {
     mogoMech.clamp(true);
     chassis.brake(pros::E_MOTOR_BRAKE_COAST);
     pros::delay(700);
-    doinker.retract(Doinker::LEFT);
+    doinker.retract();
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.forwards();
     pros::delay(750);
@@ -242,14 +242,14 @@ void goalRush() {
 int s = robotAlliance == Alliance::RED ? 1 : -1;
 
 chassis.setPose(-52*s, -31, 116);
-doinker.extend(Doinker::LEFT);
+doinker.extend();
 intake.setMode(Intake::modes::HOLD);
 intake.forwards();
 chassis.moveTimed(127, 0, 580, false);
 // chassis.brake(pros::E_MOTOR_BRAKE_COAST);
 chassis.safeMoveToPoint(-38*s, -36, 1600, {.forwards=false});
 chassis.turnToHeading(180*s, 1000);
-doinker.retract(Doinker::LEFT);
+doinker.retract();
 chassis.safeMoveToPoint(-11*s, -44, 1000, {.forwards=false, .maxSpeed=70}, false);
 robot::printPose();
 // chassis.swingToPoint(-15, -34, lemlib::DriveSide::RIGHT, 1000, {.forwards=false});
