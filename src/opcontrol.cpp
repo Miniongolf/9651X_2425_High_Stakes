@@ -51,7 +51,7 @@ void opcontrol() {
         master.update();
         partner.update();
 
-        if (master.d_up.pressed()) { robot::scoreAllianceStake(pros::E_MOTOR_BRAKE_COAST); }
+        if (master.d_up.pressed()) { robot::scoreAllianceStake(); }
 
         /** Timed haptics (45s, 32s, 31s buzz) */
         if (std::fabs(matchTimer.getTimeLeft() - 45000) < 10) {

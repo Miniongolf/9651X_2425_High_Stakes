@@ -20,16 +20,14 @@ void safeGrabMogo(float x, float y, int timeout) {
     mogoMech.clamp(true);
 }
 
-void scoreAllianceStake(pros::motor_brake_mode_e brakeMode) {
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+void scoreAllianceStake() {
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
     chassis.moveTimed(50, 0, 100, false);
-    chassis.brake(brakeMode);
+    chassis.brake();
     intake.forwards();
     pros::delay(750);
     intake.idle();
-    chassis.setBrakeMode(brakeMode);
 }
 
 void hangTier3() {

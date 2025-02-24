@@ -19,26 +19,33 @@ void auton::skills() {
     intake.idle();
 
     // Ring before mogo
-    intake.setMode(Intake::modes::HOLD);
+    intake.setMode(Intake::modes::INDEX);
     intake.forwards();
-    chassis.moveToPose(-24, 24, 30, 1000); // Ring 1
+    chassis.moveTimed(50, 0, 500);
+    chassis.swingToPoint(-24, 24, lemlib::DriveSide::LEFT, 750, {.minSpeed=127});
+    chassis.moveToPoint(-24, 24, 1000);
     // Grab first mogo
     robot::safeGrabMogo(-48, 24, 1000);
     // Fill mogo
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.forwards();
-    chassis.swingToPoint(24, 48, lemlib::DriveSide::LEFT, 1000, {.minSpeed=127});
-    chassis.moveToPoint(24, 48, 1000, {}, false);
-    chassis.moveToPoint(48, 60, 1000);
-    chassis.moveToPoint(24, 48, 1000, {.forwards=false});
-    chassis.chainTurnToHeading(-90, false, true, 1000);
-    chassis.moveToPoint(-44, 48, 3000, {.earlyExitRange=24});
-    chassis.moveToPoint(-44, 48, 3000, {.maxSpeed=60}, false);
-    pros::delay(500);
+    chassis.moveToPoint(-24, 24, 1000);
+    chassis.safeMoveToPoint(24, 48, 1250, {.minSpeed=100}, false);
+    chassis.moveToPoint(48, 60, 1000, {.maxSpeed=70});
+    chassis.safeMoveToPoint(24, 48, 1000, {.forwards=false});
+    chassis.safeMoveToPoint(-60, 48, 3000, {.maxSpeed=70}, false);
+    pros::delay(1500);
     intake.setMode(Intake::modes::INDEX);
-    chassis.safeMoveToPoint(-48, 60, 1000);
+    chassis.turnToPoint(-48, 60, 1000);
+    chassis.moveToPoint(-48, 60, 1000, {}, false);
     // Drop goal in corner
-    chassis.swingToHeading(110, lemlib::DriveSide::LEFT, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE});
+    chassis.moveTimed(-50, 0, 500, false);
     mogoMech.release();
-    chassis.moveToPoint(0, 60, 1000);
+    chassis.moveToPoint(5, 60, 1500);
+    chassis.swingToHeading(0, lemlib::DriveSide::RIGHT, 1000);
+    arm.moveToPosition(Arm::wall);
+    intake.idle();
+    intake.setMode(Intake::modes::HOLD);
+    chassis.moveTimed(50, 0, 750, false);
+    intake.reverse();
 }

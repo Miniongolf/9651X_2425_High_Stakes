@@ -43,7 +43,7 @@ pros::IMU imu(6);
 pros::Rotation horizRot(-2);
 pros::Rotation vertRot(19);
 
-lemlib::TrackingWheel horizTracker(&horizRot, 2,
+lemlib::TrackingWheel horizTracker(&horizRot, 2.05,
                                    -1, // tune this
                                    1);
 
