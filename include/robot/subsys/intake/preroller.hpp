@@ -48,6 +48,8 @@ class Preroller {
                 case states::IDLE: m_motor->move(0); break;
             }
         }
+
+        [[nodiscard]] double get_temperature() const { return m_motor->get_temperature(); }
     protected:
         MotorPtr m_motor = nullptr;
         DistancePtr m_distance = nullptr;

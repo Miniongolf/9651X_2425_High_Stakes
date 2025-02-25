@@ -44,6 +44,8 @@ class Arm {
 
         // In degrees
         void moveRelative(double angle) { moveToPosition(getPosition() + angle); }
+
+        float get_temperature() const { return m_motor->get_temperature(); }
     protected:
         MotorPtr m_motor = nullptr;
         lemlib::PID m_pid;

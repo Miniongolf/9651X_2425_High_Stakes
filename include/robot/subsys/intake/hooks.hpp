@@ -66,16 +66,18 @@ class Hooks {
 
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
-        bool colourSortEnabled = false;
-        Alliance sortingAlliance = Alliance::BLUE;
+        bool colourSortEnabled = true;
+        Alliance sortingAlliance = Alliance::RED;
 
 
         // Telemetry
+        [[nodiscard]] double get_temperature() const { return m_motor->get_temperature(); }
         friend std::ostream& operator<<(std::ostream& os, const Hooks& hooks) {
             os << "Hooks pose (" << hooks.getPosition(0) << ", " << hooks.getPosition(1) << ", " << hooks.getPosition(2)
                << ", " << hooks.getPosition(3) << ") --> " << hooks.getNearestHook(hooks.idlePose) << "\n";
             return os;
         }
+
     protected:
         // Devices
         MotorPtr m_motor = nullptr;
