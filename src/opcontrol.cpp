@@ -72,7 +72,7 @@ void opcontrol() {
         }
 
         if (master.l2 && arm.isAtPosition(Arm::idle)) {
-            intake.setMode(INTAKE_BUTTON ? Intake::modes::INDEX : Intake::modes::HOLD);
+            intake.setMode(INTAKE_BUTTON ? Intake::modes::HOLD : Intake::modes::INDEX);
         } else {
             intake.setMode(Intake::modes::CONTINUOUS);
         }

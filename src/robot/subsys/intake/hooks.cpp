@@ -136,8 +136,8 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
     lemlib::AngularDirection currentDirection =
         currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE : AngularDirection::CCW_COUNTERCLOCKWISE;
 
-    int maxVolt = 127;
-    // int maxVolt = (isArmUp) ? 90 : 127;
+    // int maxVolt = 90;
+    int maxVolt = (isArmUp) ? 127 : 90;
 
     if (forcedIndex) { setState(states::INDEX, true, true); }
 
