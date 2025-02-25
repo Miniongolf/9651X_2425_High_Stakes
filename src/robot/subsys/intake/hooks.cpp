@@ -24,14 +24,15 @@ double Hooks::getPosition(int hookNum) const {
     // Using motor position in revolutions on a 12t sprocket
     // Return sanitized position of chain links moved (revs * sprocket teeth)
     float sensorRotations = m_rotSensor->get_position() * (1.0 / 36000);
-    // if (m_rotSensor->get_position() == 2147483647) {
-    //     // Sensor dc handling, use motor encoders (might drift)
-    //     return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum] + poseOffset);
-    // } else {
-    //     // Using rotation sensor
-    //     return sanitizePosition(m_rotSensor->get_position() * (1.0 / 36000) * 12 + hooks[hookNum] + poseOffset);
-    // }
-    return sanitizePosition(m_rotSensor->get_position() * (1.0 / 36000) * 12 + hooks[hookNum] + poseOffset);
+    if (m_rotSensor->get_position() == 2147483647) {
+        // Sensor dc handling, use motor encoders (might drift)
+        return sanitizePosition(m_motor->get_position() * 12 + hooks[hookNum] + poseOffset);
+        std::printf("HOOKS ROTATION DC\n");
+    } else {
+        // Using rotation sensor
+        return sanitizePosition(sensorRotations * 12 + hooks[hookNum] + poseOffset);
+        
+    }
 }
 
 double Hooks::dist(double target, double position, lemlib::AngularDirection direction) const {
@@ -90,7 +91,10 @@ Alliance Hooks::ringDetect() const {
     const int ringProx = m_optical->get_proximity();
     // Error handling for invalid or dced optical
     // std::printf("hooks ringDetect: %f %d\n", ringHue, ringProx);
-    if (ringProx == 2147483647) { return Alliance::NONE; }
+    if (ringProx == 2147483647) {
+        return Alliance::NONE;
+        std::printf("OPTICAL DC\n");
+    }
     // Proximity check
     if (ringProx < proxRange) return Alliance::NONE;
     if (red.inRange(ringHue)) return Alliance::RED;

@@ -54,8 +54,8 @@ class CustomChassis : public lemlib::Chassis {
                       DriveCurve* steerCurve = &defaultDriveCurve)
             : Chassis(drivetrain, linearSettings, angularSettings, sensors, throttleCurve, steerCurve) {}
 
-        Eigen::Vector2d getEigenPoint() {
-            return Eigen::Vector2d(getPose(true, true).x, getPose(true, true).y);
+        Eigen::Vector2d getEigenPoint(bool radians = false, bool standardPos = false) {
+            return Eigen::Vector2d(getPose(radians, standardPos).x, getPose(true, true).y);
         };
 
         void brake() {
