@@ -16,7 +16,7 @@ namespace robot {
 
     void safeGrabMogo(float x, float y, int timeout);
 
-    void scoreAllianceStake(pros::motor_brake_mode_e brakeMode = pros::E_MOTOR_BRAKE_COAST);
+    void scoreAllianceStake();
 
     void hangTier3();
 }

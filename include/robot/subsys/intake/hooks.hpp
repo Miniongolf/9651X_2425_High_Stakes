@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lemlib/chassis/chassis.hpp"
 #include "util.hpp"
 #include <algorithm>
 
@@ -31,7 +32,7 @@ class Hooks {
 
         states getState() const { return currState; }
 
-        void setState(states state, bool forceInstant = false, bool clearQueue = false);
+        void setState(states state, bool forceInstant = true, bool clearQueue = true);
 
         bool atState(states state) const { return currState == state; }
 
@@ -56,7 +57,7 @@ class Hooks {
                                   lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
         [[nodiscard]] double getPosition(int hookNum = 0) const;
         [[nodiscard]] int getNearestHook(double target,
-                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO) const;
+                                         lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO, double tolerance = 3) const;
         [[nodiscard]] bool isAtPosition(double target, int hookNum = -1, double tolerance = 1) const;
         int poseOffset = 0;
 
@@ -66,15 +67,21 @@ class Hooks {
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
         bool colourSortEnabled = true;
+<<<<<<< HEAD
         Alliance sortingAlliance = Alliance::BLUE;
+=======
+        Alliance sortingAlliance = Alliance::RED;
+>>>>>>> 6a69a64871359c14f8d0e6ace4cfd66e9931d51a
 
 
         // Telemetry
+        [[nodiscard]] double get_temperature() const { return m_motor->get_temperature(); }
         friend std::ostream& operator<<(std::ostream& os, const Hooks& hooks) {
             os << "Hooks pose (" << hooks.getPosition(0) << ", " << hooks.getPosition(1) << ", " << hooks.getPosition(2)
                << ", " << hooks.getPosition(3) << ") --> " << hooks.getNearestHook(hooks.idlePose) << "\n";
             return os;
         }
+
     protected:
         // Devices
         MotorPtr m_motor = nullptr;
@@ -91,11 +98,10 @@ class Hooks {
         const int chainLength;
         const std::vector<double> hooks;
         const double idlePose = 0, colourSortPose = 3.5;
-        void moveTowards(double target, int hookNum, lemlib::AngularDirection direction, double settleRange = 3);
+        void moveTowards(double target, int hookNum, lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO, double settleRange = 3);
 
         // Colour sort
         const int proxRange = 200; // Tune this
-        bool colourSorting = false;
         int colourDetectHook = 0;
 
         // Hold mode flags
@@ -109,7 +115,7 @@ class Hooks {
 
         void setVoltage(int voltage) { currVoltage = voltage; }
 
-        lemlib::PID pid = {18, 0, 0};
+        lemlib::PID pid = {10, 0, 0};
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses

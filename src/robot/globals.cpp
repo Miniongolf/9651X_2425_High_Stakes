@@ -1,4 +1,5 @@
 #include "robot/globals.hpp"
+#include "pros/adi.hpp"
 
 int hangLevel = 0;
 
@@ -13,13 +14,13 @@ Arm arm( //
 
 Preroller preroller( //
     makeMotor(9, pros::MotorGears::green), //
-    makeDistance(3) //
+    makeDistance(5) //
 );
 
 Hooks hooks( //
     makeMotor(-20, pros::MotorGears::blue), //
     makeOptical(12), //
-    makeRotation(8), //
+    makeRotation(11), //
     74, //
     {0, 55, 37, 18} //
 );
@@ -32,10 +33,7 @@ Intake intake {
 
 Clamp mogoMech(makePiston('H', false, false), makeDistance(11), &chassis);
 
-Doinker doinker( //
-    makePiston('G', false, false), //
-    makePiston('Z', false, false) //
-);
+pros::adi::Pneumatics doinker('G', false, false);
 
 pros::MotorGroup leftDrive({13, -14, 15}, pros::v5::MotorGears::blue);
 pros::MotorGroup rightDrive({-16, 18, -17}, pros::v5::MotorGears::blue);
@@ -45,7 +43,7 @@ pros::IMU imu(6);
 pros::Rotation horizRot(-2);
 pros::Rotation vertRot(19);
 
-lemlib::TrackingWheel horizTracker(&horizRot, 2,
+lemlib::TrackingWheel horizTracker(&horizRot, 2.05,
                                    -1, // tune this
                                    1);
 

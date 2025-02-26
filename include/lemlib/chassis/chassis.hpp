@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pros/abstract_motor.hpp"
 #include "pros/rtos.hpp"
 #include "pros/imu.hpp"
 #include "lemlib/asset.hpp"
@@ -483,6 +484,22 @@ class Chassis {
          */
         void setBrakeMode(pros::motor_brake_mode_e mode);
         /**
+         * @brief Sets the brake mode of the drivetrain motors
+         *
+         * @param mode Mode to set the drivetrain motors to
+         *
+         * @b Example
+         * @code {.cpp}
+         * // set the brake mode of the drivetrain motors to hold
+         * chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+         * // set the brake mode of the drivetrain motors to coast
+         * chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+         * // set the brake mode of the drivetrain motors to brake
+         * chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+         * @endcode
+         */
+        void setBrakeMode(pros::MotorBrake mode);
+        /**
          * @brief Turn the chassis so it is facing the target point
          *
          * @param x x location
@@ -909,7 +926,7 @@ class Chassis {
          * @warning Do not interact with these unless you know what you are doing
          */
         PID angularPID;
-        
+
         ControllerSettings lateralSettings;
         ControllerSettings angularSettings;
     protected:

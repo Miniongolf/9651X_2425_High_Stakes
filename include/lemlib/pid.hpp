@@ -26,12 +26,12 @@ class PID {
 
         /**
          * @brief Set the gains of the PID (kP, kI, kD)
-         * 
-         * @param kP 
-         * @param kI 
-         * @param kD 
+         *
+         * @param kP
+         * @param kI
+         * @param kD
          */
-         void setGains(float kP, float kI, float kD) {
+        void setGains(float kP, float kI, float kD) {
             this->kP = kP;
             this->kI = kI;
             this->kD = kD;
@@ -39,8 +39,8 @@ class PID {
 
         /**
          * @brief Set the gains of the PID to those of another PID object
-         * 
-         * @param pid 
+         *
+         * @param pid
          */
         void setGains(lemlib::PID pid) {
             this->kP = pid.kP;
@@ -50,12 +50,10 @@ class PID {
 
         /**
          * @brief Get the value of the windup range
-         * 
-         * @return float 
+         *
+         * @return float
          */
-        float getWindupRange() {
-            return this->windupRange;
-        };
+        float getWindupRange() { return this->windupRange; };
 
         /**
          * @brief Update the PID
@@ -93,7 +91,7 @@ class PID {
          * @endcode
          */
         void reset();
-        
+
         // gains
         float kP;
         float kI;

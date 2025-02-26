@@ -25,11 +25,11 @@ void autonomous() {
     // auton::elims();
     // auton::safeShort();
     // auton::twoMogoSolo();
-    auton::soloAWP();
+    // auton::soloAWP();
     // chassis.chainTurnToHeading(45, true, false, 2000);
     // auton::tunePID(true);
     // auton::ringRush();
-    // auton::skills();
+    auton::skills();
     // auton::goalRush();
     // chassis.pathInterp({
     //     {48, 48},
@@ -38,6 +38,7 @@ void autonomous() {
     // }, false);
     // robot::printPose();
 
+    chassis.waitUntilDone();
     intake.idle(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

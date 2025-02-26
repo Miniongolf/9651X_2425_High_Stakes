@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pros/adi.hpp"
 #include "util.hpp" // IWYU pragma: keep
 #include "gamepad/gamepad.hpp" // IWYU pragma: keep
 #include "robot/constants.hpp"
@@ -18,7 +19,7 @@ extern Intake intake;
 
 extern Clamp mogoMech;
 
-extern Doinker doinker;
+extern pros::adi::Pneumatics doinker;
 
 extern pros::MotorGroup leftDrive, rightDrive;
 

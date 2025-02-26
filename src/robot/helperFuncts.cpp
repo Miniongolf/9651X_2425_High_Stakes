@@ -15,21 +15,19 @@ void moveTimed(const double throttle, const double steering, const int time) {
 }
 
 void safeGrabMogo(float x, float y, int timeout) {
-    chassis.safeMoveToPoint(x, y, timeout, {.forwards=false, .minSpeed=70, .earlyExitRange=15}, true);
-    chassis.moveToPoint(x, y, 1000, {.forwards=false, .maxSpeed=60}, false);
+    chassis.safeMoveToPoint(x, y, timeout, {.forwards=false, .minSpeed=70, .earlyExitRange=17}, true);
+    chassis.moveToPoint(x, y, 1000, {.forwards=false, .maxSpeed=50}, false);
     mogoMech.clamp(true);
 }
 
-void scoreAllianceStake(pros::motor_brake_mode_e brakeMode) {
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+void scoreAllianceStake() {
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
     chassis.moveTimed(50, 0, 100, false);
-    chassis.brake(brakeMode);
+    chassis.brake();
     intake.forwards();
-    pros::delay(300);
+    pros::delay(750);
     intake.idle();
-    chassis.setBrakeMode(brakeMode);
 }
 
 void hangTier3() {
