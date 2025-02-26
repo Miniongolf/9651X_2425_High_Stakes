@@ -65,7 +65,7 @@ class Hooks {
 
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
-        bool colourSortEnabled = false;
+        bool colourSortEnabled = true;
         Alliance sortingAlliance = Alliance::BLUE;
 
 

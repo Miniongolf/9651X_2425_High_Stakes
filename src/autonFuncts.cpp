@@ -103,7 +103,7 @@ void safeShort() {
 }
 
 void soloAWP() {
-    float s = -1;
+    float s = 1;
     // Alliance stake
     chassis.setPose(-59*s, -10, 180*s);
     chassis.moveToPoint(-59*s, 0, 1000, {.forwards = false});
@@ -123,17 +123,13 @@ void soloAWP() {
     pros::delay(250);
     intake.forwards(true);
     // chassis.moveToPoint(-32, -20, 1000, {.forwards = false});
-    chassis.moveToPoint(-24*s, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    chassis.safeMoveToPoint(-24*s, -24, 1000, {.forwards = false, .maxSpeed = 50}, false);
     pros::delay(400);
     mogoMech.clamp();
     // Ring 3
-    chassis.turnToPoint(-24*s, -48, 1000, {}, false);
-    pros::delay(200);
-    chassis.moveToPoint(-24*s, -45, 1000, {}, false);
+    chassis.safeMoveToPoint(-24*s, -45, 1000, {}, false);
     // Corner
-    chassis.turnToPoint(-55*s, -58, 1000, {}, false);
-    pros::delay(200);
-    chassis.moveToPoint(-58*s, -58, 2000, {.earlyExitRange=10}, true);
+    chassis.safeMoveToPoint(-58*s, -58, 2000, {.earlyExitRange=10}, true);
     // Arm lift
     intake.setMode(Intake::modes::HOLD);
     // arm.moveToPosition(Arm::wall-14.4);
