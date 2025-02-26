@@ -26,5 +26,5 @@ namespace catlib {
 
     double limit_min(double drive_output, double drive_min_voltage);
 
-    double curvatureToAPoint(Vector2d currentPose, double currenHeading, Vector2d targetPose);
+    double curvatureToAPoint(Vector2d currentPose, double currentHeading, Vector2d targetPose);
 }

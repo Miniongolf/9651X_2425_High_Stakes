@@ -137,7 +137,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
         currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE : AngularDirection::CCW_COUNTERCLOCKWISE;
 
     // int maxVolt = 90;
-    int maxVolt = (isArmUp) ? 127 : 127;
+    int maxVolt = (isArmUp) ? 127 : 100;
 
     if (forcedIndex) { setState(states::INDEX, true, true); }
 

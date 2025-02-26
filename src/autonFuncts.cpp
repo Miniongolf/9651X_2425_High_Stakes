@@ -57,7 +57,14 @@ void ringRush() {
 
 void autoTestStuffs() {
     chassis.setPose(0, 0, 0);
-    chassis.chainTurnToHeading(45, true, false, 1000);
+    chassis.followCurve({
+        {0, 0}, {0, 24},
+        {24, 0}, {24, 24}
+    }, 3000, 6, 1, true, false);
+    chassis.followCurve({
+        chassis.getEigenPoint(), {24, 47},
+        {-65, 32}, {0, 0}
+    }, 3000, 6);
     chassis.waitUntilDone();
 }
 

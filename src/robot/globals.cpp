@@ -59,7 +59,7 @@ lemlib::PID mogoAngularPID(2, 0, 15, 5, true);
 
 lemlib::Drivetrain drivetrain(&leftDrive, &rightDrive,
                               11.25, // measu`re this
-                              lemlib::Omniwheel::NEW_275, 600, 2);
+                              lemlib::Omniwheel::NEW_275, 600, 5);
 
 lemlib::OdomSensors odom(&vertTracker, nullptr, &horizTracker, nullptr, &imu);
 
