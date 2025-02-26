@@ -67,11 +67,7 @@ class Hooks {
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
         bool colourSortEnabled = true;
-<<<<<<< HEAD
-        Alliance sortingAlliance = Alliance::BLUE;
-=======
         Alliance sortingAlliance = Alliance::RED;
->>>>>>> 6a69a64871359c14f8d0e6ace4cfd66e9931d51a
 
 
         // Telemetry

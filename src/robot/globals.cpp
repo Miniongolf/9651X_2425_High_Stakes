@@ -3,7 +3,7 @@
 
 int hangLevel = 0;
 
-Alliance robotAlliance = Alliance::BLUE;
+Alliance robotAlliance = Alliance::RED;
 
 Arm arm( //
     makeMotor(-1, pros::MotorGears::green), //
