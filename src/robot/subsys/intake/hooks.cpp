@@ -146,7 +146,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
         case states::FORWARDS:
             setVoltage(maxVolt);
             // Detect colour sorts
-            if (colourSortEnabled && isOpposite(sortingAlliance, ringDetect())) {
+            if (colourSortEnabled && isOpposite(m_alliance, ringDetect())) {
                 std::printf("HOOKS COLOUR SORT INITIATED\n");
                 // pros::delay(10);
                 // m_motor->move(-10);

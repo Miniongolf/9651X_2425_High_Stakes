@@ -60,12 +60,19 @@ class CustomChassis : public lemlib::Chassis {
         };
 
         void brake() {
+            this->requestMotionStart();
+            // were all motions cancelled?
+            if (!this->motionRunning) return;
+
             pros::MotorBrake stdMode = drivetrain.leftMotors->get_brake_mode();
             setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
             drivetrain.leftMotors->move_velocity(0);
             drivetrain.rightMotors->move_velocity(0);
             pros::delay(30);
             setBrakeMode(stdMode);
+            pros::delay(10);
+
+            this->endMotion();
         };
 
         void moveTimed(float throttle, float steering, int time, bool async = true);

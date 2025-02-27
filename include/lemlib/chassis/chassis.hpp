@@ -297,7 +297,7 @@ struct MoveToPoseParams {
         float maxSpeed = 127;
         /** the minimum speed the robot can travel at. If set to a non-zero value, the exit conditions will switch to
          * less accurate but smoother ones. Value between 0-127. 0 by default */
-        float minSpeed = 0;
+        float minSpeed = 20;
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;
@@ -318,7 +318,7 @@ struct MoveToPointParams {
         float maxSpeed = 127;
         /** the minimum speed the robot can travel at. If set to a non-zero value, the exit conditions will switch to
          * less accurate but smoother ones. Value between 0-127. 0 by default */
-        float minSpeed = 0;
+        float minSpeed = 20;
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;

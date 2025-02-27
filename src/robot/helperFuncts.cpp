@@ -35,8 +35,7 @@ void scoreWallStake(bool wait, bool push) {
     Intake::modes prevMode = intake.getMode(); 
     intake.setMode(Intake::modes::CONTINUOUS);
     if (push) {
-        chassis.arcade(70, 0);
-        pros::delay(500);
+        chassis.moveTimed(70, 0, 500, false);
     }
     intake.reverse(); // Score wallstake
     pros::delay(200);
