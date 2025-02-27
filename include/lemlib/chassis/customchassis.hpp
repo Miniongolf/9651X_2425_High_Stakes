@@ -10,7 +10,7 @@
 using namespace lemlib;
 
 struct Waypoint {
-        Waypoint(float x, float y, int turnTimeout = 500, int moveTimeout = 1500, TurnToPointParams turnParams = {},
+        Waypoint(float x, float y, int turnTimeout = 650, int moveTimeout = 1500, TurnToPointParams turnParams = {},
                  MoveToPointParams moveParams = {})
             : x(x),
               y(y),
@@ -19,7 +19,7 @@ struct Waypoint {
               turnParams(turnParams.forwards),
               moveParams(moveParams) {}
 
-        Waypoint(Pose pose, int turnTimeout = 500, int moveTimeout = 1500, TurnToPointParams turnParams = {},
+        Waypoint(Pose pose, int turnTimeout = 650, int moveTimeout = 1500, TurnToPointParams turnParams = {},
                  MoveToPointParams moveParams = {})
             : x(pose.x),
               y(pose.y),
@@ -36,7 +36,7 @@ struct Waypoint {
               moveParams(moveParams) {}
 
         float x, y;
-        int turnTimeout = 500, moveTimeout = 1500;
+        int turnTimeout = 650, moveTimeout = 1500;
         TurnToPointParams turnParams = {};
         MoveToPointParams moveParams = {};
 };
@@ -68,7 +68,7 @@ class CustomChassis : public lemlib::Chassis {
             setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
             drivetrain.leftMotors->move_velocity(0);
             drivetrain.rightMotors->move_velocity(0);
-            pros::delay(30);
+            pros::delay(10);
             setBrakeMode(stdMode);
             pros::delay(10);
 
@@ -92,7 +92,7 @@ class CustomChassis : public lemlib::Chassis {
                              bool async = true);
         void safeMoveToPoint(float x, float y, int moveTimeout, MoveToPointParams moveParams = {}, bool async = true);
 
-        void pathInterp(std::vector<Waypoint> path, bool async = true);
+        void pathInterp(std::vector<Waypoint> path, bool safe = true, bool async = true);
 
         void followCurve(catlib::Curve curve, int timeout, float lookahead, float speedRatio = 1, bool forwards = true,
                          bool async = true);

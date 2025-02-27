@@ -14,20 +14,21 @@ void auton::skills() {
     // Start pose (in front of alliance stake)
     chassis.setPose(-64, 0, 90);
     intake.forwards();
-    pros::delay(500);
+    pros::delay(1000);
     intake.idle();
 
-    intake.setMode(Intake::modes::INDEX);
+    intake.setMode(Intake::modes::HOLD);
     intake.forwards();
     chassis.moveTimed(50, -20, 500);
     chassis.swingToPoint(-24, 24, lemlib::DriveSide::LEFT, 750, {.maxSpeed = 80, .minSpeed = 30});
     chassis.moveToPoint(-24, 24, 1000); // Ring 1 (before mogo)
+
     // Grab first mogo (top left corner)
     robot::safeGrabMogo(-48, 24, 1000);
+
     // Fill mogo
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.forwards();
-    // Fill mogo
     chassis.moveToPose(-24, 30, 65, 800, {.minSpeed = 70});
     chassis.moveToPoint(24, 45, 1250, {.minSpeed = 100, .earlyExitRange = 15}); // Ring 2
     chassis.moveToPoint(42, 58, 750, {.minSpeed = 90}); // Ring 3
@@ -38,6 +39,7 @@ void auton::skills() {
     chassis.swingToPoint(-48, 60, lemlib::DriveSide::LEFT, 750, {}, false);
     intake.setMode(Intake::modes::INDEX);
     chassis.moveToPoint(-48, 60, 1000, {.maxSpeed = 80}, false); // Grab top wallstake 1
+
     // Drop goal in corner
     chassis.swingToPoint(-70, 70, lemlib::DriveSide::LEFT, 600, {.forwards = false});
     chassis.moveTimed(-50, 0, 300, false);
