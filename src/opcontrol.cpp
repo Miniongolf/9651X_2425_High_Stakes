@@ -1,6 +1,7 @@
 #include "lemlib/util.hpp"
 #include "main.h"
 #include "pros/motors.h"
+#include "robot/globals.hpp"
 #include "robot/helperFuncts.hpp"
 #include "robot/subsys/arm/arm.hpp"
 
@@ -47,6 +48,11 @@ void opcontrol() {
     bool mogoClampedOnPress;
 
     while (true) {
+        if (leftDrive.get_temperature(0) > 45 || leftDrive.get_temperature(1) > 45 || leftDrive.get_temperature(2) > 45 ||
+            rightDrive.get_temperature(0) > 45 || rightDrive.get_temperature(1) > 45 || rightDrive.get_temperature(2) > 45) {
+            master.controller.print(0, 0, "DRIVETRAIN OVERHEAT");
+        }
+
         // Update gamepad buttons and sticks
         master.update();
         partner.update();

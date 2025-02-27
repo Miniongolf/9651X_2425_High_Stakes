@@ -1,5 +1,4 @@
 #include "robot/helperFuncts.hpp"
-#include "pros/motors.h"
 
 namespace robot {
 void printPose() {
@@ -21,16 +20,18 @@ void safeGrabMogo(float x, float y, int timeout) {
 }
 
 void scoreAllianceStake() {
+    Intake::modes mode = intake.getMode(); 
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
     chassis.moveTimed(50, 0, 100, false);
     chassis.brake();
     intake.forwards();
     pros::delay(750);
+    intake.setMode(mode);
     intake.idle();
 }
 
 void hangTier3() {
-    std::printf("Hang macro not written yet (rip)\n");
+    std::printf("Hang gone (rip ggs)\n");
 };
 } // namespace robot

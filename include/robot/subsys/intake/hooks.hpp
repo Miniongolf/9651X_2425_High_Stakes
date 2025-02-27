@@ -97,7 +97,7 @@ class Hooks {
         void moveTowards(double target, int hookNum, lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO, double settleRange = 3);
 
         // Colour sort
-        const int proxRange = 200; // Tune this
+        const int proxRange = 125; // Tune this
         int colourDetectHook = 0;
 
         // Hold mode flags
