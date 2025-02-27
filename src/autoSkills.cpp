@@ -7,8 +7,8 @@
 bool headingCloseTo(double target) { return std::fabs(lemlib::angleError(target, chassis.getPose().theta)) <= 5; };
 
 void auton::skills() {
-    // Disable colour sort
-    robotAlliance = Alliance::NONE;
+    // Set colour sort to red alliance
+    intake.setAlliance(Alliance::RED);
 
     // Start pose (in front of alliance stake)
     chassis.setPose(-64, 0, 90);
@@ -16,45 +16,38 @@ void auton::skills() {
     pros::delay(500);
     intake.idle();
 
-    // Ring before mogo
     intake.setMode(Intake::modes::INDEX);
     intake.forwards();
-    chassis.moveTimed(50, 0, 500);
+    chassis.moveTimed(50, -20, 500);
     chassis.swingToPoint(-24, 24, lemlib::DriveSide::LEFT, 750, {.minSpeed = 127});
-    chassis.moveToPoint(-24, 24, 1000);
+    chassis.moveToPoint(-24, 24, 1000); // Ring 1 (before mogo)
     // Grab first mogo (top left corner)
     robot::safeGrabMogo(-48, 24, 1000);
     // Fill mogo
     intake.setMode(Intake::modes::CONTINUOUS);
-    intake.forwards(); // Ring 1
+    intake.forwards();
     // Fill mogo
-    chassis.moveToPose(-24, 30, 65, 1000, {.minSpeed=127});
+    chassis.moveToPose(-24, 30, 65, 1000, {.minSpeed = 90});
     chassis.moveToPoint(24, 45, 1250, {.minSpeed = 127, .earlyExitRange = 12}); // Ring 2
-    chassis.moveToPoint(42, 53, 1000); // Ring 3
-    chassis.moveToPoint(24, 47, 1000, {.forwards = false}); // Ring 4
-    chassis.moveToPoint(-60, 47, 3000, {.maxSpeed = 50}, false); // Rings 5+6
-    pros::delay(500);
+    chassis.moveToPoint(42, 53, 500, {.minSpeed = 70}); // Ring 3
+    chassis.moveToPoint(24, 47, 1000, {.forwards = false, .minSpeed = 50}); // Ring 4
+    chassis.moveToPoint(-60, 47, 3000, {.minSpeed = 127, .earlyExitRange = 24}); // Ring 5
+    chassis.moveToPoint(-60, 47, 3000, {.maxSpeed = 50}, false); // Ring 6
+    pros::delay(300);
+    chassis.swingToHeading(-25, lemlib::DriveSide::LEFT, 1000, {.minSpeed = 127, .earlyExitRange = 10}, false);
     intake.setMode(Intake::modes::INDEX);
-    pros::delay(200);
-    chassis.swingToHeading(-25, lemlib::DriveSide::LEFT, 1000, {.minSpeed = 127, .earlyExitRange=10});
-    chassis.safeMoveToPoint(-48, 60, 1000, {.maxSpeed = 80}, false); // Grab top wallstake 1
+    chassis.moveToPoint(-48, 60, 1000, {.maxSpeed = 80}, false); // Grab top wallstake 1
     // Drop goal in corner
     chassis.turnToPoint(-70, 70, 1000, {.forwards = false});
-    chassis.moveTimed(-50, 0, 700, false);
+    chassis.moveTimed(-50, 0, 500, false);
     mogoMech.release(true);
-    chassis.moveTimed(50, 0, 500, false);
     // Top wallstake
-    chassis.safeMoveToPoint(0, 40, 2000);
-    chassis.turnToHeading(0, 1000);
-    chassis.moveTimed(70, 0, 800, false);
-    pros::delay(300);
-    chassis.moveTimed(-50, 0, 500);
+    chassis.safeMoveToPoint(-10, 48, 500, 1000, {.earlyExitRange = 0}, {.minSpeed=30});
+    chassis.swingToHeading(0, lemlib::DriveSide::LEFT, 500, {}, false);
+    pros::delay(350);
     arm.moveToPosition(Arm::wall);
     intake.idle();
-    intake.setMode(Intake::modes::CONTINUOUS);
-    chassis.moveTimed(70, 0, 800, false);
-    intake.reverse(); // Score wallstake
-    pros::delay(750);
+    robot::scoreWallStake(true, true);
 
     // Second mogo (bottom left)
     chassis.swingToPoint(-48, 0, lemlib::DriveSide::LEFT, 1000, {.forwards = false}, false);

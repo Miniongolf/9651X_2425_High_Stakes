@@ -24,7 +24,7 @@ class Hooks {
             m_optical->set_led_pwm(100);
             m_motor->tare_position();
             m_rotSensor->set_position(0);
-            sortingAlliance = alliance;
+            m_alliance = alliance;
         }
 
         // State machine
@@ -67,7 +67,7 @@ class Hooks {
         // Colour sort
         [[nodiscard]] Alliance ringDetect() const;
         bool colourSortEnabled = true;
-        Alliance sortingAlliance = Alliance::RED;
+        Alliance m_alliance = Alliance::RED;
 
 
         // Telemetry

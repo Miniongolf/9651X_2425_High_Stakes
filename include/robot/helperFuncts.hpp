@@ -17,6 +17,8 @@ namespace robot {
     void safeGrabMogo(float x, float y, int timeout);
 
     void scoreAllianceStake();
+    
+    void scoreWallStake(bool wait = false, bool push = false);
 
     void hangTier3();
 }

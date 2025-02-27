@@ -26,13 +26,9 @@ class Intake {
          *
          * @param mode
          */
-        void setMode(modes mode) {
-            m_mode = mode;
-        }
+        void setMode(modes mode) { m_mode = mode; }
 
-        void grabTwo() {
-            setMode(modes::INDEX);
-        }
+        void grabTwo() { setMode(modes::INDEX); }
 
         /**
          * @brief Get the state of the hooks
@@ -75,6 +71,10 @@ class Intake {
         void trimHooks(int amount) { m_hooks->poseOffset += amount; }
 
         void resetHooksOffset() { m_hooks->poseOffset = 0; }
+
+        void setAlliance(Alliance alliance) { m_hooks->m_alliance = alliance; }
+
+        [[nodiscard]] Alliance getAlliance() const { return m_hooks->m_alliance; }
     protected:
         PrerollerPtr m_preroller = nullptr;
         HooksPtr m_hooks = nullptr;

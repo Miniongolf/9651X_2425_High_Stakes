@@ -31,7 +31,7 @@ class Clamp {
             m_chassis->lateralPID.setGains(mogoLateralPID);
             m_chassis->angularPID.setGains(mogoAngularPID);
             cancelAutoClamp();
-            if (wait) { pros::delay(50); }
+            if (wait) { pros::delay(30); }
         }
 
         void release(bool wait = false) {
@@ -39,7 +39,7 @@ class Clamp {
             m_chassis->lateralPID.setGains(emptyLateralPID);
             m_chassis->angularPID.setGains(emptyAngularPID);
             cancelAutoClamp();
-            if (wait) { pros::delay(50); }
+            if (wait) { pros::delay(30); }
         }
 
         void setState(bool isClamped) {
