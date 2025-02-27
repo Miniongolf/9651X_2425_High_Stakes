@@ -134,7 +134,11 @@ void opcontrol() {
         int rightPower = master.stickRight.y();
         int turnPower = master.stickRight.x();
 
-        chassis.arcade(throttle, turnPower * 0.75, false, 0.7);
+        if (arm.getTargetPosition() == Arm::hang) {
+            chassis.arcade(throttle * 0.66, turnPower * 0.5, false, 0.7);
+        } else {
+            chassis.arcade(throttle, turnPower * 0.75, false, 0.7);
+        }
         // chassis.tank(throttle, rightPower);
 
         // Telemetry

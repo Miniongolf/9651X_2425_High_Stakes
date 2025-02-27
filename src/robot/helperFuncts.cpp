@@ -14,7 +14,8 @@ void moveTimed(const double throttle, const double steering, const int time) {
 }
 
 void safeGrabMogo(float x, float y, int timeout) {
-    chassis.safeMoveToPoint(x, y, timeout, {.forwards=false, .minSpeed=70, .earlyExitRange=17}, true);
+    chassis.turnToPoint(x, y, 500, {.forwards=false, .minSpeed=50}, true);
+    chassis.moveToPoint(x, y, timeout, {.forwards=false, .minSpeed=70, .earlyExitRange=17}, true);
     chassis.moveToPoint(x, y, 1000, {.forwards=false, .maxSpeed=70}, false);
     mogoMech.clamp(true);
 }
@@ -23,8 +24,9 @@ void scoreAllianceStake() {
     Intake::modes mode = intake.getMode(); 
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
-    chassis.moveTimed(50, 0, 100, false);
+    chassis.moveTimed(45, 0, 95, false);
     chassis.brake();
+    pros::delay(20);
     intake.forwards();
     pros::delay(750);
     intake.setMode(mode);

@@ -118,7 +118,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
      *  However, its effects will be tracked by prevVoltage
      */
     jamDetects.push_back(m_motor->get_current_draw() >= jamThresh.first &&
-                         std::fabs(m_rotSensor->get_velocity()) <= jamThresh.second);
+                         std::fabs(m_motor->get_actual_velocity()) <= jamThresh.second && currVoltage != 0);
     if (jamDetects.size() > 5) {
         jamDetects.erase(jamDetects.begin());
     } // Keep the vector size at 5 by popping the oldest element
