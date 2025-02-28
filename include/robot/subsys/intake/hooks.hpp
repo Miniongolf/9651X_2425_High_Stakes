@@ -48,7 +48,7 @@ class Hooks {
 
         void idle() { setState(states::IDLE); }
 
-        void update(bool hasPrerollRing, bool forcedIndex, bool isArmUp);
+        void update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isArmStuck);
 
         // Position utils
         [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }
@@ -68,7 +68,6 @@ class Hooks {
         [[nodiscard]] Alliance ringDetect() const;
         bool colourSortEnabled = true;
         Alliance m_alliance = Alliance::RED;
-
 
         // Telemetry
         [[nodiscard]] double get_temperature() const { return m_motor->get_temperature(); }

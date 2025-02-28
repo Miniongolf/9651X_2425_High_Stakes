@@ -112,7 +112,7 @@ void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection dir
     setVoltage(voltage);
 };
 
-void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
+void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isArmStuck) {
     /** Jam detection
      *  NOTE: the jam state is not a real state and will not be tracked by lastState or prevState
      *  However, its effects will be tracked by prevVoltage
@@ -132,6 +132,13 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
         pros::delay(250);
     }
 
+    // Prioritize moving the arm up if it is stuck
+    if (isArmStuck) {
+        setVoltage(50);
+        m_motor->move(currVoltage);
+        return;
+    }
+
     lemlib::AngularDirection currentDirection =
         currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE : AngularDirection::CCW_COUNTERCLOCKWISE;
 
@@ -148,10 +155,6 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp) {
             // Detect colour sorts
             if (colourSortEnabled && isOpposite(m_alliance, ringDetect())) {
                 std::printf("HOOKS COLOUR SORT INITIATED\n");
-                // pros::delay(10);
-                // m_motor->move(-10);
-                // pros::delay(200);
-                // m_motor->move(maxVolt);
                 colourDetectHook = getNearestHook(colourSortPose, lemlib::AngularDirection::CW_CLOCKWISE);
                 lemlib::Timer colourSortTimer(500);
                 while (dist(colourSortPose, getPosition(colourDetectHook)) > 0 && !colourSortTimer.isDone()) {

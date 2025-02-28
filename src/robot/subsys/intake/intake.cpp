@@ -36,7 +36,7 @@ void Intake::taskFunct() {
         }
 
         m_preroller->update();
-        m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmUp);
+        m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmUp, m_arm->isJammed());
         isIndexForced = false;
         if (counter % 25 == 0) {
             // std::cout << *m_hooks.get();
