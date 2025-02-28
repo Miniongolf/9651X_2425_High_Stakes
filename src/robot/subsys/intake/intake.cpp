@@ -36,6 +36,7 @@ void Intake::taskFunct() {
         }
 
         m_preroller->update();
+        if (m_arm->isJammed()) { std::printf("Arm jammed\n"); }
         m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmUp, m_arm->isJammed());
         isIndexForced = false;
         if (counter % 25 == 0) {

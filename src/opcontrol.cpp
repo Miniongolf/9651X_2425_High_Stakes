@@ -135,7 +135,7 @@ void opcontrol() {
         int turnPower = master.stickRight.x();
 
         if (arm.getTargetPosition() == Arm::hang) {
-            chassis.arcade(throttle * 0.66, turnPower * 0.5, false, 0.7);
+            chassis.arcade(throttle * 0.5, turnPower * 0.4, false, 0.7);
         } else {
             chassis.arcade(throttle, turnPower * 0.75, false, 0.7);
         }

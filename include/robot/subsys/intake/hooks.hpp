@@ -107,6 +107,7 @@ class Hooks {
 
         // Voltage utils
         int currVoltage = 0, prevVoltage = 0;
+        bool prevIsArmStuck = false;
 
         void setVoltage(int voltage) { currVoltage = voltage; }
 

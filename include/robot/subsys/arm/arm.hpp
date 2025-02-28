@@ -24,7 +24,7 @@ class Arm {
         }
 
         // Antijam
-        [[nodiscard]] bool isJammed() const;
+        [[nodiscard]] bool isJammed();
 
         // don't use, probably buggy (but in degrees if you do)
         void setPosition(double position) { offset = position - getPosition() - offset; }
@@ -62,7 +62,7 @@ class Arm {
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses
-        const std::pair<int, double> jamThresh = {900, 5}; // {current, velocity}
+        const std::pair<int, double> jamThresh = {2000, 5}; // {current, velocity}
 };
 
 using ArmPtr = std::unique_ptr<Arm>;

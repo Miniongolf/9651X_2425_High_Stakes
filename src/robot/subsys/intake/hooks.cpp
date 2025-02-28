@@ -1,4 +1,5 @@
 #include "robot/subsys/intake/hooks.hpp"
+#include "lemlib/chassis/chassis.hpp"
 
 void Hooks::setState(states state, bool forceInstant, bool clearQueue) {
     if (forceInstant) {
@@ -30,7 +31,6 @@ double Hooks::getPosition(int hookNum) const {
     } else {
         // Using rotation sensor
         return sanitizePosition(sensorRotations * 12 + hooks[hookNum] + poseOffset);
-        
     }
 }
 
@@ -132,15 +132,9 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isA
         pros::delay(250);
     }
 
-    // Prioritize moving the arm up if it is stuck
-    if (isArmStuck) {
-        setVoltage(50);
-        m_motor->move(currVoltage);
-        return;
-    }
-
-    lemlib::AngularDirection currentDirection =
-        currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE : AngularDirection::CCW_COUNTERCLOCKWISE;
+    lemlib::AngularDirection currentDirection = prevIsArmStuck     ? lemlib::AngularDirection::AUTO
+                                                : currVoltage >= 0 ? AngularDirection::CW_CLOCKWISE
+                                                                   : AngularDirection::CCW_COUNTERCLOCKWISE;
 
     // int maxVolt = 90;
     int maxVolt = (isArmUp) ? 127 : 100;
@@ -171,8 +165,14 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isA
             isBusy = false;
             break;
         case states::IDLE:
-            if (this->isAtPosition(idlePose)) setVoltage(0);
-            else { moveTowards(idlePose, -1, currentDirection); }
+            // Prioritize moving the arm up if it is stuck
+            if (isArmStuck) {
+                setVoltage(30);
+            } else if (this->isAtPosition(idlePose)) {
+                setVoltage(0);
+            } else {
+                moveTowards(idlePose, -1, currentDirection);
+            }
             isBusy = false;
             break;
         case states::INDEX:
@@ -203,6 +203,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isA
     }
     m_motor->move(currVoltage);
     prevHasPrerollRing = hasPrerollRing;
+    prevIsArmStuck = isArmStuck;
     prevVoltage = currVoltage;
     prevState = (lastState == currState) ? prevState : lastState;
     lastState = currState;
