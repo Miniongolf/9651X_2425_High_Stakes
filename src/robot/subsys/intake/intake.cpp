@@ -5,7 +5,7 @@ void Intake::taskFunct() {
     while (true) {
         pros::delay(10);
         bool force = (m_mode == modes::INDEX) ? false : true;
-        bool isArmDown = m_arm->isAtPosition(Arm::idle);
+        bool isArmDown = m_arm->isAtPosition(Arm::idle, 40);
         bool isArmUp = m_arm->isAtPosition(Arm::wall);
 
         if (isArmUp) { setMode(modes::CONTINUOUS); }
@@ -37,7 +37,7 @@ void Intake::taskFunct() {
 
         m_preroller->update();
         if (m_arm->isJammed()) { std::printf("Arm jammed\n"); }
-        m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmUp, m_arm->isJammed());
+        m_hooks->update(m_preroller->hasRing(), isIndexForced, isArmDown, isArmUp, m_arm->isJammed());
         isIndexForced = false;
         if (counter % 25 == 0) {
             // std::cout << *m_hooks.get();

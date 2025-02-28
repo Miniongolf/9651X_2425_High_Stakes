@@ -14,14 +14,15 @@ void moveTimed(const double throttle, const double steering, const int time) {
 }
 
 void safeGrabMogo(float x, float y, int timeout) {
-    chassis.turnToPoint(x, y, 500, {.forwards=false, .minSpeed=50}, true);
-    chassis.moveToPoint(x, y, timeout, {.forwards=false, .minSpeed=70, .earlyExitRange=17}, true);
-    chassis.moveToPoint(x, y, 1000, {.forwards=false, .maxSpeed=70}, false);
+    chassis.turnToPoint(x, y, 1000, {.forwards = false, .minSpeed = 0}, false);
+    chassis.brake();
+    chassis.moveToPoint(x, y, timeout, {.forwards = false, .minSpeed = 70, .earlyExitRange = 17}, false);
+    chassis.moveToPoint(x, y, 1000, {.forwards = false, .maxSpeed = 70}, false);
     mogoMech.clamp(true);
 }
 
 void scoreAllianceStake() {
-    Intake::modes mode = intake.getMode(); 
+    Intake::modes mode = intake.getMode();
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
     chassis.moveTimed(45, 0, 95, false);
@@ -34,10 +35,15 @@ void scoreAllianceStake() {
 }
 
 void scoreWallStake(bool wait, bool push) {
-    Intake::modes prevMode = intake.getMode(); 
+    Intake::modes prevMode = intake.getMode();
     intake.setMode(Intake::modes::CONTINUOUS);
+    if (wait) {
+        intake.idle();
+        pros::delay(700);
+    }
     if (push) {
-        chassis.moveTimed(70, 0, 500, false);
+        chassis.arcade(60, 0);
+        pros::delay(750);
     }
     intake.reverse(); // Score wallstake
     pros::delay(200);
@@ -47,7 +53,5 @@ void scoreWallStake(bool wait, bool push) {
     intake.idle();
 }
 
-void hangTier3() {
-    std::printf("Hang gone (rip ggs)\n");
-};
+void hangTier3() { std::printf("Hang gone (rip ggs)\n"); };
 } // namespace robot

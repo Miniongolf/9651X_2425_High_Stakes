@@ -23,7 +23,6 @@ void Arm::taskFunct() {
         double voltage = m_pid.update(error) + kF * cos(getPosition(true));
         double maxVolt = 127;
         if (counter % 20 == 0) {
-            std::printf("Arm: %d, %f\n", m_motor->get_current_draw(), std::fabs(m_motor->get_actual_velocity()));
             // std::printf("Arm angle: %f --> %f, | %f\n", getPosition(), targetPose, error);
             // std::printf("isArmUp: %d\n", isAtPosition(wall));
         }

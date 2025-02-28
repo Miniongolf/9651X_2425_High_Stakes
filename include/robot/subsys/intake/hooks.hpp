@@ -48,7 +48,7 @@ class Hooks {
 
         void idle() { setState(states::IDLE); }
 
-        void update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isArmStuck);
+        void update(bool hasPrerollRing, bool forcedIndex, bool isArmDown, bool isArmUp, bool isArmStuck);
 
         // Position utils
         [[nodiscard]] double sanitizePosition(double position) const { return std::fmod(position, chainLength); }

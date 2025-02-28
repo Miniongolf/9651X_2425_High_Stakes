@@ -112,7 +112,7 @@ void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection dir
     setVoltage(voltage);
 };
 
-void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isArmStuck) {
+void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmDown, bool isArmUp, bool isArmStuck) {
     /** Jam detection
      *  NOTE: the jam state is not a real state and will not be tracked by lastState or prevState
      *  However, its effects will be tracked by prevVoltage
@@ -138,6 +138,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isA
 
     // int maxVolt = 90;
     int maxVolt = (isArmUp) ? 127 : 100;
+    int idlePose = (isArmDown) ? 0 : -5;
 
     if (forcedIndex) { setState(states::INDEX, true, true); }
 
@@ -167,11 +168,11 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmUp, bool isA
         case states::IDLE:
             // Prioritize moving the arm up if it is stuck
             if (isArmStuck) {
-                setVoltage(30);
+                setVoltage(60);
             } else if (this->isAtPosition(idlePose)) {
                 setVoltage(0);
             } else {
-                moveTowards(idlePose, -1, currentDirection);
+                moveTowards(idlePose, -1, currentDirection, 7);
             }
             isBusy = false;
             break;
