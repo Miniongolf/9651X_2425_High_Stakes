@@ -68,10 +68,9 @@ class CustomChassis : public lemlib::Chassis {
             setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
             drivetrain.leftMotors->move_velocity(0);
             drivetrain.rightMotors->move_velocity(0);
-            pros::delay(10);
+            pros::delay(20);
             setBrakeMode(stdMode);
             pros::delay(10);
-
             this->endMotion();
         };
 
