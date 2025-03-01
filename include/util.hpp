@@ -1,4 +1,4 @@
-git p#pragma once
+#pragma once
 
 #include <memory>
 #include <atomic> // IWYU pragma: keep
