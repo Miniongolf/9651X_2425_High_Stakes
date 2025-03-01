@@ -75,9 +75,10 @@ class Intake {
         void setAlliance(Alliance alliance) { m_hooks->m_alliance = alliance; }
 
         [[nodiscard]] Alliance getAlliance() const { return m_hooks->m_alliance; }
-    protected:
+        
         PrerollerPtr m_preroller = nullptr;
         HooksPtr m_hooks = nullptr;
+    protected:
         ArmPtr m_arm = nullptr;
 
         modes m_mode = modes::CONTINUOUS;

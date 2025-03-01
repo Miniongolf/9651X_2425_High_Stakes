@@ -137,7 +137,7 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmDown, bool i
                                                                    : AngularDirection::CCW_COUNTERCLOCKWISE;
 
     // int maxVolt = 90;
-    int maxVolt = (isArmUp) ? 127 : 100;
+    int maxVolt = (isArmUp) ? 127 : 127;
     int idlePose = (isArmDown) ? 0 : -5;
 
     if (forcedIndex) { setState(states::INDEX, true, true); }

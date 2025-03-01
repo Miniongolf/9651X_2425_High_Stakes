@@ -92,7 +92,7 @@ class Hooks {
         // Hook positions
         const int chainLength;
         const std::vector<double> hooks;
-        const double idlePose = 0, colourSortPose = 3.5;
+        const double idlePose = 0, colourSortPose = 2;
         void moveTowards(double target, int hookNum, lemlib::AngularDirection direction = lemlib::AngularDirection::AUTO, double settleRange = 3);
 
         // Colour sort

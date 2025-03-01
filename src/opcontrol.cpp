@@ -35,6 +35,8 @@ void opcontrol() {
 
     Button& DOINKER_BUTTON = master.d_left;
 
+    Button& DISABLE_SORT_BUTTON = master.y;
+
     // Subsys init
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     intake.setMode(Intake::modes::CONTINUOUS);
@@ -82,6 +84,9 @@ void opcontrol() {
         } else {
             intake.setMode(Intake::modes::CONTINUOUS);
         }
+
+        // Disable colour sort
+        hooks.colourSortEnabled = !DISABLE_SORT_BUTTON;
 
         // Force index
         if (master.d_down.pressed()) { intake.forceIndex(); }
