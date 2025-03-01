@@ -18,5 +18,6 @@ namespace auton {
     void tunePID(bool hasMogo);
     void ringRush();
     void blueGoalRush();
+    void newBlueGoalRush();
     void goalRush();
 }

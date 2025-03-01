@@ -4,13 +4,6 @@
 #include "robot/helperFuncts.hpp"
 #include "robot/subsys/intake/intake.hpp"
 
-lemlib::Pose doinkerClampPose() {
-    chassis.waitUntilDone();
-    lemlib::Pose relDoink = lemlib::Pose {23, 5}.rotate(chassis.getPose(true, true).theta);
-    std::printf("RelX: %f, RelY: %f\n", relDoink.x, relDoink.y);
-    return {chassis.getPose().x + relDoink.x, chassis.getPose().y + relDoink.y};
-}
-
 namespace auton {
 int split = 0;
 Time startTime = 0_msec;
@@ -93,7 +86,7 @@ void blueGoalRush() {
     chassis.moveTimed(127, 0, 650, false);
     robot::printPose();
     chassis.moveToPoint(55, -70, 1000, {.forwards = false, .minSpeed = 70}, false);
-    lemlib::Pose rushedGoalPose = doinkerClampPose();
+    lemlib::Pose rushedGoalPose = robot::doinkerClampPose();
     nextSplit("Goal rush pull back");
     // Grab rushed goal
     chassis.turnToHeading(chassis.getPose().theta + 35, 1000, {.minSpeed = 90, .earlyExitRange = 5});
@@ -142,7 +135,6 @@ void blueGoalRush() {
     // chassis.moveToPoint(24, -24, 500);
     // chassis.moveTimed(50, 0, 500);
     nextSplit("Touch bar");
-
 }
 
 void goalRush() {

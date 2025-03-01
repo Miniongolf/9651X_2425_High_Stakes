@@ -56,4 +56,11 @@ void scoreWallStake(bool wait, bool push) {
 }
 
 void hangTier3() { std::printf("Hang gone (rip ggs)\n"); };
+
+lemlib::Pose doinkerClampPose() {
+    chassis.waitUntilDone();
+    lemlib::Pose relDoink = lemlib::Pose {23, 5}.rotate(chassis.getPose(true, true).theta);
+    std::printf("RelX: %f, RelY: %f\n", relDoink.x, relDoink.y);
+    return {chassis.getPose().x + relDoink.x, chassis.getPose().y + relDoink.y};
+}
 } // namespace robot

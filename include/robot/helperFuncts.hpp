@@ -21,4 +21,6 @@ namespace robot {
     void scoreWallStake(bool wait = false, bool push = false);
 
     void hangTier3();
+
+    lemlib::Pose doinkerClampPose();
 }

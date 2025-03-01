@@ -45,17 +45,21 @@ void auton::safeAWP(bool positive) {
     chassis.setPose(-55 * s, -13 * p, 0 + 90 * (p - 1));
     // Alliance stake
     chassis.moveToPoint(-55 * s, 9.5 * p, 750, {.maxSpeed = 80});
-    chassis.swingToHeading(90 * s, lemlib::DriveSide::LEFT * s * p, 800);
+    chassis.swingToHeading(90 * s, lemlib::DriveSide::LEFT * s * p, 800, {.minSpeed = 0});
     chassis.moveTimed(-70, 0, 500);
     robot::scoreAllianceStake();
 
     // Grab mogo
     chassis.moveTimed(50, 20 * s, 300);
-    robot::safeGrabMogo(-24 * s, -24 * p, 1250);
+    chassis.turnToPoint(-24*s, -24*p, 750, {.forwards = false});
+    chassis.moveToPoint(-24*s, -24*p, 1000, {.forwards = false, .minSpeed = 50, .earlyExitRange = 24}, false);
+    chassis.brake();
+    chassis.moveToPoint(-24*s, -24*p, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    mogoMech.clamp();
 
     // Grab ring
     intake.forwards();
-    chassis.safeMoveToPoint(-27 * s, -45 * p, 1000);
+    chassis.safeMoveToPoint(-27 * s, -42 * p, 1000);
     chassis.moveTimed(-50, 0, 100);
 
     // Corner
@@ -80,17 +84,19 @@ void auton::safeAWP(bool positive) {
         }
     } else { // Blue alliance
         if (positive) {
-            chassis.safeMoveToPoint(-60 * s, -30, 1000, {.forwards = false});
-            chassis.turnToPoint(-70 * s, -70, 1000, {}, false);
+            chassis.safeMoveToPoint(60, -30, 1000, {.forwards = false});
+            chassis.turnToPoint(70, -70, 1000, {}, false);
             chassis.moveTimed(50, 0, 500, false);
             chassis.brake();
             doinker.extend();
-            chassis.moveTimed(30, 0, 500);
+            chassis.moveTimed(30, 0, 500, false);
+            chassis.turnToHeading(-90, 750, {.minSpeed = 127}, false);
+            doinker.retract();
         } else {
-            chassis.moveTimed(-50, -30, 750);
-            chassis.safeMoveToPoint(20, 38, 1000, {.maxSpeed = 60}, false);
+            chassis.moveTimed(-50, -50, 700);
+            chassis.safeMoveToPoint(20, 37, 1500, {.maxSpeed = 60}, false);
             chassis.moveTimed(-60, -30, 500, false);
-            chassis.safeMoveToPoint(20, 45, 1000, {.maxSpeed = 60}, false);
+            chassis.safeMoveToPoint(20, 42, 1500, {.maxSpeed = 60}, false);
             pros::delay(300);
             chassis.moveToPoint(36, 36, 1000, {.forwards = false}, false);
         }
