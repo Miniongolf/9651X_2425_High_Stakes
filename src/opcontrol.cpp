@@ -96,7 +96,7 @@ void opcontrol() {
         }
 
         /** Arm */
-        if (master.l2.released() && master.l2.getLastHoldTime() < 150_msec) {
+        if (master.l2.released() && master.l2.getLastHoldTime() < 220_msec) {
             double lastTarget = arm.getTargetPosition();
             double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::wall : Arm::idle;
             arm.moveToPosition(target);
