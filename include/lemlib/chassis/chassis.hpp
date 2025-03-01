@@ -233,6 +233,14 @@ enum class DriveSide {
     RIGHT /** lock the right side of the drivetrain */
 };
 
+inline DriveSide operator* (DriveSide lhs, int rhs) {
+    if (lhs == DriveSide::LEFT) {
+        return (rhs > 0 ? DriveSide::LEFT : DriveSide::RIGHT);
+    } else {
+        return (rhs > 0 ? DriveSide::RIGHT : DriveSide::LEFT);
+    }
+}
+
 /**
  * @brief Parameters for Chassis::swingToPoint
  *
