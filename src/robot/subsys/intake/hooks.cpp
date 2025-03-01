@@ -200,6 +200,11 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmDown, bool i
             } else {
                 setVoltage(0);
             }
+
+            if (forcedIndex) {
+                m_motor->move(80);
+                pros::delay(200);
+            }
             break;
     }
     m_motor->move(currVoltage);

@@ -2,7 +2,7 @@
 
 double Arm::idle = -50;
 double Arm::wall = 58;
-double Arm::hang = -15;
+double Arm::hang = -13;
 
 bool Arm::isJammed() {
     if (m_motor->get_position() == 2147483647) return false;

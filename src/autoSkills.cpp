@@ -5,7 +5,6 @@
 #include "robot/helperFuncts.hpp"
 #include "robot/subsys/arm/arm.hpp"
 #include "robot/subsys/intake/intake.hpp"
-#include "units/units.hpp"
 #include <string>
 
 bool headingCloseTo(double target) { return std::fabs(lemlib::angleError(target, chassis.getPose().theta)) <= 5; };
@@ -13,15 +12,6 @@ bool headingCloseTo(double target) { return std::fabs(lemlib::angleError(target,
 bool robotCloseTo(lemlib::Pose target) {
     return target.distance(chassis.getPose()) <= 5 &&
            std::fabs(lemlib::angleError(target.theta, chassis.getPose().theta, false)) <= 5;
-}
-
-int split = 0;
-Time startTime = 0_msec;
-
-void nextSplit(std::string name) {
-    split++;
-    Time elapsedTime = from_msec(pros::millis()) - startTime;
-    std::cout << "Split " << split << ": " << name << " @ " << elapsedTime << "\n";
 }
 
 void auton::skills() {
