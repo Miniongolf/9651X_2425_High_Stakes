@@ -29,8 +29,8 @@ void autonomous() {
     // chassis.chainTurnToHeading(45, true, false, 2000);
     // auton::tunePID(true);
     // auton::ringRush();
-    auton::skills();
-    // auton::goalRush();
+    // auton::skills();
+    auton::goalRush();
     // chassis.pathInterp({
     //     {48, 48},
     //     {0, 0},

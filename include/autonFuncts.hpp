@@ -6,9 +6,6 @@ namespace auton {
     void skills();
     void tunePID(bool hasMogo);
     void ringRush();
-    void safeShort();
-    void soloAWP();
-    void twoMogoSolo();
-    void elims();
+    void blueGoalRush();
     void goalRush();
 }
