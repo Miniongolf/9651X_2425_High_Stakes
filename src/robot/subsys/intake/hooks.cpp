@@ -202,8 +202,9 @@ void Hooks::update(bool hasPrerollRing, bool forcedIndex, bool isArmDown, bool i
             }
 
             if (forcedIndex) {
-                m_motor->move(80);
+                m_motor->move(60);
                 pros::delay(200);
+                m_motor->move(0);
             }
             break;
     }

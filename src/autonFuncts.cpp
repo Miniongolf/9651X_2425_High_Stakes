@@ -83,21 +83,21 @@ void autoTestStuffs() {
 }
 
 void blueGoalRush() {
-    chassis.setPose(55, -70, -65.5);
+    chassis.setPose(55, -63, -65.5);
     resetSplit();
 
     doinker.extend();
     intake.setMode(Intake::modes::HOLD);
     intake.forwards();
+    // Goal rush
     chassis.moveTimed(127, 0, 650, false);
     robot::printPose();
     chassis.moveToPoint(55, -70, 1000, {.forwards = false, .minSpeed = 70}, false);
     lemlib::Pose rushedGoalPose = doinkerClampPose();
-    std::cout << lemlib::format_as(chassis.getPose(false, true)) << " ==> " << lemlib::format_as(rushedGoalPose)
-              << '\n';
     nextSplit("Goal rush pull back");
-    chassis.turnToHeading(chassis.getPose().theta + 30, 1000, {.minSpeed = 70});
-    chassis.moveTimed(60, 0, 300, false);
+    // Grab rushed goal
+    chassis.turnToHeading(chassis.getPose().theta + 35, 1000, {.minSpeed = 90, .earlyExitRange = 5});
+    chassis.moveTimed(90, 0, 180, false);
     doinker.retract();
     chassis.moveTimed(-60, 0, 200, false);
     chassis.safeMoveToPoint(rushedGoalPose.x, rushedGoalPose.y, 1000, 1000,
@@ -107,33 +107,42 @@ void blueGoalRush() {
     nextSplit("Grab rushed goal");
     intake.setMode(Intake::modes::CONTINUOUS);
     chassis.turnToPoint(70, -80, 750, {}, false);
-    pros::delay(400);
+    pros::delay(600);
     intake.setMode(Intake::modes::INDEX);
+    intake.forwards();
     // Grab corner ring
-    chassis.moveTimed(80, 0, 1250);
+    chassis.moveTimed(80, 0, 1000);
     pros::delay(300);
     mogoMech.release(false);
     chassis.moveTimed(127, 0, 1000, false);
     nextSplit("Corner ring");
-    chassis.turnToPoint(57, 0, 1000, {}, false);
-    pros::delay(300);
-    chassis.moveToPoint(57, 0, 1500, {.minSpeed = 20, .earlyExitRange = 24}, false);
-    chassis.brake();
-    arm.moveToPosition(Arm::wall);
-    chassis.moveToPoint(57, 0, 500, {.maxSpeed = 30}, false);
-    robot::printPose();
-    chassis.brake();
-    intake.setMode(Intake::modes::CONTINUOUS);
-    intake.forwards();
-    pros::delay(50);
-    intake.idle();
-    chassis.turnToHeading(90, 1200, {.direction = lemlib::AngularDirection::CCW_COUNTERCLOCKWISE}, false);
-    chassis.moveTimed(50, 0, 300);
+    chassis.swingToPoint(60, 0, lemlib::DriveSide::RIGHT, 1000, {}, false);
+    intake.setMode(Intake::modes::HOLD);
     intake.reverse();
-    pros::delay(750);
-    arm.moveToPosition(Arm::idle);
-    intake.idle();
-    chassis.moveTimed(-50, 0, 300);
+    chassis.moveToPoint(60, 5, 2000, {.earlyExitRange = 16}, false);
+    chassis.moveToPoint(60, 5, 1000, {.maxSpeed = 60, .minSpeed = 0}, false);
+    chassis.brake();
+    chassis.swingToHeading(-90, lemlib::DriveSide::RIGHT, 1000);
+    chassis.moveTimed(-60, 0, 300);
+    chassis.setPose(63, 0, chassis.getPose().theta);
+    robot::scoreAllianceStake();
+    nextSplit("Alliance stake");
+    chassis.turnToHeading(-90, 1000);
+    chassis.moveTimed(50, 0, 500);
+
+    // chassis.swingToHeading(-135, lemlib::DriveSide::LEFT, 1000, {}, false);
+    // chassis.moveToPose(24, -12, -90, 1000);
+    // chassis.safeMoveToPoint(12, -12, 1000, {}, false);
+    // chassis.turnToHeading(-60, 1000, {}, false);
+    // doinker.extend();
+    // chassis.moveTimed(-70, 0, 750);
+    // mogoMech.clamp(true);
+    // intake.setMode(Intake::modes::CONTINUOUS);
+    // intake.forwards();
+    // chassis.moveToPoint(24, -24, 500);
+    // chassis.moveTimed(50, 0, 500);
+    nextSplit("Touch bar");
+
 }
 
 void goalRush() {
