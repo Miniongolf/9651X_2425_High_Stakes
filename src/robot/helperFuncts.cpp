@@ -16,9 +16,9 @@ void moveTimed(const double throttle, const double steering, const int time) {
 void safeGrabMogo(float x, float y, int timeout) {
     chassis.turnToPoint(x, y, 1000, {.forwards = false, .minSpeed = 0}, false);
     chassis.brake();
-    chassis.moveToPoint(x, y, timeout, {.forwards = false, .minSpeed = 70, .earlyExitRange = 24}, false);
+    chassis.moveToPoint(x, y, timeout, {.forwards = false, .earlyExitRange = 24}, false);
     chassis.brake();
-    chassis.moveToPoint(x, y, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    chassis.moveToPoint(x, y, 1000, {.forwards = false, .maxSpeed = 40, .minSpeed = 0}, false);
     mogoMech.clamp(true);
     chassis.brake();
 }

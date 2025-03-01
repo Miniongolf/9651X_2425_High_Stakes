@@ -111,7 +111,7 @@ class Hooks {
 
         void setVoltage(int voltage) { currVoltage = voltage; }
 
-        lemlib::PID pid = {10, 0, 0};
+        lemlib::PID pid = {7, 0, 0};
 
         // Jam detection
         std::vector<bool> jamDetects = std::vector<bool>(5, false); // This construction returns all falses

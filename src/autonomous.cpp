@@ -22,17 +22,13 @@ void autonomous() {
     intake.idle(true);
 
     // Put the auton to run here
-    // auton::elims();
-    // auton::safeShort();
-    // auton::twoMogoSolo();
-    // auton::soloAWP();
     // chassis.chainTurnToHeading(45, true, false, 2000);
     // auton::tunePID(true);
     // auton::ringRush();
     // auton::skills();
     // auton::blueGoalRush();
-    // auton::twoRing(true);
     auton::twoRing(true);
+    // auton::safeAWP(false);
     // chassis.pathInterp({
     //     {48, 48},
     //     {0, 0},

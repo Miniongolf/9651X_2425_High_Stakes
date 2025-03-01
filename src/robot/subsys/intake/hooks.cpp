@@ -108,7 +108,10 @@ void Hooks::moveTowards(double target, int hookNum, lemlib::AngularDirection dir
     if (isAtPosition(target, hookNum, settleRange)) { direction = AngularDirection::AUTO; }
     // Move the hook to the target position
     const double error = dist(target, getPosition(hookNum), direction);
-    const double voltage = pid.update(error);
+    double voltage = pid.kP * error;
+    if (std::fabs(error) < 7 && std::fabs(error) > 2) {
+        voltage += lemlib::sgn(voltage) * 20;
+    }
     setVoltage(voltage);
 };
 

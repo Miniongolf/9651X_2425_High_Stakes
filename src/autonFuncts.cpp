@@ -23,7 +23,7 @@ void resetSplit() {
 void nextSplit(std::string name) {
     split++;
     Time elapsedTime = from_msec(pros::millis()) - startTime;
-    std::cout << "Split " << split << ": " << name << " @ " << elapsedTime << "\n";
+    std::cout << "Split " << split << ": " << name << " @ " << elapsedTime << ", " << format_as(chassis.getPose()) << "\n";
 }
 
 void tunePID(bool hasMogo) {

@@ -19,7 +19,6 @@ void auton::skills() {
     // Set colour sort to red alliance
     intake.setAlliance(Alliance::RED);
 
-    /**
     // Start pose (in front of alliance stake)
     chassis.setPose(-64, 0, 90);
     intake.forwards();
@@ -43,9 +42,12 @@ void auton::skills() {
     chassis.moveToPoint(40, 55, 750, {.maxSpeed = 90, .minSpeed = 70}, false); // Ring 3
     chassis.moveToPoint(24, 48, 1000, {.forwards = false}, false); // Ring 4
     chassis.safeMoveToPoint(-24, 48, 800, 2000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE, .minSpeed = 0},
-    {.minSpeed = 110, .earlyExitRange = 24}, false); // Ring 5 chassis.moveToPoint(-43, 48, 2000, {.maxSpeed = 40},
-    false); chassis.moveToPoint(-48, 42, 2000, {.maxSpeed = 40}, false); // Ring 6 chassis.swingToPoint(-48, 60,
-    lemlib::DriveSide::RIGHT, 1000, {}, false); chassis.safeMoveToPoint(-48, 60, 1000, {}, false);
+                            {.minSpeed = 110, .earlyExitRange = 24},
+                            false); // Ring 5
+    chassis.moveToPoint(-43, 48, 2000, {.maxSpeed = 40}, false);
+    chassis.moveToPoint(-48, 42, 2000, {.maxSpeed = 40}, false); // Ring 6
+    chassis.swingToPoint(-48, 60, lemlib::DriveSide::RIGHT, 1000, {}, false);
+    chassis.safeMoveToPoint(-48, 60, 1000, {}, false);
     intake.setMode(Intake::modes::INDEX);
 
     // Drop first goal in corner
@@ -57,34 +59,37 @@ void auton::skills() {
     chassis.safeMoveToPoint(-15, 48, 500, 1000);
     chassis.swingToPoint(0, 150, lemlib::DriveSide::LEFT, 1000, {.maxSpeed = 70}, false);
     chassis.moveTimed(50, 0, 500, false);
+    pros::delay(100);
     chassis.moveTimed(-50, 0, 200);
     chassis.brake();
-    pros::delay(50);
+    pros::delay(500);
     arm.moveToPosition(Arm::wall);
-    pros::delay(600);
     intake.idle();
+    pros::delay(600);
     robot::scoreWallStake(true, true);
     robot::printPose();
-    */
-    // chassis.setPose(0, 54, chassis.getPose().theta); // Odom reset on top wallstake
-    chassis.setPose(0, 58, 0); // Odom reset on top wallstake, change to preserve imu after
+
+    chassis.setPose(0, 58, chassis.getPose().theta); // Odom reset on top wallstake, preserve imu heading
     pros::delay(10);
     nextSplit("Top wallstake");
 
     // Top right mogo
     intake.setMode(Intake::modes::HOLD);
     intake.reverse();
-    arm.moveToPosition(30);
+    arm.moveToPosition(60);
     chassis.moveTimed(-60, 0, 500, false);
     arm.moveToPosition(Arm::idle);
     chassis.brake();
     intake.forwards();
     // Grab ring for alliance stake
     intake.setMode(Intake::modes::INDEX);
-    chassis.safeMoveToPoint(46, 46, 1000, {}, false);
+    chassis.turnToPoint(46, 46, 1000, {.direction = lemlib::AngularDirection::CCW_COUNTERCLOCKWISE});
+    chassis.moveToPoint(46, 46, 1000, {}, false);
     pros::delay(300);
     // Go to push goal
-    chassis.safeMoveToPoint(45, 24, 600, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE}, {}, false);
+    chassis.safeMoveToPoint(46, 35, 600, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE}, {}, false);
+    chassis.brake();
+    pros::delay(50);
     // Push goal into corner
     chassis.swingToPoint(90, 70, lemlib::DriveSide::LEFT, 750, {}, false);
     intake.setMode(Intake::modes::HOLD);
@@ -97,36 +102,25 @@ void auton::skills() {
     intake.idle();
     nextSplit("Corner Mogo");
 
-    // Grab 3rd goal + alliance stake
-    robot::safeGrabMogo(56, -10, 2500);
+    // Grab 3rd goal
+    robot::safeGrabMogo(51, -5, 2500);
     robot::printPose();
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
-    arm.moveToPosition(Arm::wall);
-    chassis.swingToHeading(90, lemlib::DriveSide::RIGHT, 750, {.minSpeed = 0}, false);
-    robot::scoreWallStake(true, true);
-    if (robotCloseTo({58, 0, 0})) {
-        chassis.setPose(58, 0, chassis.getPose().theta); // Odom reset on blue alliance stake
-    }
-    nextSplit("Alliance stake");
+    nextSplit("Third Goal");
 
     // Cross field diagonally
-    chassis.moveTimed(-50, 30, 500, false);
-    intake.setMode(Intake::modes::INDEX);
-    chassis.swingToHeading(180, lemlib::DriveSide::LEFT, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE},
-                           false);
-    arm.moveToPosition(Arm::idle);
-    chassis.safeMoveToPoint(36, 25, 1000, {}, false);
-    intake.forwards(); // Start crossing
-    chassis.swingToPoint(0, 0, lemlib::DriveSide::LEFT, 750, {.minSpeed = 0}, false);
-    robot::printPose();
+    chassis.turnToPoint(36, 36, 600, {.minSpeed = 0});
+    chassis.moveToPoint(36, 36, 1000, {.maxSpeed = 80, .minSpeed = 0}, false);
+    chassis.brake();
+    chassis.turnToPoint(0, 0, 1000, {}, false);
     pros::delay(500);
     intake.setMode(Intake::modes::INDEX);
     chassis.moveToPoint(0, 0, 1000, {.minSpeed = 70}, false);
     chassis.moveToPoint(-24, -24, 1000, {.minSpeed = 70}, false);
     intake.setMode(Intake::modes::CONTINUOUS);
     chassis.moveToPoint(-40, -39, 1000);
-    chassis.swingToHeading(180, lemlib::DriveSide::LEFT, 600, {}, false);
+    chassis.swingToHeading(180, lemlib::DriveSide::LEFT, 800, {}, false);
     chassis.moveTimed(50, 0, 750, false);
     chassis.turnToHeading(-45, 750, {.minSpeed = 50, .earlyExitRange = 5}, false);
     chassis.swingToHeading(0, lemlib::DriveSide::RIGHT, 400, {}, false);
