@@ -30,7 +30,7 @@ void autonomous() {
     // auton::tunePID(true);
     // auton::ringRush();
     // auton::skills();
-    auton::goalRush();
+    auton::blueGoalRush();
     // chassis.pathInterp({
     //     {48, 48},
     //     {0, 0},
