@@ -49,7 +49,7 @@ void auton::skills() {
     chassis.swingToPoint(-48, 60, lemlib::DriveSide::RIGHT, 1000, {}, false);
     chassis.safeMoveToPoint(-48, 60, 1000, {}, false);
     intake.setMode(Intake::modes::INDEX);
-
+    
     // Drop first goal in corner
     chassis.turnToPoint(-70, 70, 600, {.forwards = false});
     chassis.moveTimed(-50, 0, 600, false);
@@ -69,7 +69,7 @@ void auton::skills() {
     robot::scoreWallStake(true, true);
     robot::printPose();
 
-    chassis.setPose(0, 58, chassis.getPose().theta); // Odom reset on top wallstake, preserve imu heading
+    // chassis.setPose(0, 61, 0); // Odom reset on top wallstake, don't preserve imu heading
     pros::delay(10);
     nextSplit("Top wallstake");
 
@@ -80,18 +80,18 @@ void auton::skills() {
     chassis.moveTimed(-60, 0, 500, false);
     arm.moveToPosition(Arm::idle);
     chassis.brake();
-    intake.forwards();
     // Grab ring for alliance stake
     intake.setMode(Intake::modes::INDEX);
+    intake.forwards();
     chassis.turnToPoint(46, 46, 1000, {.direction = lemlib::AngularDirection::CCW_COUNTERCLOCKWISE});
     chassis.moveToPoint(46, 46, 1000, {}, false);
     pros::delay(300);
     // Go to push goal
-    chassis.safeMoveToPoint(46, 35, 600, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE}, {}, false);
+    chassis.safeMoveToPoint(46, 29, 600, 1000, {.direction = lemlib::AngularDirection::CW_CLOCKWISE}, {}, false);
     chassis.brake();
     pros::delay(50);
     // Push goal into corner
-    chassis.swingToPoint(90, 70, lemlib::DriveSide::LEFT, 750, {}, false);
+    chassis.swingToPoint(90, 70, lemlib::DriveSide::LEFT, 1000, {}, false);
     intake.setMode(Intake::modes::HOLD);
     intake.reverse();
     chassis.moveTimed(100, 0, 800, false);
@@ -103,7 +103,7 @@ void auton::skills() {
     nextSplit("Corner Mogo");
 
     // Grab 3rd goal
-    robot::safeGrabMogo(51, -5, 2500);
+    robot::safeGrabMogo(51, -8, 2500);
     robot::printPose();
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.idle();
@@ -116,8 +116,8 @@ void auton::skills() {
     chassis.turnToPoint(0, 0, 1000, {}, false);
     pros::delay(500);
     intake.setMode(Intake::modes::INDEX);
-    chassis.moveToPoint(0, 0, 1000, {.minSpeed = 70}, false);
-    chassis.moveToPoint(-24, -24, 1000, {.minSpeed = 70}, false);
+    chassis.moveToPoint(0, 0, 1000, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(-24, -24, 1000, {.maxSpeed = 70}, false);
     intake.setMode(Intake::modes::CONTINUOUS);
     chassis.moveToPoint(-40, -39, 1000);
     chassis.swingToHeading(180, lemlib::DriveSide::LEFT, 800, {}, false);

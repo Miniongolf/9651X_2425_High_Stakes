@@ -44,8 +44,8 @@ void scoreWallStake(bool wait, bool push) {
         pros::delay(700);
     }
     if (push) {
-        chassis.arcade(60, 0);
-        pros::delay(750);
+        chassis.arcade(40, 0);
+        pros::delay(900);
     }
     intake.reverse(); // Score wallstake
     pros::delay(200);
