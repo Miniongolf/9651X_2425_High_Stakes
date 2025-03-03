@@ -40,8 +40,8 @@
 * You should add more #includes here
 */
 #include "lemlib/api.hpp"
-#include "globals.hpp"
-#include "helperFuncts.hpp"
+#include "robot/globals.hpp"
+#include "robot/helperFuncts.hpp"
 
 /**
 * If you find doing pros::Motor() to be tedious and you'd prefer just to do

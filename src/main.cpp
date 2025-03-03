@@ -1,6 +1,5 @@
 #include "main.h"
-#include "autonFuncts.hpp"
-#include "helperFuncts.hpp"
+#include "liblvgl/llemu.hpp"
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -9,24 +8,42 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    pros::Controller master(pros::E_CONTROLLER_MASTER);
+    std::printf("--INITIALIZING--\n");
+
+    pros::lcd::initialize();
+
+    // thread to for brain screen and position logging
+    pros::Task screenTask([&]() {
+        while (true) {
+            // print robot location to the brain screen
+            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // log position telemetry
+            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            // delay to save resources
+            pros::delay(100);
+        }
+    });
 
     // Calibrate chassis    
 	chassis.calibrate();
     chassis.setPose(0, 0, 0);
 
-    // Set pneumatics positions
-    arm.retract();
-    mogoMech.retract();
-    doinker.retract();
+    // Intake init
+    intake.initialize(robotAlliance);
 
-    master.clear();
+    // Mogo mech init
+    mogoMech.initialize();
 
-    std::printf("Initialized\n");
+    // Arm init
+    arm.initialize();
+
+    std::printf("--INIT COMPLETE--\n");
     std::printf("Left motor temps: %f, %f, %f\n", leftDrive.get_temperature(0), leftDrive.get_temperature(1), leftDrive.get_temperature(2));
     std::printf("Right motor temps: %f, %f, %f\n", rightDrive.get_temperature(0), rightDrive.get_temperature(1), rightDrive.get_temperature(2));
-    std::printf("Intake temps: %f %f\n", intake.m_motor->get_temperature(), intake.m_motor2->get_temperature());
-    std::printf("Arm temp: %f\n", arm.m_motor->get_temperature());
+    std::printf("Intake temps: %f -> %f\n", preroller.get_temperature(), hooks.get_temperature());
+    std::printf("Arm temp: %f\n", arm.get_temperature());
 }
 
 /**
@@ -34,9 +51,7 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {
-    robot::suspendTasks();
-}
+void disabled() {}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field

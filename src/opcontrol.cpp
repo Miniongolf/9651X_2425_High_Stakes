@@ -1,10 +1,9 @@
-#include "globals.hpp"
-#include "helperFuncts.hpp"
-#include "lemlib/timer.hpp"
+#include "lemlib/util.hpp"
 #include "main.h"
-#include "pros/abstract_motor.hpp"
-#include "pros/misc.h"
-#include "subsys/arm.hpp"
+#include "pros/motors.h"
+#include "robot/globals.hpp"
+#include "robot/helperFuncts.hpp"
+#include "robot/subsys/arm/arm.hpp"
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -21,93 +20,133 @@
  */
 void opcontrol() {
     int counter = 0;
-    pros::Controller master(pros::E_CONTROLLER_MASTER);
-    pros::Controller partner(pros::E_CONTROLLER_PARTNER);
+
+    // Gamepad init
+    Gamepad master(pros::E_CONTROLLER_MASTER);
+    Gamepad partner(pros::E_CONTROLLER_PARTNER);
+
+    Button& INTAKE_BUTTON = master.r2;
+    Button& OUTTAKE_BUTTON = master.r1;
+
+    Button& MOGO_BUTTON = master.l1;
+
+    Button& ARM_UP_BUTTON = master.x;
+    Button& ARM_DOWN_BUTTON = master.a;
+
+    Button& DOINKER_BUTTON = master.d_left;
+
+    Button& DISABLE_SORT_BUTTON = master.y;
+
+    // Subsys init
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+    intake.setMode(Intake::modes::CONTINUOUS);
+    intake.idle(true);
+    mogoMech.cancelAutoClamp();
+    doinker.retract();
 
     printf("-- OPCONTROL STARTING --\n");
-    lemlib::Timer wallIntakeTimer = 0;
     lemlib::Timer matchTimer = 105000;
 
+    bool mogoClampedOnPress;
+
     while (true) {
-        // 20s buzz
-        if (std::fabs(matchTimer.getTimeLeft() - 20000) < 10) {
-            master.rumble("-.");
-        } else if (std::fabs(matchTimer.getTimeLeft() - 17000) < 10) {
-            master.rumble(".");
-        } else if (std::fabs(matchTimer.getTimeLeft() - 16000) < 10) {
-            master.rumble("...");
+        if (leftDrive.get_temperature(0) > 45 || leftDrive.get_temperature(1) > 45 || leftDrive.get_temperature(2) > 45 ||
+            rightDrive.get_temperature(0) > 45 || rightDrive.get_temperature(1) > 45 || rightDrive.get_temperature(2) > 45) {
+            master.controller.print(0, 0, "DRIVETRAIN OVERHEAT");
         }
 
-        // Mogo Mech
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) mogoMech.toggle();
+        // Update gamepad buttons and sticks
+        master.update();
+        partner.update();
 
-        // Doinker
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) doinker.toggle();
+        if (master.d_up.pressed()) { robot::scoreAllianceStake(); }
 
-        // Intake + hooks conveyor sys
-        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2) || !wallIntakeTimer.isDone() || partner.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.forwards();
-        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.reverse();
-        else intake.stop();
+        /** Timed haptics (45s, 32s, 31s buzz) */
+        if (std::fabs(matchTimer.getTimeLeft() - 45000) < 10) {
+            master.controller.rumble("-.");
+        } else if (std::fabs(matchTimer.getTimeLeft() - 32000) < 10) {
+            master.controller.rumble(".");
+        } else if (std::fabs(matchTimer.getTimeLeft() - 31000) < 10) {
+            master.controller.rumble("...");
+        }
 
-        // Arm
+        /** Intake */
+        if (OUTTAKE_BUTTON) {
+            intake.reverse(true, true);
+        } else if (INTAKE_BUTTON || (master.l2 && arm.isAtPosition(Arm::idle))) {
+            intake.forwards(true, true);
+        } else {
+            intake.idle(true);
+        }
 
-        /* Driver 2:
-        L2 load
-        L1 standby
-        R1 lady brown extend
-        dpad up, dpad down manual
-        R2 alliance stake
-        Y mogo tip
-        A piston extend
-        */
-        
-        // Arm slides
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-            if (arm.m_piston->is_extended()) {
-                arm.retract();
-                if (arm.targetAngle == armPositions::load) arm.moveToAngle(armPositions::standby);
+        if (master.l2 && arm.isAtPosition(Arm::idle)) {
+            intake.setMode(INTAKE_BUTTON ? Intake::modes::HOLD : Intake::modes::INDEX);
+        } else {
+            intake.setMode(Intake::modes::CONTINUOUS);
+        }
+
+        // Disable colour sort
+        hooks.colourSortEnabled = !DISABLE_SORT_BUTTON;
+
+        // Force index
+        if (master.d_down.pressed()) { intake.forceIndex(); }
+
+        // Hooks position trim
+        if (partner.d_up) {
+            intake.trimHooks(1);
+        } else if (partner.d_down) {
+            intake.trimHooks(-1);
+        } else if (partner.d_left.heldFor(250_msec)) {
+            intake.resetHooksOffset();
+        }
+
+        /** Arm */
+        if (master.l2.released() && master.l2.getLastHoldTime() < 220_msec) {
+            double lastTarget = arm.getTargetPosition();
+            double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::wall : Arm::idle;
+            arm.moveToPosition(target);
+        } else if (master.x.pressed()) {
+            double lastTarget = arm.getTargetPosition();
+            double target = arm.getTargetPosition() == lemlib::sanitizeAngle(Arm::idle, false) ? Arm::hang : Arm::idle;
+            arm.moveToPosition(target);
+        }
+
+        /** Mogo mech */
+        if (MOGO_BUTTON.pressed()) {
+            mogoClampedOnPress = mogoMech.isClamped();
+            if (mogoMech.isClamped()) {
+                mogoMech.release();
             } else {
-                arm.extend();
-                if (arm.targetAngle == armPositions::standby) arm.moveToAngle(armPositions::load);
+                mogoMech.requestAutoClamp();
             }
+        } else if (MOGO_BUTTON.heldFor(0.25_sec)) {
+            mogoMech.requestAutoClamp(false);
+        } else if (MOGO_BUTTON.released()) {
+            mogoMech.cancelAutoClamp();
+            std::cout << "MOGO BUTTON RELEASED " << mogoClampedOnPress << '\n';
+            if (!MOGO_BUTTON.lastHeldFor(0.25_sec) && !mogoClampedOnPress) { mogoMech.clamp(); }
         }
 
-        // Controller 1 load + standby
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2)) {
-            if (arm.m_piston->is_extended() || arm.targetAngle == armPositions::standby) {
-                arm.moveToAngle(armPositions::load);
-            } else { arm.moveToAngle(armPositions::standby); }
+        /** Doinker */
+        if (DOINKER_BUTTON.pressed()) { doinker.toggle(); }
+
+        if (counter % 20 == 0) {
+            // std::printf("mogo dist: %f, %d\n", to_mm(mogoMech.getDistance()), mogoMech.isClamped());
         }
-
-        // Manual arm
-        if (partner.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) arm.changeAngle(-10);
-        else if (partner.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) arm.changeAngle(10);
-
-        // Wall + alliance
-        if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1) || master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-            arm.moveToAngle(armPositions::wallStake);
-            wallIntakeTimer.set(300);
-            // wallIntakeTimer.resume();
-        } else if (partner.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
-            arm.moveToAngle(armPositions::allianceStake);
-        }
-
-        // Driver 1 arm down
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-            arm.moveToAngle(330);
-        }
-
-        // if (counter % 20 == 0) robot::printPose();
-        // master.print(0, 0, "ARM ANGLE: %d", arm.getAngle());
-        
 
         // Chassis
-        int leftPower = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-        int rightPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
-        int turnPower = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+        int throttle = master.stickLeft.y();
+        int rightPower = master.stickRight.y();
+        int turnPower = master.stickRight.x();
 
-        chassis.arcade(leftPower, turnPower*0.85, false, 0.8);
-        // chassis.tank(leftPower, rightPower);
+        if (arm.getTargetPosition() == Arm::hang) {
+            chassis.arcade(throttle * 0.5, turnPower * 0.4, false, 0.7);
+        } else {
+            chassis.arcade(throttle, turnPower * 0.75, false, 0.7);
+        }
+        // chassis.tank(throttle, rightPower);
+
+        // Telemetry
         counter++;
         pros::delay(10);
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pros/abstract_motor.hpp"
 #include "pros/rtos.hpp"
 #include "pros/imu.hpp"
 #include "lemlib/asset.hpp"
@@ -232,6 +233,14 @@ enum class DriveSide {
     RIGHT /** lock the right side of the drivetrain */
 };
 
+inline DriveSide operator* (DriveSide lhs, int rhs) {
+    if (lhs == DriveSide::LEFT) {
+        return (rhs > 0 ? DriveSide::LEFT : DriveSide::RIGHT);
+    } else {
+        return (rhs > 0 ? DriveSide::RIGHT : DriveSide::LEFT);
+    }
+}
+
 /**
  * @brief Parameters for Chassis::swingToPoint
  *
@@ -296,7 +305,7 @@ struct MoveToPoseParams {
         float maxSpeed = 127;
         /** the minimum speed the robot can travel at. If set to a non-zero value, the exit conditions will switch to
          * less accurate but smoother ones. Value between 0-127. 0 by default */
-        float minSpeed = 0;
+        float minSpeed = 20;
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;
@@ -317,7 +326,7 @@ struct MoveToPointParams {
         float maxSpeed = 127;
         /** the minimum speed the robot can travel at. If set to a non-zero value, the exit conditions will switch to
          * less accurate but smoother ones. Value between 0-127. 0 by default */
-        float minSpeed = 0;
+        float minSpeed = 20;
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;
@@ -482,6 +491,22 @@ class Chassis {
          * @endcode
          */
         void setBrakeMode(pros::motor_brake_mode_e mode);
+        /**
+         * @brief Sets the brake mode of the drivetrain motors
+         *
+         * @param mode Mode to set the drivetrain motors to
+         *
+         * @b Example
+         * @code {.cpp}
+         * // set the brake mode of the drivetrain motors to hold
+         * chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+         * // set the brake mode of the drivetrain motors to coast
+         * chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+         * // set the brake mode of the drivetrain motors to brake
+         * chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+         * @endcode
+         */
+        void setBrakeMode(pros::MotorBrake mode);
         /**
          * @brief Turn the chassis so it is facing the target point
          *
@@ -909,6 +934,9 @@ class Chassis {
          * @warning Do not interact with these unless you know what you are doing
          */
         PID angularPID;
+
+        ControllerSettings lateralSettings;
+        ControllerSettings angularSettings;
     protected:
         /**
          * @brief Indicates that this motion is queued and blocks current task until this motion reaches front of queue
@@ -924,8 +952,6 @@ class Chassis {
 
         float distTraveled = 0;
 
-        ControllerSettings lateralSettings;
-        ControllerSettings angularSettings;
         Drivetrain drivetrain;
         OdomSensors sensors;
         DriveCurve* throttleCurve;

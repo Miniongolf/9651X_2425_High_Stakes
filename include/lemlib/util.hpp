@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include <cmath> // IWYU pragma: keep
 #include <vector>
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/pose.hpp"
@@ -75,7 +75,10 @@ constexpr float degToRad(float deg) { return deg * M_PI / 180; }
  * sanitizeAngle(7 * M_PI); // returns pi
  * @endcode
  */
-float sanitizeAngle(float angle, bool radians = true);
+constexpr float sanitizeAngle(float angle, bool radians = true) {
+    if (radians) return std::fmod(std::fmod(angle, 2 * M_PI) + 2 * M_PI, 2 * M_PI);
+    else return std::fmod(std::fmod(angle, 360) + 360, 360);
+};
 
 /**
  * @brief Calculate the error between 2 angles. Useful when calculating the error between 2 headings

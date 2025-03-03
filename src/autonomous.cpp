@@ -1,6 +1,7 @@
-#include "helperFuncts.hpp"
 #include "main.h"
-#include "autonFuncts.hpp"
+#include "autonFuncts.hpp" // IWYU pragma: keep
+#include "robot/globals.hpp"
+#include "robot/helperFuncts.hpp" // IWYU pragma: keep
 
 /**
 * Runs the user autonomous code. This function will be started in its own task
@@ -14,28 +15,28 @@
 * from where it left off.
 */
 void autonomous() {
-    std::printf("isRedAlliance: %d\n", isRedAlliance);
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
-
+    // Reset stuffs
     chassis.setPose(0, 0, 0);
-    robot::releaseMogo();
-    doinker.retract();
-    robot::resumeTasks();
-    arm.moveToAngle(armPositions::standby, true);
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+    mogoMech.reset();
+    intake.idle(true);
 
-    auton::alternateAutoSkills();
-    // auton::tunePID(false);
-    // auton::soloAWP();
+    // Put the auton to run here
+    // chassis.chainTurnToHeading(45, true, false, 2000);
     // auton::tunePID(true);
-    // auton::testBoomerang();
-    // auton::blueMogoRush();
-    // auton::redMogoRush();
-    // auton::safeSAWP();
-    // auton::autoSkills();
-// // //    auton::scoreMax();
-// //    auton::rushRush();
-// //    auton::rushWP();
-    // auton::BruteForceAutoSkills();
+    // auton::ringRush();
+    // auton::skills();
+    auton::blueGoalRush();
+    // auton::twoRing(true);
+    // auton::safeAWP(false);
+    // chassis.pathInterp({
+    //     {48, 48},
+    //     {0, 0},
+    //     {0, 48, 300, 1000, {.forwards=false}, {.forwards=false}},
+    // }, false);
+    // robot::printPose();
 
+    chassis.waitUntilDone();
+    intake.idle(true);
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 }

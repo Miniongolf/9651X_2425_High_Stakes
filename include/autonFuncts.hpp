@@ -1,16 +1,23 @@
-#include "helperFuncts.hpp"
-
 #pragma once
 
-namespace auton {
-void tunePID(bool hasMogo);
-void testBoomerang();
-void safeSAWP();
-void soloAWP();
-void safeAWP();
-void autoSkills();
-void redMogoRush();
-void blueMogoRush();
+#include "robot/helperFuncts.hpp" // IWYU pragma: keep
+#include "units/units.hpp"
 
-void alternateAutoSkills();
+namespace auton {
+    extern int splitNum;
+    extern Time startTime;
+    void resetSplit();
+    void nextSplit(std::string name);
+
+    void twoRing(bool positive);
+    void safeAWP(bool positive);
+
+    void sigSAWP();
+
+    void skills();
+    void tunePID(bool hasMogo);
+    void ringRush();
+    void blueGoalRush();
+    void newBlueGoalRush();
+    void goalRush();
 }
