@@ -43,24 +43,24 @@ void auton::safeAWP(bool positive) {
     int s = (robotAlliance == Alliance::RED) ? 1 : -1;
     int p = positive ? 1 : -1;
     chassis.setPose(-55 * s, -13 * p, 0 + 90 * (p - 1));
+    pros::delay(2000);
     // Alliance stake
     chassis.moveToPoint(-55 * s, 9.5 * p, 750, {.maxSpeed = 80});
     chassis.swingToHeading(90 * s, lemlib::DriveSide::LEFT * s * p, 800, {.minSpeed = 0});
     chassis.moveTimed(-70, 0, 500);
     robot::scoreAllianceStake();
-
     // Grab mogo
     chassis.moveTimed(50, 20 * s, 300);
-    chassis.turnToPoint(-24*s, -24*p, 750, {.forwards = false});
-    chassis.moveToPoint(-24*s, -24*p, 1000, {.forwards = false, .minSpeed = 50, .earlyExitRange = 24}, false);
+    chassis.turnToPoint(-24 * s, -24 * p, 750, {.forwards = false});
+    chassis.moveToPoint(-24 * s, -24 * p, 1000, {.forwards = false, .minSpeed = 50, .earlyExitRange = 24}, false);
     chassis.brake();
-    chassis.moveToPoint(-24*s, -24*p, 1000, {.forwards = false, .maxSpeed = 50}, false);
+    chassis.moveToPoint(-24 * s, -24 * p, 1000, {.forwards = false, .maxSpeed = 50}, false);
     mogoMech.clamp();
 
     // Grab ring
     intake.forwards();
     chassis.safeMoveToPoint(-27 * s, -42 * p, 1000);
-    chassis.moveTimed(-50, 0, 100);
+    chassis.moveTimed(-50, 0, 100, false);
 
     // Corner
     if (robotAlliance == Alliance::RED) {
@@ -72,10 +72,10 @@ void auton::safeAWP(bool positive) {
             doinker.extend();
             chassis.moveTimed(30, 0, 500);
         } else {
-            chassis.safeMoveToPoint(-11, 45, 1000);
-            chassis.moveTimed(-60, -30, 500);
-            chassis.safeMoveToPoint(-11, 41, 1000, {.maxSpeed = 60});
-            chassis.moveToPoint(-36, 36, 1000, {.forwards = false}, false);
+            // chassis.safeMoveToPoint(-11, 45, 1000);
+            // chassis.moveTimed(-60, -30, 500);
+            // chassis.safeMoveToPoint(-11, 41, 1000, {.maxSpeed = 60});
+            // chassis.moveToPoint(-36, 36, 1000, {.forwards = false}, false);
             // chassis.safeMoveToPoint(-55, 55, 1000);
             // chassis.turnToHeading(-45, 750);
             // chassis.moveTimed(80, 0, 1000, false);
@@ -93,19 +93,22 @@ void auton::safeAWP(bool positive) {
             chassis.turnToHeading(-90, 750, {.minSpeed = 127}, false);
             doinker.retract();
         } else {
-            chassis.moveTimed(-50, -50, 700);
-            chassis.safeMoveToPoint(20, 37, 1500, {.maxSpeed = 60}, false);
-            chassis.moveTimed(-60, -30, 500, false);
-            chassis.safeMoveToPoint(20, 42, 1500, {.maxSpeed = 60}, false);
-            pros::delay(300);
-            chassis.moveToPoint(36, 36, 1000, {.forwards = false}, false);
+            // chassis.moveTimed(-50, -50, 700);
+            // chassis.safeMoveToPoint(20, 37, 1500, {.maxSpeed = 60}, false);
+            // chassis.moveTimed(-60, -30, 500, false);
+            // chassis.safeMoveToPoint(20, 42, 1500, {.maxSpeed = 60}, false);
+            // pros::delay(300);
+            // chassis.moveToPoint(36, 36, 1000, {.forwards = false}, false);
         }
     }
+    pros::delay(1000);
     arm.moveToPosition(Arm::wall);
     chassis.turnToPoint(0, 0, 1000, {}, true);
     pros::delay(1000);
     intake.idle();
     // pros::delay(300);
+    chassis.moveToPoint(-32 * s, -32 * p, 1500, {.maxSpeed = 60}, false);
+    chassis.turnToPoint(-16 * s, -16 * p, 1000);
     chassis.moveToPoint(-16 * s, -16 * p, 1500, {.maxSpeed = 60}, false);
     robot::printPose();
     nextSplit("Touch bar");

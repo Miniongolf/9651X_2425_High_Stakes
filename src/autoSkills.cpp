@@ -19,7 +19,6 @@ void auton::skills() {
     // Set colour sort to red alliance
     intake.setAlliance(Alliance::RED);
     // Start pose (in front of alliance stake)
-    /*
     chassis.setPose(-64, 0, 90);
     intake.forwards();
     pros::delay(700);
@@ -68,9 +67,8 @@ void auton::skills() {
     pros::delay(600);
     robot::scoreWallStake(true, true);
     robot::printPose();
-    */
 
-    chassis.setPose(5, 61, 0); // Odom reset on top wallstake, don't preserve imu heading
+    // chassis.setPose(5, 61, 0); // Odom reset on top wallstake, don't preserve imu heading
     pros::delay(10);
     nextSplit("Top wallstake");
 
@@ -141,19 +139,23 @@ void auton::skills() {
     intake.setMode(Intake::modes::CONTINUOUS);
     intake.forwards();
     chassis.safeMoveToPoint(-24, -48, 1000);
-    chassis.safeMoveToPoint(0, -60, 1000);
+    chassis.safeMoveToPoint(0, -54, 1000);
     chassis.safeMoveToPoint(46, -60, 1000);
     chassis.safeMoveToPoint(48, -48, 1000);
     chassis.safeMoveToPoint(24, -48, 1000, false);
     chassis.safeMoveToPoint(55, -55, 1000, {.forwards = false}, false);
     mogoMech.release(true);
+    intake.idle();
     chassis.moveTimed(-50, 0, 500);
     chassis.safeMoveToPoint(24, -24, 1000, false);
     chassis.turnToPoint(0, 0, 750);
     arm.moveToPosition(Arm::hang);
-    chassis.moveTimed(127, 0, 500);
-    chassis.moveTimed(70, 0, 1250, false);
+    chassis.moveToPoint(20, -20, 1000, {}, false);
+    chassis.brake();
+    chassis.moveTimed(90, 0, 2000, false);
     arm.moveToPosition(Arm::idle);
     pros::delay(1500);
     arm.moveToPosition(Arm::hang);
+    nextSplit("Hang");
+    pros::delay(2000);
 }
